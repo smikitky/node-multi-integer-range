@@ -6,7 +6,7 @@ export class MultiRange {
 	/**
 	 * Creates a new MultiRange object.
 	 */
-	constructor(data: string | number[] | MultiRange)
+	constructor(data?: string | number[] | MultiRange)
 	{
 		this.ranges = [];
 		if (typeof data === 'string') {
