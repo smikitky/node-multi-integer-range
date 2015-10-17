@@ -1,4 +1,4 @@
-var MultiRange = require('../js/multi-integer-range').MultiRange;
+var MultiRange = require('../lib/multi-integer-range').MultiRange;
 var assert = require('chai').assert;
 
 describe('MultiRange', function() {
