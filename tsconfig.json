@@ -3,7 +3,7 @@
 		"multi-integer-range.ts"
 	],
 	"compilerOptions": {
-		"outDir": "js",
+		"outDir": "lib",
 		"target": "es5",
 		"module": "UMD",
 		"newLine": "LF",

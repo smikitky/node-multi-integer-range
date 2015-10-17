@@ -1,9 +1,9 @@
 {
   "name": "multi-integer-range",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parses and manipulates multiple comma-separated integer ranges (eg \"1-3,8-10\")",
   "repository": "https://github.com/smikitky/node-multi-integer-range.git",
-  "main": "./js/multi-integer-range.js",
+  "main": "./lib/multi-integer-range.js",
   "scripts": {
     "test": "node_modules/.bin/mocha",
     "build": "node_modules/.bin/tsc"
