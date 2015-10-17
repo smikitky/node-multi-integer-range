@@ -86,16 +86,6 @@ Currently there is no built-in iterators/generators support,
 but you can easily write your own generators to iterate over a MultiRange.
 An example is found in `examples/iterator-generator.js`.
 
-## TypeScript Definition (optional)
-
-The main logic is written in TypeScript, and this library
-comes with type definition file (`*.d.ts`).
-Inside your TS project, You can just type
-`import MultiRange = require('multi-int-ranges')`
-and enjoy the type safety (TypeScript >= 1.6).
-
-Of course you can use this library without TypeScript.
-
 ## Use in Browsers
 
 This library should be Browserify-friendly,
@@ -113,7 +103,7 @@ npm test
 
 ### Bugs
 
-Plese GitHub issues and pull requests.
+Use GitHub issues.
 
 ## Author
 
