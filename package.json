@@ -1,0 +1,26 @@
+{
+  "name": "multi-integer-range",
+  "version": "1.0.0",
+  "description": "Parses and manipulates multiple comma-separated integer ranges (eg \"1-3,8-10\")",
+  "repository": "https://github.com/smikitky/node-multi-integer-range.git",
+  "main": "./js/multi-integer-range.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha",
+    "build": "node_modules/.bin/tsc"
+  },
+  "keywords": [
+    "integer",
+    "range",
+    "page",
+    "multiple",
+    "parseInt",
+    "parse"
+  ],
+  "author": "Soichiro Miki",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "typescript": "^1.6.2"
+  }
+}

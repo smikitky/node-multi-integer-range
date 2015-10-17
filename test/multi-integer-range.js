@@ -1,0 +1,150 @@
+var MultiRange = require('../js/multi-integer-range').MultiRange;
+var assert = require('chai').assert;
+
+describe('MultiRange', function() {
+	function mr(init) {
+		return new MultiRange(init);
+	}
+
+	function t(mr, expected) {
+		assert.strictEqual(mr.toString(), expected);
+	}
+
+	describe('constructor', function() {
+		it('must initialize with a string', function() {
+			t(mr(''), '');
+			t(mr('5'), '5');
+			t(mr('1-3,5,7-10'), '1-3,5,7-10');
+			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
+		});
+
+		it('must accept ranges with random/reverse order', function() {
+			t(mr('1,8,2-4,7,5-6,10-9'), '1-10');
+			t(mr('10-8,7-5,1-4'), '1-10');
+		});
+
+		it('must initialize with a array', function() {
+			t(mr([1,10,8,5,9]), '1,5,8-10');
+		});
+
+		it('must construct with existing MultiRange', function() {
+			t(new MultiRange(mr('5-10')), '5-10');
+		});
+
+		it('must throw an error for invalid input', function() {
+			assert.throws(function() { mr('abc'); }, SyntaxError);
+			assert.throws(function() { mr('1.5'); }, SyntaxError);
+			assert.throws(function() { mr('2-5,8-10,*,99'); }, SyntaxError);
+			assert.throws(function() { mr(','); }, SyntaxError);
+			assert.throws(function() { mr('-'); }, SyntaxError);
+			assert.throws(function() { mr(15); }, TypeError);
+			assert.throws(function() { mr(null); }, TypeError);
+			assert.doesNotThrow(function() { mr(undefined); }, Error);
+			assert.doesNotThrow(function() { mr(); }, Error);
+			assert.doesNotThrow(function() { mr(''); }, Error);
+		});
+	});
+
+
+	describe('#append', function() {
+		it('must append by number', function() {
+			t(mr('5-10').append(5), '5-10');
+			t(mr('5-10').append(8), '5-10');
+			t(mr('5-10').append(10), '5-10');
+			t(mr('5-10').append(11), '5-11');
+			t(mr('5-10').append(4), '4-10');
+			t(mr('5-10').append(15), '5-10,15');
+			t(mr('5-10').append(1), '1,5-10');
+			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
+			t(mr('5-10,15-20').append(3), '3,5-10,15-20');
+			t(mr('5-10,15-20').append(25), '5-10,15-20,25');
+		});
+		it('must append range resulting in concatenation', function() {
+			t(mr('1-10,12-15,17-20').append(11), '1-15,17-20');
+			t(mr('1-10,12-15,17-20').appendRange(1,100), '1-100');
+			t(mr('1-10,12-15,17-20,100').appendRange(5,14), '1-15,17-20,100');
+			t(mr('1-10,12-15,17-20').appendRange(14,19), '1-10,12-20');
+		});
+		it('must append using string', function() {
+			t(mr('5-10,15-20').append('11-14,21-25'), '5-25');
+		});
+		it('must append using another MultiRange', function() {
+			t(mr('5-10,15-20').append(mr('11-14,21-25')), '5-25');
+		});
+	});
+
+	describe('#substract', function() {
+		it('must subtract a value', function() {
+			t(mr('1-10').subtract(100), '1-10');
+			t(mr('1-10').subtract(0), '1-10');
+			t(mr('1-10').subtract(11), '1-10');
+			t(mr('1-10').subtract(1), '2-10');
+			t(mr('1-10').subtract(10), '1-9');
+		});
+		it('must subtract range resulting in devision', function() {
+			t(mr('1-10').subtractRange(1, 10), '');
+			t(mr('1-10').subtractRange(5, 8), '1-4,9-10');
+			t(mr('1-10,20-30').subtractRange(11, 19), '1-10,20-30');
+			t(mr('1-10,20-30').subtractRange(5, 25), '1-4,26-30');
+		});
+		it('must subtract using string', function() {
+			t(mr('1-20').subtract('5,10-15'), '1-4,6-9,16-20');
+		});
+		it('must subtract using another MultiRange', function() {
+			t(mr('1-20').subtract(new mr('5,10-15')), '1-4,6-9,16-20');
+		});
+	});
+
+	it('#has', function() {
+		assert.isTrue(mr('5-20,25-100,150-300').has(7));
+		assert.isTrue(mr('5-20,25-100,150-300').has(25));
+		assert.isTrue(mr('5-20,25-100,150-300').has(300));
+		assert.isFalse(mr('5-20,25-100,150-300').has(2));
+		assert.isFalse(mr('5-20,25-100,150-300').has(125));
+		assert.isFalse(mr('5-20,25-100,150-300').has(500));
+	});
+
+	it('#isContinuous', function() {
+		assert.isTrue(mr('1').isContinuous());
+		assert.isTrue(mr('5-10').isContinuous());
+		assert.isFalse(mr('').isContinuous());
+		assert.isFalse(mr('5-10,12-15').isContinuous());
+	});
+
+	it('#length', function() {
+		assert.equal(mr('').length(), 0);
+		assert.equal(mr('5').length(), 1);
+		assert.equal(mr('5-10').length(), 6);
+		assert.equal(mr('1,3,10-15,20-21').length(), 10);
+	});
+
+	it('#equals', function() {
+		assert.isTrue(mr('').equals(''));
+		assert.isTrue(mr('5').equals(mr('5')));
+		assert.isTrue(mr('2-8').equals('2-8'));
+		assert.isTrue(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20'));
+		assert.isFalse(mr('').equals('5'));
+		assert.isFalse(mr('5').equals('5-6'));
+		assert.isFalse(mr('2-8').equals('2-7'));
+		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
+	});
+
+	it('#toString', function() {
+		assert.equal('' + mr('15-20'), '15-20');
+	});
+
+	it('#toArray', function() {
+		assert.deepEqual(mr('').toArray(), []);
+		assert.deepEqual(mr('2').toArray(), [2]);
+		assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
+		assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
+	});
+
+	it('must not change the internal data after getRanges()', function() {
+		var a = mr('5,12-15,100');
+		var ranges = a.getRanges();
+		ranges[0][1] = 7;
+		ranges[1][0] = 14;
+		t(a, '5,12-15,100');
+	});
+});
