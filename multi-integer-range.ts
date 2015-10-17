@@ -33,6 +33,12 @@ export class MultiRange {
 		}
 	}
 
+	public clone(): MultiRange {
+		var result = new MultiRange();
+		result.ranges = this.getRanges();
+		return result;
+	}
+
 	/**
 	 * Appends range to this instance.
 	 */
@@ -40,7 +46,7 @@ export class MultiRange {
 		if (typeof value === 'number') {
 			return this.appendRange(value, value);
 		} else if (value instanceof MultiRange) {
-			value.getRanges().forEach(r => this.appendRange(r[0], r[1]));
+			value.ranges.forEach(r => this.appendRange(r[0], r[1]));
 			return this;
 		} else if (typeof value === 'string') {
 			return this.append(new MultiRange(value));
