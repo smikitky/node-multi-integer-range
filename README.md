@@ -1,5 +1,7 @@
 # multi-integer-range
 
+[![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=master)](https://travis-ci.org/smikitky/node-multi-integer-range)
+
 A library which parses and manipulates comma-delimited positive integer ranges (such as "1-3,8-10").
 
 Such strings are typically used in print dialogs to indicate which pages to print.
