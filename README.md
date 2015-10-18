@@ -109,15 +109,14 @@ for (let page of pages) {
 ```
 
 If `Symbol.iterator` is not defined, you can still access the iterator
-implementation and use it like this:
+implementation and use it manually like this:
 
 ```
-var pages = new MultiRange('2,5-7');
-var it = pages.getIterator();
-var page = it.next();
-while (!page.done) {
+var pages = new MultiRange('2,5-7'),
+    it = pages.getIterator(),
+    page;
+while (!(page = it.next()).done) {
     console.log(page.value);
-    page = it.next();
 }
 ```
 
