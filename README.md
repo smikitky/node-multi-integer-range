@@ -122,8 +122,7 @@ while (!(page = it.next()).done) {
 
 ## Use in Browsers
 
-This library should be Browserify-friendly,
-but you need ES5 Array iterator polyfill for IE8 support.
+This library should be Browserify-friendly.
 
 ## Development
 

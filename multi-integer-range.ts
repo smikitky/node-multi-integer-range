@@ -14,7 +14,7 @@ export class MultiRange {
 		if (typeof data === 'string') {
 			let s = data.replace(/\s/g, '');
 			if (s.length == 0) return;
-			s.split(',').forEach(r => {
+			for (let r of s.split(',')) {
 				let match = r.match(/^(\d+)(\-(\d+))?$/);
 				if (match) {
 					if (typeof match[3] !== 'undefined') {
@@ -25,18 +25,18 @@ export class MultiRange {
 				} else {
 					throw new SyntaxError('Invalid input');
 				}
-			});
+			};
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
 		} else if (data instanceof Array){
-			data.forEach(n => this.append(n));
+			for (let n of data) this.append(n);
 		} else if (typeof data !== 'undefined') {
 			throw new TypeError('Invalid input');
 		}
 	}
 
 	public clone(): MultiRange {
-		var result = new MultiRange();
+		let result = new MultiRange();
 		result.ranges = this.getRanges();
 		return result;
 	}
@@ -48,7 +48,7 @@ export class MultiRange {
 		if (typeof value === 'number') {
 			return this.appendRange(value, value);
 		} else if (value instanceof MultiRange) {
-			value.ranges.forEach(r => this.appendRange(r[0], r[1]));
+			for (let r of value.ranges) this.appendRange(r[0], r[1]);
 			return this;
 		} else if (typeof value === 'string') {
 			return this.append(new MultiRange(value));
@@ -63,11 +63,11 @@ export class MultiRange {
 	 * @param max The minimum value of the range to append.
 	 */
 	public appendRange(min: number, max: number): MultiRange {
-		var newRange: Range = [Math.max(0, min), max];
+		let newRange: Range = [Math.max(0, min), max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
-		var overlap = this.findOverlap(newRange);
+		let overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);
 		return this;
 	}
@@ -79,7 +79,7 @@ export class MultiRange {
 		if (typeof value === 'number') {
 			return this.subtractRange(value, value);
 		} else if (value instanceof MultiRange) {
-			value.getRanges().forEach(r => this.subtractRange(r[0], r[1]));
+			for (let r of value.ranges) this.subtractRange(r[0], r[1]);
 			return this;
 		} else if (typeof value === 'string') {
 			return this.subtract(new MultiRange(value));
@@ -93,13 +93,13 @@ export class MultiRange {
 	 */
 	public subtractRange(min: number, max: number): MultiRange
 	{
-		var newRange: Range = [Math.max(0, min), max];
+		let newRange: Range = [Math.max(0, min), max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
-		var overlap = this.findOverlap(newRange);
+		let overlap = this.findOverlap(newRange);
 		if (overlap.count > 0) {
-			var remain = [];
+			let remain = [];
 			if (this.ranges[overlap.lo][0] < newRange[0]) {
 				remain.push([this.ranges[overlap.lo][0], newRange[0] - 1]);
 			}
@@ -119,12 +119,12 @@ export class MultiRange {
 	 */
 	private findOverlap(target: Range): { lo: number; count: number; union: Range }
 	{
-		var lim = this.ranges.length;
-		for (var lo = 0; lo < lim; lo++) {
-			var r = this.ranges[lo];
-			var union;
+		let lim = this.ranges.length;
+		for (let lo = 0; lo < lim; lo++) {
+			let r = this.ranges[lo];
+			let union;
 			if (union = this.calcUnion(r, target)) {
-				var count = 1;
+				let count = 1;
 				let tmp;
 				while ((lo + count < lim) && (tmp = this.calcUnion(union, this.ranges[lo+count]))) {
 					union = tmp;
@@ -160,7 +160,9 @@ export class MultiRange {
 	 */
 	public getRanges(): Range[]
 	{
-		return this.ranges.map(r => <Range>[r[0], r[1]]);
+		let result = []
+		for (let r of this.ranges) result.push(<Range>[r[0], r[1]]);
+		return result;
 	}
 
 	/**
@@ -170,7 +172,7 @@ export class MultiRange {
 	 */
 	public has(value: number): boolean
 	{
-		for (var r of this.ranges) {
+		for (let r of this.ranges) {
 			if (value >= r[0] && value <= r[1]) {
 				return true;
 			}
@@ -197,8 +199,8 @@ export class MultiRange {
 	 * @return The number of integer values in this instance.
 	 */
 	public length(): number {
-		var result = 0;
-		this.ranges.forEach(r => result += r[1] - r[0] + 1);
+		let result = 0;
+		for (let r of this.ranges) result += r[1] - r[0] + 1;
 		return result;
 	}
 
@@ -214,7 +216,7 @@ export class MultiRange {
 		} else {
 			if (cmp === this) return true;
 			if (this.ranges.length !== cmp.ranges.length) return false;
-			for (var i = 0; i < this.ranges.length; i++) {
+			for (let i = 0; i < this.ranges.length; i++) {
 				if (this.ranges[i][0] !== cmp.ranges[i][0] || this.ranges[i][1] !== cmp.ranges[i][1])
 					return false;
 			}
@@ -227,12 +229,10 @@ export class MultiRange {
 	 */
 	public toString(): string
 	{
-		return this.ranges
-			.map(r =>
-				r[0] == r[1]
-				? '' + r[0]
-				: r[0] + '-' + r[1])
-			.join(',');
+		let ranges = [];
+		for (let r of this.ranges)
+			ranges.push(r[0] == r[1] ? String(r[0]) : r[0] + '-' + r[1]);
+		return ranges.join(',');
 	}
 
 	/**
@@ -241,10 +241,10 @@ export class MultiRange {
 	 */
 	public toArray(): number[]
 	{
-		var result = new Array(this.length());
-		var idx = 0;
-		for (var r of this.ranges) {
-			for (var n = r[0]; n <= r[1]; n++) {
+		let result = new Array(this.length());
+		let idx = 0;
+		for (let r of this.ranges) {
+			for (let n = r[0]; n <= r[1]; n++) {
 				result[idx++] = n;
 			}
 		}
@@ -253,16 +253,15 @@ export class MultiRange {
 
 	public getIterator(): { next: () => { done?: boolean, value?: number }}
 	{
-		var i = 0,
-			ranges: Range[] = this.ranges,
-			curRange: Range = ranges[i],
+		let i = 0,
+			curRange: Range = this.ranges[i],
 			j = curRange ? curRange[0] : undefined;
 		return {
 			next: () => {
 				if (!curRange) return { done: true };
-				var ret = j;
+				let ret = j;
 				if (++j > curRange[1]) {
-					curRange = ranges[++i];
+					curRange = this.ranges[++i];
 					j = curRange ? curRange[0] : undefined;
 				}
 				return { value: ret };
@@ -272,7 +271,7 @@ export class MultiRange {
 
 }
 
-// ES6 iterator, if Symbol.iterator is defined
-if (typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol') {
+// Set ES6 iterator, if Symbol.iterator is defined
+if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
 	MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
 }
