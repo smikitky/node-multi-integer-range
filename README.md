@@ -33,13 +33,13 @@ var mr3 = new MultiRange(mr);
 Internal data are always sorted and normalized,
 so the above three constructor create instances with identical data.
 
-The string parser is permissive, accepting space characters
+The string parser is permissive and accepts space characters
 before/after comma/hyphens. Order is not important either, and
 overlapped numbers are silently ignored.
 
 ```
 var mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
-console.log(mr.equals('2-10')); // prints true
+console.log(mr.toString()); // prints '2-10'
 ```
 
 ### Manipulation and Comparison
@@ -65,6 +65,12 @@ console.log(mr.equals('1,9-12,13,14,15')); // true
 // Inclusion check
 console.log(mr.has(10)); // true
 console.log(mr.has(100)); // false
+
+// Length (the total number of integers)
+console.log(mr.length()); // 10
+
+// Continuity
+console.log(mr.isContinuous()); // false
 ```
 
 ### Output
@@ -89,18 +95,29 @@ console.log(mr.getRanges()); // [[1,3],[5,8]]
 
 ### Iteration
 
-A quick-and-dirty way to iterate over a MultiRange is something like this:
+**ES6 iterator**: If `Symbol.iterator` is defined in the runtime,
+you can simply iterate over the instance using the `for ... of` statement:
 
 ```
-var pages = (new MultiRange('1-10')).toArray();
-for (var i = 0; i < pages.length; i++) {
-  console.log(pages[i]);
+var pages = new MultiRange('2,5-7');
+for (let page of pages) {
+    console.log(page);
+}
+// prints 2, 5, 6, 7
+```
+
+If `Symbol.iterator` is not defined, you can still access the iterator
+implementation and use it like this:
+
+```
+var pages = new MultiRange('2,5-7');
+var it = pages.getIterator();
+var page = it.next();
+while (!page.done) {
+    console.log(page.value);
+    page = it.next();
 }
 ```
-
-Currently there is no built-in iterators/generators support,
-but you can easily write your own generators to iterate over a MultiRange.
-An example is found in `examples/iterator-generator.js`.
 
 ## Use in Browsers
 

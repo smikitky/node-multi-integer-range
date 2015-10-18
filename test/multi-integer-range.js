@@ -147,6 +147,46 @@ describe('MultiRange', function() {
 		assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
 	});
 
+	describe('Iteration', function() {
+		it('#getIterator', function() {
+			function testIter(mr, expected) {
+				var it = mr.getIterator();
+				var i = 0;
+				var val = it.next();
+				while (!val.done) {
+					assert.equal(val.value, expected[i++], 'iterator returned unexpected value');
+					val = it.next();
+				}
+				assert.equal(i, expected.length, 'iterator returned less elements than expected	');
+			}
+			testIter(mr(''), []);
+			testIter(mr('8'), [8]);
+			testIter(mr('2-5'), [2,3,4,5]);
+			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
+		});
+
+		if (typeof Symbol.iterator !== 'symbol') {
+			it.skip('ES6 iterator');
+			return;
+		}
+
+		it('ES6 iterator', function() {
+			function testIter(mr, expected) {
+				var i = 0;
+				for (var item of mr) {
+					assert.equal(item, expected[i++]);
+				}
+				assert.equal(i, expected.length);
+			}
+			testIter(mr(''), []);
+			testIter(mr('8'), [8]);
+			testIter(mr('2-5'), [2,3,4,5]);
+			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
+		});
+
+	});
+
+
 	it('must not change the internal data after getRanges()', function() {
 		var a = mr('5,12-15,100');
 		var ranges = a.getRanges();

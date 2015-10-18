@@ -1,5 +1,7 @@
 export type Range = [number, number];
 
+declare var Symbol: any;
+
 export class MultiRange {
 	private ranges: Range[];
 
@@ -249,4 +251,28 @@ export class MultiRange {
 		return result;
 	}
 
+	public getIterator(): { next: () => { done?: boolean, value?: number }}
+	{
+		var i = 0,
+			ranges: Range[] = this.ranges,
+			curRange: Range = ranges[i],
+			j = curRange ? curRange[0] : undefined;
+		return {
+			next: () => {
+				if (!curRange) return { done: true };
+				var ret = j;
+				if (++j > curRange[1]) {
+					curRange = ranges[++i];
+					j = curRange ? curRange[0] : undefined;
+				}
+				return { value: ret };
+			}
+		}
+	}
+
+}
+
+// ES6 iterator, if Symbol.iterator is defined
+if (typeof Symbol == 'function' && typeof Symbol.iterator == 'symbol') {
+	MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
 }
