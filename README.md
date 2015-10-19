@@ -24,7 +24,7 @@ Install via npm: `npm install multi-integer-range`
 
 Initialization can be done with an integer array, a string, or another MultiRange instance.
 
-```
+```js
 var MultiRange = require('multi-integer-range').MultiRange;
 
 var mr = new MultiRange([7, 2, 9, 1, 8, 3]);
@@ -39,14 +39,14 @@ The string parser is permissive and accepts space characters
 before/after comma/hyphens. Order is not important either, and
 overlapped numbers are silently ignored.
 
-```
+```js
 var mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
 console.log(mr.toString()); // prints '2-10'
 ```
 
 ### Manipulation and Comparison
 
-```
+```js
 var mr = new MultiRange('1-3,7-9');
 
 // Addition
@@ -79,7 +79,7 @@ console.log(mr.isContinuous()); // false
 
 There are several ways to get the content of the MultiRange object.
 
-```
+```js
 var mr = new MultiRange([1,2,3,5,6,7,8]);
 
 // As a string
@@ -100,7 +100,7 @@ console.log(mr.getRanges()); // [[1,3],[5,8]]
 **ES6 iterator**: If `Symbol.iterator` is defined in the runtime,
 you can simply iterate over the instance using the `for ... of` statement:
 
-```
+```js
 var pages = new MultiRange('2,5-7');
 for (let page of pages) {
     console.log(page);
@@ -111,7 +111,7 @@ for (let page of pages) {
 If `Symbol.iterator` is not defined, you can still access the iterator
 implementation and use it manually like this:
 
-```
+```js
 var pages = new MultiRange('2,5-7'),
     it = pages.getIterator(),
     page;
