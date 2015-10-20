@@ -78,6 +78,10 @@ describe('MultiRange', function() {
 		it('must append using another MultiRange', function() {
 			t(mr('5-10,15-20').append(mr('11-14,21-25')), '5-25');
 		});
+		it('must be chainable', function() {
+			t(mr('1-50').append(60).append('70').append(mr([80])).appendRange(90,90),
+				'1-50,60,70,80,90');
+		});
 	});
 
 	describe('#substract', function() {
@@ -99,6 +103,10 @@ describe('MultiRange', function() {
 		});
 		it('must subtract using another MultiRange', function() {
 			t(mr('1-20').subtract(new mr('5,10-15')), '1-4,6-9,16-20');
+		});
+		it('must be chainable', function() {
+			t(mr('1-50').subtract(40).subtract('30').subtract(mr([20])).subtractRange(10,10),
+				'1-9,11-19,21-29,31-39,41-50');
 		});
 	});
 
