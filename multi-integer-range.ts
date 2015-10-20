@@ -1,3 +1,5 @@
+/*! multi-integer-range (c) 2015 Soichiro Miki */
+
 export type Range = [number, number];
 
 declare var Symbol: any;
@@ -35,6 +37,9 @@ export class MultiRange {
 		}
 	}
 
+	/**
+	 * Clones this instance.
+	 */
 	public clone(): MultiRange {
 		let result = new MultiRange();
 		result.ranges = this.getRanges();
@@ -112,13 +117,35 @@ export class MultiRange {
 	}
 
 	/**
-	 * Determines how the given range overlaps the existing ranges.
+	 * Determines how the given range overlaps or touches the existing ranges.
+	 * This is a helper method that calculates how an append/subtract operation
+	 * affects the existing range members.
 	 * @param target The range array to test.
 	 * @return An object containing information about how the given range
-	 * overlaps this instance.
+	 * overlaps or touches this instance.
 	 */
 	private findOverlap(target: Range): { lo: number; count: number; union: Range }
 	{
+		//   a        b  c     d         e  f       g h i   j k  l       m
+		//--------------------------------------------------------------------
+		//   |----(0)----|     |---(1)---|  |---(2)---|          |--(3)--|
+		//            |------------(A)--------------|
+		//                                            |-(B)-|
+		//                                              |-(C)-|
+		//
+		// (0)-(3) represent the existing ranges (this.ranges),
+		// and (A)-(C) are the ranges being passed to this function.
+		//
+		// A pseudocode findOverlap(A) returns { lo: 0, count: 3, union: <a-h> },
+		// meaning (A) overlaps the 3 existing ranges from index 0.
+		//
+		// findOverlap(B) returns { lo: 2, count: 1, union: <f-j> },
+		// meaning (B) "touches" one range element, (2).
+		//
+		// findOverlap(C) returns { lo: 3, count: 0, union: <i-k> }
+		// meaning (C) is between (2) and (3) but overlaps/touches neither of them.
+		//
+
 		let lim = this.ranges.length;
 		for (let lo = 0; lo < lim; lo++) {
 			let r = this.ranges[lo];
@@ -137,9 +164,10 @@ export class MultiRange {
 				return { lo, count: 0, union: target }
 			}
 		}
-		// The given target does not touch nor overlap the existing ranges
+		// The given target is larger than the largest existing range
 		return { lo: lim, count: 0, union: target };
 	}
+
 
 	/**
 	 * Calculates the union of two specified ranges.
