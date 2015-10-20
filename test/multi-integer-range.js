@@ -1,10 +1,10 @@
-var MultiRange = require('../lib/multi-integer-range').MultiRange;
+var multi_integer_range = require('../lib/multi-integer-range');
+var MultiRange = multi_integer_range.MultiRange;
+var multirange = multi_integer_range.multirange;
 var assert = require('chai').assert;
 
 describe('MultiRange', function() {
-	function mr(init) {
-		return new MultiRange(init);
-	}
+	var mr = multirange;
 
 	function t(mr, expected) {
 		assert.strictEqual(mr.toString(), expected);

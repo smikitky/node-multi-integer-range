@@ -23,17 +23,23 @@ Install via npm: `npm install multi-integer-range`
 ### Initialization
 
 Initialization can be done with an integer array, a string, or another MultiRange instance.
+A shorthand constructor function `multirange()` is also available.
+Use whichever you prefer.
 
 ```js
 var MultiRange = require('multi-integer-range').MultiRange;
 
-var mr = new MultiRange([7, 2, 9, 1, 8, 3]);
+var mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
 var mr2 = new MultiRange('1-2, 3, 7-9');
-var mr3 = new MultiRange(mr);
+var mr3 = new MultiRange(mr1);
+
+// function-style
+var multirange = require('multi-integer-range').multirange;
+var mr4 = multirange('1,2,3,7,8,9'); // the same as `new MultiRange`
 ```
 
 Internal data are always sorted and normalized,
-so the above three constructor create instances with identical data.
+so the above four (`mr1`-`mr4`) hold a instance with identical range data.
 
 The string parser is permissive and accepts space characters
 before/after comma/hyphens. Order is not important either, and
@@ -101,8 +107,7 @@ console.log(mr.getRanges()); // [[1,3],[5,8]]
 you can simply iterate over the instance using the `for ... of` statement:
 
 ```js
-var pages = new MultiRange('2,5-7');
-for (let page of pages) {
+for (let page of multirange('2,5-7')) {
     console.log(page);
 }
 // prints 2, 5, 6, 7
@@ -112,8 +117,7 @@ If `Symbol.iterator` is not defined, you can still access the iterator
 implementation and use it manually like this:
 
 ```js
-var pages = new MultiRange('2,5-7'),
-    it = pages.getIterator(),
+var it = multirange('2,5-7').getIterator(),
     page;
 while (!(page = it.next()).done) {
     console.log(page.value);

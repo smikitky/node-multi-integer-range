@@ -275,3 +275,8 @@ export class MultiRange {
 if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
 	MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
 }
+
+// A shorthand function to get a new MultiRange instance
+export function multirange(data: string | number[] | MultiRange): MultiRange {
+	return new MultiRange(data);
+}
