@@ -75,7 +75,7 @@ console.log(mr.has(10)); // true
 console.log(mr.has(100)); // false
 
 // Length (the total number of integers)
-console.log(mr.length()); // 10
+console.log(mr.length()); // prints 8
 
 // Continuity
 console.log(mr.isContinuous()); // false
