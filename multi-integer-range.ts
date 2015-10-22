@@ -10,24 +10,10 @@ export class MultiRange {
 	/**
 	 * Creates a new MultiRange object.
 	 */
-	constructor(data?: string | number[] | MultiRange)
-	{
+	constructor(data?: string | number[] | MultiRange) {
 		this.ranges = [];
 		if (typeof data === 'string') {
-			let s = data.replace(/\s/g, '');
-			if (s.length == 0) return;
-			for (let r of s.split(',')) {
-				let match = r.match(/^(\d+)(\-(\d+))?$/);
-				if (match) {
-					if (typeof match[3] !== 'undefined') {
-						this.appendRange(parseInt(match[1]), parseInt(match[3]));
-					} else {
-						this.append(parseInt(match[1]));
-					}
-				} else {
-					throw new SyntaxError('Invalid input');
-				}
-			};
+			this.parseString(data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
 		} else if (data instanceof Array){
@@ -35,6 +21,27 @@ export class MultiRange {
 		} else if (typeof data !== 'undefined') {
 			throw new TypeError('Invalid input');
 		}
+	}
+
+	/**
+	 * Parses the initialize string and build the range data.
+	 * Override this if you need to customize the parsing strategy.
+	 */
+	protected parseString(data: string): void {
+		let s = data.replace(/\s/g, '');
+		if (s.length === 0) return;
+		for (let r of s.split(',')) {
+			let match = r.match(/^(\d+)(\-(\d+))?$/);
+			if (match) {
+				if (typeof match[3] !== 'undefined') {
+					this.appendRange(parseInt(match[1]), parseInt(match[3]));
+				} else {
+					this.append(parseInt(match[1]));
+				}
+			} else {
+				throw new SyntaxError('Invalid input');
+			}
+		};
 	}
 
 	/**
@@ -294,20 +301,20 @@ export class MultiRange {
 	/**
 	 * Returns ES6-compatible iterator.
 	 */
-	public getIterator(): { next: () => { done?: boolean, value?: number }}
+	public getIterator(): { next: () => { done: boolean, value: number }}
 	{
 		let i = 0,
 			curRange: Range = this.ranges[i],
 			j = curRange ? curRange[0] : undefined;
 		return {
 			next: () => {
-				if (!curRange) return { done: true };
+				if (!curRange) return { done: true, value: undefined };
 				let ret = j;
 				if (++j > curRange[1]) {
 					curRange = this.ranges[++i];
 					j = curRange ? curRange[0] : undefined;
 				}
-				return { value: ret };
+				return { done: false, value: ret };
 			}
 		}
 	}
