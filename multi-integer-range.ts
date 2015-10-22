@@ -88,6 +88,8 @@ export class MultiRange {
 			return this;
 		} else if (typeof value === 'string') {
 			return this.subtract(new MultiRange(value));
+		} else if (typeof value !== 'undefined') {
+			throw new TypeError('Invalid input');
 		}
 	}
 
