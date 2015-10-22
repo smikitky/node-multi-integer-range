@@ -33,11 +33,9 @@ export class MultiRange {
 		for (let r of s.split(',')) {
 			let match = r.match(/^(\d+)(\-(\d+))?$/);
 			if (match) {
-				if (typeof match[3] !== 'undefined') {
-					this.appendRange(parseInt(match[1]), parseInt(match[3]));
-				} else {
-					this.append(parseInt(match[1]));
-				}
+				let min = parseInt(match[1]);
+				let max = typeof match[3] !== 'undefined' ? parseInt(match[3]) : min;
+				this.appendRange(min, max);
 			} else {
 				throw new SyntaxError('Invalid input');
 			}
@@ -54,7 +52,7 @@ export class MultiRange {
 	}
 
 	/**
-	 * Appends range to this instance.
+	 * Appends a range to this instance.
 	 */
 	public append(value: number | string | MultiRange): MultiRange {
 		if (typeof value === 'number') {
@@ -85,7 +83,7 @@ export class MultiRange {
 	}
 
 	/**
-	 * Subtracts range from this instance.
+	 * Subtracts a range from this instance.
 	 */
 	public subtract(value: number | string | MultiRange): MultiRange {
 		if (typeof value === 'number') {
