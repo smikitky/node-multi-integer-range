@@ -151,28 +151,26 @@ export class MultiRange {
 		//
 		// findOverlap(C) returns { lo: 3, count: 0, union: <i-k> }
 		// meaning (C) is between (2) and (3) but overlaps/touches neither of them.
-		//
 
-		let lim = this.ranges.length;
-		for (let lo = 0; lo < lim; lo++) {
-			let r = this.ranges[lo];
+		for (let hi = this.ranges.length - 1; hi >= 0; hi--) {
+			let r = this.ranges[hi];
 			let union;
 			if (union = this.calcUnion(r, target)) {
 				let count = 1;
 				let tmp;
-				while ((lo + count < lim) && (tmp = this.calcUnion(union, this.ranges[lo+count]))) {
+				while ((hi - count >= 0) && (tmp = this.calcUnion(union, this.ranges[hi - count]))) {
 					union = tmp;
 					count++;
 				}
 				// The given target touches or overlaps one or more of the existing ranges
-				return { lo, count, union };
-			} else if (r[0] > target[1] + 1) {
+				return { lo: hi + 1 - count, count, union };
+			} else if (r[1] < target[0]) {
 				// The given target does not touch nor overlap the existing ranges
-				return { lo, count: 0, union: target }
+				return { lo: hi + 1, count: 0, union: target };
 			}
 		}
-		// The given target is larger than the largest existing range
-		return { lo: lim, count: 0, union: target };
+		// The given target is smaller than the smallest existing range
+		return { lo: 0, count: 0, union: target };
 	}
 
 
