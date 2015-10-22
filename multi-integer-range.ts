@@ -200,17 +200,27 @@ export class MultiRange {
 	 * @param value Value to be checked
 	 * @return True if the specified value is included in the range.
 	 */
-	public has(value: number): boolean
+	public has(value: number | string | MultiRange): boolean
 	{
-		for (let r of this.ranges) {
-			if (value >= r[0] && value <= r[1]) {
-				return true;
+		if (typeof value === 'number') {
+			return this.has(new MultiRange([value]));
+		} else if (typeof value === 'string') {
+			return this.has(new MultiRange(value));
+		} else if (value instanceof MultiRange) {
+			let s = 0;
+			let len = this.ranges.length;
+			for (let tr of value.ranges) {
+				let i: number;
+				for (i = s; i < len; i++) {
+					let my = this.ranges[i];
+					if (tr[0] >= my[0] && tr[1] <= my[1] && tr[1] >= my[0] && tr[1] <= my[1]) break;
+				}
+				if (i === len) return false;
 			}
-			if (value < r[0]) {
-				return false;
-			}
+			return true;
+		} else {
+			throw new TypeError('Invalid input');
 		}
-		return false;
 	}
 
 	/**
@@ -281,6 +291,9 @@ export class MultiRange {
 		return result;
 	}
 
+	/**
+	 * Returns ES6-compatible iterator.
+	 */
 	public getIterator(): { next: () => { done?: boolean, value?: number }}
 	{
 		let i = 0,

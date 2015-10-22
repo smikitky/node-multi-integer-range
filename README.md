@@ -73,6 +73,7 @@ console.log(mr.equals('1,9-12,13,14,15')); // true
 // Inclusion check
 console.log(mr.has(10)); // true
 console.log(mr.has(100)); // false
+console.log(mr.has('1,10-12')); // true
 
 // Length (the total number of integers)
 console.log(mr.length()); // prints 8
