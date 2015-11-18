@@ -209,11 +209,11 @@ export class MultiRange {
 	 * @param value Value to be checked
 	 * @return True if the specified value is included in the range.
 	 */
-	public has(value: number | string | MultiRange): boolean
+	public has(value: number | string | (number|Range)[] | MultiRange): boolean
 	{
 		if (typeof value === 'number') {
 			return this.has(new MultiRange([value]));
-		} else if (typeof value === 'string') {
+		} else if (typeof value === 'string' || value instanceof Array) {
 			return this.has(new MultiRange(value));
 		} else if (value instanceof MultiRange) {
 			let s = 0;

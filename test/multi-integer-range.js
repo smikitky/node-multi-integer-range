@@ -114,27 +114,36 @@ describe('MultiRange', function() {
 		});
 	});
 
-	it('#has', function() {
-		assert.isTrue(mr('5-20,25-100,150-300').has('7'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('25'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('300'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('5-10'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('5-10,25'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('25-40,160'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('5-20,25-100,150-300'));
-		assert.isTrue(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250'));
-		assert.isTrue(mr('5-20,25-100,150-300').has(''));
+	describe('#has', function() {
+		it('must perform correct inclusion check', function() {
+			assert.isTrue(mr('5-20,25-100,150-300').has('7'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('25'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('300'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('5-10'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('5-10,25'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('25-40,160'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('5-20,25-100,150-300'));
+			assert.isTrue(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250'));
+			assert.isTrue(mr('5-20,25-100,150-300').has(''));
 
-		assert.isFalse(mr('5-20,25-100,150-300').has('3'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('22'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('500'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('10-21'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('149-400'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('5-20,25-103,150-300'));
-		assert.isFalse(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250,301'));
-
-		assert.isTrue(mr('5-20,25-100,150-300').has(30));
-		assert.isTrue(mr('5-20,25-100,150-300').has(mr('30')));
+			assert.isFalse(mr('5-20,25-100,150-300').has('3'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('22'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('500'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('10-21'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('149-400'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('5-20,25-103,150-300'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250,301'));
+		});
+		it('must accept various parameters', function() {
+			assert.isTrue(mr('5-20,25-100,150-300').has(30));
+			assert.isFalse(mr('5-20,25-100,150-300').has(23));
+			assert.isTrue(mr('5-20,25-100,150-300').has([10,20,30,40]));
+			assert.isFalse(mr('5-20,25-100,150-300').has([10,20,30,40,120]));
+			assert.isTrue(mr('5-20,25-100,150-300').has([[10,20],[30,50]]));
+			assert.isFalse(mr('5-20,25-100,150-300').has([[10,20],[21,25],[30,50]]));
+			assert.isTrue(mr('5-20,25-100,150-300').has(mr('30')));
+			assert.isFalse(mr('5-20,25-100,150-300').has(mr('23')));
+		});
 	});
 
 	it('#hasRange', function() {
