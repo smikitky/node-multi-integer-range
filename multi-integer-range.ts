@@ -232,6 +232,11 @@ export class MultiRange {
 		}
 	}
 
+	public hasRange(min: number, max: number): boolean
+	{
+		return this.has(new MultiRange([[min, max]]));
+	}
+
 	/**
 	 * Checks if the current instance is continuous.
 	 * Note that this returns false if the current range is empty.
