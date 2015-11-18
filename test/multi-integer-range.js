@@ -23,8 +23,12 @@ describe('MultiRange', function() {
 			t(mr('10-8,7-5,1-4'), '1-10');
 		});
 
-		it('must initialize with a array', function() {
+		it('must initialize with an array', function() {
 			t(mr([1,10,8,5,9]), '1,5,8-10');
+		});
+
+		it('must initialize with an array of array', function() {
+			t(mr([[2,5],[7,10]]), '2-5,7-10');
 		});
 
 		it('must construct with existing MultiRange', function() {

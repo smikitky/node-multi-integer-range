@@ -10,14 +10,20 @@ export class MultiRange {
 	/**
 	 * Creates a new MultiRange object.
 	 */
-	constructor(data?: string | number[] | MultiRange) {
+	constructor(data?: string | (number|Range)[] | MultiRange) {
 		this.ranges = [];
 		if (typeof data === 'string') {
 			this.parseString(data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
-		} else if (data instanceof Array){
-			for (let n of data) this.append(n);
+		} else if (data instanceof Array) {
+			for (let item of <(number|Range)[]>data) {
+				if (item instanceof Array && item.length === 2) {
+					this.appendRange(item[0], item[1]);
+				} else if (typeof item === 'number'){
+					this.append(item);
+				}
+			}
 		} else if (typeof data !== 'undefined') {
 			throw new TypeError('Invalid input');
 		}
