@@ -70,16 +70,14 @@ export class MultiRange {
 	/**
 	 * Appends a range to this instance.
 	 */
-	public append(value: number | string | MultiRange): MultiRange {
-		if (typeof value === 'number') {
-			return this.appendRange(value, value);
+	public append(value: Initializer): MultiRange {
+		if (typeof value === 'undefined') {
+			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			for (let r of value.ranges) this.appendRange(r[0], r[1]);
 			return this;
-		} else if (typeof value === 'string') {
+		} else {
 			return this.append(new MultiRange(value));
-		} else if (typeof value !== 'undefined') {
-			throw new TypeError('Invalid input');
 		}
 	}
 
@@ -101,16 +99,14 @@ export class MultiRange {
 	/**
 	 * Subtracts a range from this instance.
 	 */
-	public subtract(value: number | string | MultiRange): MultiRange {
-		if (typeof value === 'number') {
-			return this.subtractRange(value, value);
+	public subtract(value: Initializer): MultiRange {
+		if (typeof value === 'undefined') {
+			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			for (let r of value.ranges) this.subtractRange(r[0], r[1]);
 			return this;
-		} else if (typeof value === 'string') {
+		} else {
 			return this.subtract(new MultiRange(value));
-		} else if (typeof value !== 'undefined') {
-			throw new TypeError('Invalid input');
 		}
 	}
 
@@ -144,10 +140,10 @@ export class MultiRange {
 	 * Note that this modifies the original object
 	 * rather than returning the new MultiRange object.
 	 */
-	private intersect(value: number | string | MultiRange): MultiRange {
-		if (typeof value === 'number') {
-			return this.intersect(new MultiRange([value]));
-		} else {
+	private intersect(value: Initializer): MultiRange {
+		if (typeof value === 'undefined') {
+			throw new TypeError('Invalid input');
+		} else if (value instanceof MultiRange) {
 		 	let result = new MultiRange();
 			let that = new MultiRange(value);
 			let jstart = 0; // used for optimization
@@ -165,6 +161,8 @@ export class MultiRange {
 			}
 			this.ranges = result.ranges;
 			return this;
+		} else {
+			return this.intersect(new MultiRange(value));
 		}
 	}
 
@@ -248,12 +246,10 @@ export class MultiRange {
 	 * @param value Value to be checked
 	 * @return True if the specified value is included in the range.
 	 */
-	public has(value: number | string | (number|Range)[] | MultiRange): boolean
+	public has(value: Initializer): boolean
 	{
-		if (typeof value === 'number') {
-			return this.has(new MultiRange([value]));
-		} else if (typeof value === 'string' || value instanceof Array) {
-			return this.has(new MultiRange(value));
+		if (typeof value === 'undefined') {
+			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			let s = 0;
 			let len = this.ranges.length;
@@ -267,7 +263,7 @@ export class MultiRange {
 			}
 			return true;
 		} else {
-			throw new TypeError('Invalid input');
+			return this.has(new MultiRange(value));
 		}
 	}
 
@@ -302,11 +298,11 @@ export class MultiRange {
 	 * @param cmp The data to compare.
 	 * @return True if cmp is exactly the same as this instance.
 	 */
-	public equals(cmp: MultiRange | string): boolean
+	public equals(cmp: Initializer): boolean
 	{
-		if (typeof cmp === 'string') {
-			return this.equals(new MultiRange(cmp));
-		} else {
+		if (typeof cmp === 'undefined') {
+			throw new TypeError('Invalid input');
+		} else if (cmp instanceof MultiRange) {
 			if (cmp === this) return true;
 			if (this.ranges.length !== cmp.ranges.length) return false;
 			for (let i = 0; i < this.ranges.length; i++) {
@@ -314,6 +310,8 @@ export class MultiRange {
 					return false;
 			}
 			return true;
+		} else {
+			return this.equals(new MultiRange(cmp));
 		}
 	}
 
