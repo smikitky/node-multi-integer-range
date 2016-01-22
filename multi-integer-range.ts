@@ -2,6 +2,8 @@
 
 export type Range = [number, number];
 
+export type Initializer = string | number | (number|Range)[] | MultiRange;
+
 declare var Symbol: any;
 
 export class MultiRange {
@@ -10,18 +12,26 @@ export class MultiRange {
 	/**
 	 * Creates a new MultiRange object.
 	 */
-	constructor(data?: string | (number|Range)[] | MultiRange) {
+	constructor(data?: Initializer) {
 		this.ranges = [];
 		if (typeof data === 'string') {
 			this.parseString(data);
+		} else if (typeof data === 'number') {
+			this.ranges.push([data, data]);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
-		} else if (data instanceof Array) {
+		} else if (Array.isArray(data)) {
 			for (let item of <(number|Range)[]>data) {
-				if (item instanceof Array && item.length === 2) {
-					this.appendRange(item[0], item[1]);
+				if (Array.isArray(item)) {
+					if (item.length === 2) {
+						this.appendRange(item[0], item[1]);
+					} else {
+						throw new TypeError('Invalid array initializer');
+					}
 				} else if (typeof item === 'number'){
 					this.append(item);
+				} else {
+					throw new TypeError('Invalid array initialzer');
 				}
 			}
 		} else if (typeof data !== 'undefined') {

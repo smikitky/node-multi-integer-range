@@ -23,16 +23,19 @@ describe('MultiRange', function() {
 			t(mr('10-8,7-5,1-4'), '1-10');
 		});
 
-		it('must initialize with an array', function() {
-			t(mr([1,10,8,5,9]), '1,5,8-10');
+		it('must initialize with an integer', function() {
+			t(mr(2), '2');
 		});
 
-		it('must initialize with an array of array', function() {
+		it('must initialize with an array', function() {
+			t(mr([]), '');
+			t(mr([1,10,8,5,9]), '1,5,8-10');
 			t(mr([[2,5],[7,10]]), '2-5,7-10');
+			t(mr([5,[8,10],[12,15]]), '5,8-10,12-15');
 		});
 
 		it('must construct with existing MultiRange', function() {
-			t(new MultiRange(mr('5-10')), '5-10');
+			t(mr(mr('5-10')), '5-10');
 		});
 
 		it('must throw an error for invalid input', function() {
@@ -41,9 +44,12 @@ describe('MultiRange', function() {
 			assert.throws(function() { mr('2-5,8-10,*,99'); }, SyntaxError);
 			assert.throws(function() { mr(','); }, SyntaxError);
 			assert.throws(function() { mr('-'); }, SyntaxError);
-			assert.throws(function() { mr(15); }, TypeError);
+			assert.throws(function() { mr(['abc']); }, TypeError);
+			assert.throws(function() { mr([1,[5,9,7]]); }, TypeError);
 			assert.throws(function() { mr(null); }, TypeError);
+			// followings are valid
 			assert.doesNotThrow(function() { mr(undefined); }, Error);
+			assert.doesNotThrow(function() { mr([]); }, Error);
 			assert.doesNotThrow(function() { mr(); }, Error);
 			assert.doesNotThrow(function() { mr(''); }, Error);
 		});
