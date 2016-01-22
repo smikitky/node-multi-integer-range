@@ -18,12 +18,12 @@ describe('MultiRange', function() {
 			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
 		});
 
-		it('must accept ranges with random/reverse order', function() {
+		it('must parse string with random/reverse order', function() {
 			t(mr('1,8,2-4,7,5-6,10-9'), '1-10');
 			t(mr('10-8,7-5,1-4'), '1-10');
 		});
 
-		it('must initialize with an integer', function() {
+		it('must initialize with a single integer', function() {
 			t(mr(2), '2');
 		});
 
@@ -31,11 +31,14 @@ describe('MultiRange', function() {
 			t(mr([]), '');
 			t(mr([1,10,8,5,9]), '1,5,8-10');
 			t(mr([[2,5],[7,10]]), '2-5,7-10');
+
+			// Mixed array like this is not recommended nor explicitly
+			// documented, but it works
 			t(mr([5,[8,10],[12,15]]), '5,8-10,12-15');
 		});
 
 		it('must construct with existing MultiRange', function() {
-			t(mr(mr('5-10')), '5-10');
+			t(mr(mr('5-10')), '5-10'); // aka clone
 		});
 
 		it('must throw an error for invalid input', function() {

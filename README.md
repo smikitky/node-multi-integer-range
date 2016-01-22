@@ -23,8 +23,21 @@ Install via npm: `npm install multi-integer-range`
 
 ### Initialization
 
-Initialization can be done with an integer array, an array of
-`[number, number]` tuples, a string, or another MultiRange instance.
+Most of the methods (including the constructor) take one *Initializer* parameter.
+An initializer is an integer array, an array of `[number, number]` tuples,
+a string, a single integer, or another MultiRange instance.
+
+Pass it to the constructor to create a MultiRange object. Of course you can
+create an empty MultiRange object if no argument is passed to the constructor.
+
+```
+Initializer:
+    string |
+    number |
+    ( number | [number,number] )[] |
+    MultiRange;
+```
+
 A shorthand constructor function `multirange()` is also available.
 Use whichever you prefer.
 
@@ -34,7 +47,7 @@ var MultiRange = require('multi-integer-range').MultiRange;
 var mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
 var mr2 = new MultiRange('1-2, 3, 7-9');
 var mr3 = new MultiRange([[1,3], [7,9]]);
-var mr4 = new MultiRange(mr1);
+var mr4 = new MultiRange(mr1); // clone
 
 // function-style
 var multirange = require('multi-integer-range').multirange;
@@ -42,7 +55,7 @@ var mr5 = multirange('1,2,3,7,8,9'); // the same as `new MultiRange`
 ```
 
 Internal data are always sorted and normalized,
-so the above four (`mr1`-`mr5`) hold a instance with identical range data.
+so the above five (`mr1`-`mr5`) hold a instance with identical range data.
 
 The string parser is permissive and accepts space characters
 before/after comma/hyphens. Order is not important either, and
@@ -94,19 +107,19 @@ console.log(mr.isContinuous()); // false
 There are several ways to get the content of the MultiRange object.
 
 ```js
-var mr = new MultiRange([1,2,3,5,6,7,8]);
+var mr = new MultiRange([1,2,3,5,6,7,8,10]);
 
 // As a string
-console.log(mr.toString()); // '1-3,5-8'
+console.log(mr.toString()); // '1-3,5-8,10'
 
 // Or concat an empty string to implicitly call #toString()
-console.log('' + mr); // '1-3,5-8'
+console.log('' + mr); // '1-3,5-8,10'
 
 // As an array which holds every integer (of course slow for large range)
-console.log(mr.toArray()); // [1,2,3,5,6,7,8]
+console.log(mr.toArray()); // [1,2,3,5,6,7,8,10]
 
 // As an array of 2-element arrays
-console.log(mr.getRanges()); // [[1,3],[5,8]]
+console.log(mr.getRanges()); // [[1,3],[5,8],[10,10]]
 ```
 
 ### Iteration
@@ -148,7 +161,7 @@ npm test
 
 ### Bugs
 
-Use GitHub issues.
+Report any bugs and suggestions using GitHub issues.
 
 ## Author
 
