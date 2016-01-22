@@ -138,7 +138,7 @@ export class MultiRange {
 	 * Note that this modifies the original object
 	 * rather than returning the new MultiRange object.
 	 */
-	private intersect(value: Initializer): MultiRange {
+	public intersect(value: Initializer): MultiRange {
 		if (typeof value === 'undefined') {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
