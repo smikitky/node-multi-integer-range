@@ -56,11 +56,12 @@ describe('MultiRange', function() {
 	});
 
 	it('#clone', function() {
-		var orig = mr('1-5');
+		var orig = mr('2-5');
 		var clone = orig.clone();
-		clone.append(8);
-		t(orig, '1-5');
-		t(clone, '1-5,8');
+		orig.append(6);
+		clone.append(1);
+		t(orig, '2-6');
+		t(clone, '1-5');
 	});
 
 	describe('#append', function() {

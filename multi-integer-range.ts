@@ -62,9 +62,7 @@ export class MultiRange {
 	 * Clones this instance.
 	 */
 	public clone(): MultiRange {
-		let result = new MultiRange();
-		result.ranges = this.getRanges();
-		return result;
+		return new MultiRange(this);
 	}
 
 	/**
