@@ -129,6 +129,30 @@ export class MultiRange {
 		return this;
 	}
 
+	private intersect(value: number | string | MultiRange): MultiRange {
+		if (typeof value === 'number') {
+			return this.intersect(new MultiRange([value]));
+		} else {
+		 	let result = new MultiRange();
+			let that = new MultiRange(value);
+			let jstart = 0; // used for optimization
+			for (let i = 0; i < this.ranges.length; i++) {
+				for (let j = jstart; j < that.ranges.length; j++) {
+					if (this.ranges[i][0] <= that.ranges[j][1] && this.ranges[i][1] >= that.ranges[j][0]) {
+							jstart = j;
+							let min = Math.max(this.ranges[i][0], that.ranges[j][0]);
+							let max = Math.min(this.ranges[i][1], that.ranges[j][1]);
+							result.appendRange(min, max);
+					} else if (this.ranges[i][1] < that.ranges[j][0]) {
+						break;
+					}
+				}
+			}
+			this.ranges = result.ranges;
+			return this;
+		}
+	}
+
 	/**
 	 * Determines how the given range overlaps or touches the existing ranges.
 	 * This is a helper method that calculates how an append/subtract operation

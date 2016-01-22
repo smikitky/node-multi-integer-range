@@ -114,6 +114,33 @@ describe('MultiRange', function() {
 		});
 	});
 
+	describe('#intersect', function() {
+		it('must accept various input types', function() {
+			t(mr('10-15').intersect(12), '12');
+			t(mr('10-15').intersect('12-17'), '12-15');
+			t(mr('10-15').intersect(mr('12-17')), '12-15');
+			t(mr('10-15').intersect(mr([[12,17]])), '12-15');
+			t(mr('10-15').intersect(mr([12,15,17])), '12,15');
+		});
+		it('must calculate intersections correctly', function() {
+			// the result must remain consistent when operands are swapped
+			function t2(r1, r2, expected) {
+				t(mr(r1).intersect(r2), expected);
+				t(mr(r2).intersect(r1), expected);
+			}
+			t2('1-5', '8', '');
+			t2('30-50,60-80,90-120', '45-65,75-90', '45-50,60-65,75-80,90');
+			t2('10,12,14,16,18,20', '11,13,15,17,19,21', '');
+			t2('10,12,14,16,18,20', '10,12,14,16,18,20', '10,12,14,16,18,20');
+			t2('10-12,14-16,18-20', '11,13,15,17,19,21', '11,15,19');
+			t2('10-12,14-16,18-20', '10-12,14-16,18-20', '10-12,14-16,18-20');
+			t2('10-12,14-16,18-20', '20-22,24-26,28-30', '20');
+		});
+		it('must be chainable', function() {
+			t(mr('1-100').intersect('20-150').intersect('10-40'), '20-40');
+		});
+	});
+
 	describe('#has', function() {
 		it('must perform correct inclusion check', function() {
 			assert.isTrue(mr('5-20,25-100,150-300').has('7'));
