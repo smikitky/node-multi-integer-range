@@ -142,22 +142,23 @@ export class MultiRange {
 		if (typeof value === 'undefined') {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
-		 	let result = new MultiRange();
-			let that = new MultiRange(value);
+		 	let result = [];
 			let jstart = 0; // used for optimization
 			for (let i = 0; i < this.ranges.length; i++) {
-				for (let j = jstart; j < that.ranges.length; j++) {
-					if (this.ranges[i][0] <= that.ranges[j][1] && this.ranges[i][1] >= that.ranges[j][0]) {
+				let r1 = this.ranges[i];
+				for (let j = jstart; j < value.ranges.length; j++) {
+					let r2 = value.ranges[j];
+					if (r1[0] <= r2[1] && r1[1] >= r2[0]) {
 							jstart = j;
-							let min = Math.max(this.ranges[i][0], that.ranges[j][0]);
-							let max = Math.min(this.ranges[i][1], that.ranges[j][1]);
-							result.appendRange(min, max);
-					} else if (this.ranges[i][1] < that.ranges[j][0]) {
+							let min = Math.max(r1[0], r2[0]);
+							let max = Math.min(r1[1], r2[1]);
+							result.push([min, max]);
+					} else if (r1[1] < r2[0]) {
 						break;
 					}
 				}
 			}
-			this.ranges = result.ranges;
+			this.ranges = result;
 			return this;
 		} else {
 			return this.intersect(new MultiRange(value));
