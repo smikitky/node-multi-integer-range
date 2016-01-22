@@ -68,7 +68,7 @@ describe('MultiRange', function() {
 	});
 
 	describe('#append', function() {
-		it('must append by number', function() {
+		it('must append values correctly', function() {
 			t(mr('5-10').append(5), '5-10');
 			t(mr('5-10').append(8), '5-10');
 			t(mr('5-10').append(10), '5-10');
@@ -79,17 +79,16 @@ describe('MultiRange', function() {
 			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
 			t(mr('5-10,15-20').append(3), '3,5-10,15-20');
 			t(mr('5-10,15-20').append(25), '5-10,15-20,25');
-		});
-		it('must append range resulting in concatenation', function() {
 			t(mr('1-10,12-15,17-20').append(11), '1-15,17-20');
-			t(mr('1-10,12-15,17-20').appendRange(1,100), '1-100');
-			t(mr('1-10,12-15,17-20,100').appendRange(5,14), '1-15,17-20,100');
-			t(mr('1-10,12-15,17-20').appendRange(14,19), '1-10,12-20');
+			t(mr('1-10,12-15,17-20').append([[1,100]]), '1-100');
+			t(mr('1-10,12-15,17-20,100').append([[5,14]]), '1-15,17-20,100');
+			t(mr('1-10,12-15,17-20').append([[14,19]]), '1-10,12-20');
 		});
-		it('must append using string', function() {
+		it('must accept various input types', function() {
+			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
 			t(mr('5-10,15-20').append('11-14,21-25'), '5-25');
-		});
-		it('must append using another MultiRange', function() {
+			t(mr('5-10,15-20').append([12]), '5-10,12,15-20');
+			t(mr('5-10,15-20').append([[12, 13]]), '5-10,12-13,15-20');
 			t(mr('5-10,15-20').append(mr('11-14,21-25')), '5-25');
 		});
 		it('must be chainable', function() {
@@ -99,23 +98,22 @@ describe('MultiRange', function() {
 	});
 
 	describe('#substract', function() {
-		it('must subtract a value', function() {
+		it('must subtract values correctly', function() {
 			t(mr('1-10').subtract(100), '1-10');
 			t(mr('1-10').subtract(0), '1-10');
 			t(mr('1-10').subtract(11), '1-10');
 			t(mr('1-10').subtract(1), '2-10');
 			t(mr('1-10').subtract(10), '1-9');
-		});
-		it('must subtract range resulting in devision', function() {
 			t(mr('1-10').subtractRange(1, 10), '');
 			t(mr('1-10').subtractRange(5, 8), '1-4,9-10');
 			t(mr('1-10,20-30').subtractRange(11, 19), '1-10,20-30');
 			t(mr('1-10,20-30').subtractRange(5, 25), '1-4,26-30');
 		});
-		it('must subtract using string', function() {
+		it('must accept various input types', function() {
+			t(mr('1-20').subtract(5), '1-4,6-20');
 			t(mr('1-20').subtract('5,10-15'), '1-4,6-9,16-20');
-		});
-		it('must subtract using another MultiRange', function() {
+			t(mr('1-20').subtract([5,10,15]), '1-4,6-9,11-14,16-20');
+			t(mr('1-20').subtract([[5,10]]), '1-4,11-20');
 			t(mr('1-20').subtract(new mr('5,10-15')), '1-4,6-9,16-20');
 		});
 		it('must be chainable', function() {
@@ -125,13 +123,6 @@ describe('MultiRange', function() {
 	});
 
 	describe('#intersect', function() {
-		it('must accept various input types', function() {
-			t(mr('10-15').intersect(12), '12');
-			t(mr('10-15').intersect('12-17'), '12-15');
-			t(mr('10-15').intersect(mr('12-17')), '12-15');
-			t(mr('10-15').intersect(mr([[12,17]])), '12-15');
-			t(mr('10-15').intersect(mr([12,15,17])), '12,15');
-		});
 		it('must calculate intersections correctly', function() {
 			// the result must remain consistent when operands are swapped
 			function t2(r1, r2, expected) {
@@ -145,6 +136,13 @@ describe('MultiRange', function() {
 			t2('10-12,14-16,18-20', '11,13,15,17,19,21', '11,15,19');
 			t2('10-12,14-16,18-20', '10-12,14-16,18-20', '10-12,14-16,18-20');
 			t2('10-12,14-16,18-20', '20-22,24-26,28-30', '20');
+		});
+		it('must accept various input types', function() {
+			t(mr('10-15').intersect(12), '12');
+			t(mr('10-15').intersect('12-17'), '12-15');
+			t(mr('10-15').intersect([12,15,17]), '12,15');
+			t(mr('10-15').intersect([[12,17]]), '12-15');
+			t(mr('10-15').intersect(mr('12-17')), '12-15');
 		});
 		it('must be chainable', function() {
 			t(mr('1-100').intersect('20-150').intersect('10-40'), '20-40');
@@ -171,9 +169,11 @@ describe('MultiRange', function() {
 			assert.isFalse(mr('5-20,25-100,150-300').has('5-20,25-103,150-300'));
 			assert.isFalse(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250,301'));
 		});
-		it('must accept various parameters', function() {
+		it('must accept various input types', function() {
 			assert.isTrue(mr('5-20,25-100,150-300').has(30));
 			assert.isFalse(mr('5-20,25-100,150-300').has(23));
+			assert.isTrue(mr('5-20,25-100,150-300').has('30'));
+			assert.isFalse(mr('5-20,25-100,150-300').has('23'));
 			assert.isTrue(mr('5-20,25-100,150-300').has([10,20,30,40]));
 			assert.isFalse(mr('5-20,25-100,150-300').has([10,20,30,40,120]));
 			assert.isTrue(mr('5-20,25-100,150-300').has([[10,20],[30,50]]));
@@ -262,7 +262,6 @@ describe('MultiRange', function() {
 		});
 
 	});
-
 
 	it('must not change the internal data after getRanges()', function() {
 		var a = mr('5,12-15,100');
