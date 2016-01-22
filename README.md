@@ -10,7 +10,8 @@ Supported operations include
 
 - Addition (e.g., '1-2' + '3-5' => '1-5')
 - Subtraction (e.g., '1-10' - '5-9' => '1-4,10')
-- Inclusion check (e.g., '5' in '1-10')
+- Inclusion check (e.g., '5' is in '1-10')
+- Intersection (e.g., '1-5' ∩ '2-8' => '2-5')
 - Array creation
 
 Internal data are always *sorted and normalized* to the smallest possible
@@ -69,8 +70,12 @@ console.log('' + mr); // prints '1-15'
 mr.subtract('2-8');
 console.log('' + mr); // prints '1,9-15'
 
+// Intersection
+mr.intersect('1-14');
+console.log('' + mr); // prints '1,9-14'
+
 // Equality check
-console.log(mr.equals('1,9-12,13,14,15')); // true
+console.log(mr.equals('1,9-12,13,14')); // true
 
 // Inclusion check
 console.log(mr.has(10)); // true

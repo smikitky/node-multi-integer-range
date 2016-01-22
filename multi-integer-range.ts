@@ -129,6 +129,11 @@ export class MultiRange {
 		return this;
 	}
 
+	/**
+	 * Remove integers which are not included in the given ranges (aka intersection).
+	 * Note that this modifies the original object
+	 * rather than returning the new MultiRange object.
+	 */
 	private intersect(value: number | string | MultiRange): MultiRange {
 		if (typeof value === 'number') {
 			return this.intersect(new MultiRange([value]));
