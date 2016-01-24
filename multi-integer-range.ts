@@ -66,7 +66,8 @@ export class MultiRange {
 	}
 
 	/**
-	 * Appends a range to this instance.
+	 * Appends to this instance.
+	 * @parasm value The data to append.
 	 */
 	public append(value: Initializer): MultiRange {
 		if (typeof value === 'undefined') {
@@ -95,7 +96,8 @@ export class MultiRange {
 	}
 
 	/**
-	 * Subtracts a range from this instance.
+	 * Subtracts from this instance.
+	 * @param value The data to subtract.
 	 */
 	public subtract(value: Initializer): MultiRange {
 		if (typeof value === 'undefined') {
@@ -135,8 +137,7 @@ export class MultiRange {
 
 	/**
 	 * Remove integers which are not included in the given ranges (aka intersection).
-	 * Note that this modifies the original object
-	 * rather than returning the new MultiRange object.
+	 * @param value The data to calculate the intersetion.
 	 */
 	public intersect(value: Initializer): MultiRange {
 		if (typeof value === 'undefined') {
@@ -231,7 +232,7 @@ export class MultiRange {
 	}
 
 	/**
-	 * Returns the range data.
+	 * Exports the whole range data as an array of arrays.
 	 */
 	public getRanges(): Range[]
 	{
@@ -241,9 +242,9 @@ export class MultiRange {
 	}
 
 	/**
-	 * Checks if the specified value is included in the current range.
+	 * Checks if the instance contains the specified value.
 	 * @param value Value to be checked
-	 * @return True if the specified value is included in the range.
+	 * @return True if the specified value is included in the instance.
 	 */
 	public has(value: Initializer): boolean
 	{
@@ -266,6 +267,12 @@ export class MultiRange {
 		}
 	}
 
+	/**
+	 * Checks if the instance contains the range specified by the two parameters.
+	 * @param min The minimum value of the range to subtract.
+	 * @param max The minimum value of the range to subtract.
+	 * @return True if the specified value is included in the instance.
+	 */
 	public hasRange(min: number, max: number): boolean
 	{
 		return this.has(new MultiRange([[min, max]]));

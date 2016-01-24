@@ -6,12 +6,12 @@ A library which parses and manipulates comma-delimited positive integer ranges (
 
 Such strings are typically used in print dialogs to indicate which pages to print.
 
-Supported operations include
+Supported operations include:
 
-- Addition (e.g., '1-2' + '3-5' => '1-5')
-- Subtraction (e.g., '1-10' - '5-9' => '1-4,10')
-- Inclusion check (e.g., '5' is in '1-10')
-- Intersection (e.g., '1-5' ∩ '2-8' => '2-5')
+- Addition (e.g., `1-2,6` + `3-5` => `1-6`)
+- Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
+- Inclusion check (e.g., `3,7-9` is in `1-10`)
+- Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
 - Array creation
 
 Internal data are always *sorted and normalized* to the smallest possible
@@ -19,19 +19,35 @@ representation.
 
 ## Usage
 
+### Basic Example
+
 Install via npm: `npm install multi-integer-range`
+
+```js
+var MultiRange = require('multi-integer-range').MultiRange;
+
+var pages = new MultiRange('1-5,12-15');
+pages.append(6).append([7,8]).append('9-11').subtract(2);
+console.log(pages.toString()); // '1,3-15'
+console.log(pages.has('5,9,12-14')); // true
+
+// output
+console.log(pages.toArray()); // [5,9,12,13,14]
+console.log(pages.getRanges()); // [[5,5],[9,9],[12,14]]
+console.log(pages.isContinuous()); // false
+```
 
 ### Initialization
 
-Most of the methods (including the constructor) take one *Initializer* parameter.
+Some methods (and the constructor) take one *Initializer* parameter.
 An initializer is an integer array, an array of `[number, number]` tuples,
 a string, a single integer, or another MultiRange instance.
 
-Pass it to the constructor to create a MultiRange object. Of course you can
-create an empty MultiRange object if no argument is passed to the constructor.
+Pass it to the constructor to create a MultiRange object,
+or pass nothing to create an empty MultiRange object.
 
-```
-Initializer:
+```ts
+type Initializer =
     string |
     number |
     ( number | [number,number] )[] |
@@ -66,61 +82,30 @@ var mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
 console.log(mr.toString()); // prints '2-10'
 ```
 
-### Manipulation and Comparison
+### Methods
 
-```js
-var mr = new MultiRange('1-3,7-9');
+Manipulation methods are mutable and chainable by design.
+That is, for example, when you call `append(5)`, it will change
+the internal representation and return the modified self,
+rather than returning a new instance.
+To get the copy of the instance, use `clone()`, or alternatively the copy constructor (`var copy = new MultiRange(orig)`).
 
-// Addition
-mr.append('4-5')
-  .append(6)
-  .append(new MultiRange('10-11'))
-  .appendRange(12, 15); // append 12-15
-
-console.log('' + mr); // prints '1-15'
-
-// Subtraction
-mr.subtract('2-8');
-console.log('' + mr); // prints '1,9-15'
-
-// Intersection
-mr.intersect('1-14');
-console.log('' + mr); // prints '1,9-14'
-
-// Equality check
-console.log(mr.equals('1,9-12,13,14')); // true
-
-// Inclusion check
-console.log(mr.has(10)); // true
-console.log(mr.has(100)); // false
-console.log(mr.has('1,10-12')); // true
-
-// Length (the total number of integers)
-console.log(mr.length()); // prints 8
-
-// Continuity
-console.log(mr.isContinuous()); // false
-```
-
-### Output
-
-There are several ways to get the content of the MultiRange object.
-
-```js
-var mr = new MultiRange([1,2,3,5,6,7,8,10]);
-
-// As a string
-console.log(mr.toString()); // '1-3,5-8,10'
-
-// Or concat an empty string to implicitly call #toString()
-console.log('' + mr); // '1-3,5-8,10'
-
-// As an array which holds every integer (of course slow for large range)
-console.log(mr.toArray()); // [1,2,3,5,6,7,8,10]
-
-// As an array of 2-element arrays
-console.log(mr.getRanges()); // [[1,3],[5,8],[10,10]]
-```
+- `new MultiRange(data?: Initializer)` Creates a new MultiRange object.
+- `clone(): MultiRange` Clones this instance.
+- `append(value: Initializer): MultiRange` Appends to this instance.
+- `appendRange(min: number, max: number): MultiRange` Appends one range specified by the two parameters.
+- `subtract(value: Initializer): MultiRange` Subtracts from this instance.
+- `subtractRange(min: number, max: number): MultiRange` Subtracts one range specified by the two parameters.
+- `intersect(value: Initializer): MultiRange` Remove integers which are not included in `value` (aka intersection).
+- `has(value: Initializer): boolean` Checks if the instance contains the specified value.
+- `hasRange(min: number, max: number): boolean` Checks if the instance contains the range specified by the two parameters.
+- `isContinuous(): boolean` Checks if the current instance is continuous. Note that this returns false if the current range is empty.
+- `length(): number` Calculates how many numbers are effectively included in this instance. (`multirange('1-10,51-60,90').length()` returns 21)
+- `equals(cmp: Initializer): boolean` Checks if two MultiRange data are identical.
+- `toString(): string` Returns the string respresentation of this MultiRange.
+- `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
+- `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
+- `getIterator(): Object` Returns ES6-compatible iterator. See the description below.
 
 ### Iteration
 
@@ -162,6 +147,8 @@ npm test
 ### Bugs
 
 Report any bugs and suggestions using GitHub issues.
+
+**Performance Considerations**: This library works efficiently for large ranges as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmentated set of integers which are scarcely continuous (for example, random 10000 integers between 1 to 1000000).
 
 ## Author
 
