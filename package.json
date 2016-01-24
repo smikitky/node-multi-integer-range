@@ -23,5 +23,6 @@
     "chai": "^3.3.0",
     "mocha": "^2.3.3",
     "typescript": "^1.6.2"
-  }
+  },
+  "tonicExample": "var MultiRange = require('node-multi-integer-range').MultiRange;"
 }
