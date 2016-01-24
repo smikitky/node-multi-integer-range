@@ -194,6 +194,29 @@ export class MultiRange {
 		// findOverlap(C) returns { lo: 3, count: 0, union: <i-k> }
 		// meaning (C) is between (2) and (3) but overlaps/touches neither of them.
 
+		let binarySearch = (search: number, min: number, max: number): any => {
+			let c = Math.floor((max + min) / 2);
+			let r0 = this.ranges[c];
+			let r1 = this.ranges[c+1]; // can be undefined
+			if (r0[0] <= search && search <= r0[1]) return { wrap: true, index: c };
+			if (r0[1] < search && r1 && search < r1[0]) return { wrap: false, index: c };
+			if (min === max) {
+				if (search < r0[0]) return 'lo';
+				return 'hi';
+			}
+			if (search < r0[0]) return binarySearch(search, 0, c - 1);
+			if (search > r0[1]) return binarySearch(search, c + 1, max);
+		};
+
+		let left = binarySearch(target[0], 0, this.ranges.length - 1);
+		let right = binarySearch(target[1], 0, this.ranges.length - 1);
+		if (left.wrap) {
+			return { lo: left.index, count: right.index - left.index + 1, union: null };
+		} else {
+			return { lo: left.index, count: right.index - left.index + 1, union: null };
+		}
+
+		/*
 		for (let hi = this.ranges.length - 1; hi >= 0; hi--) {
 			let r = this.ranges[hi];
 			let union;
@@ -213,6 +236,7 @@ export class MultiRange {
 		}
 		// The given target is smaller than the smallest existing range
 		return { lo: 0, count: 0, union: target };
+		*/
 	}
 
 
