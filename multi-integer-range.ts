@@ -34,7 +34,7 @@ export class MultiRange {
 					throw new TypeError('Invalid array initialzer');
 				}
 			}
-		} else if (data !== void 0) {
+		} else if (data !== undefined) {
 			throw new TypeError('Invalid input');
 		}
 	}
@@ -70,7 +70,7 @@ export class MultiRange {
 	 * @parasm value The data to append.
 	 */
 	public append(value: Initializer): MultiRange {
-		if (value === void 0) {
+		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			for (let r of value.ranges) this.appendRange(r[0], r[1]);
@@ -100,7 +100,7 @@ export class MultiRange {
 	 * @param value The data to subtract.
 	 */
 	public subtract(value: Initializer): MultiRange {
-		if (value === void 0) {
+		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			for (let r of value.ranges) this.subtractRange(r[0], r[1]);
@@ -140,7 +140,7 @@ export class MultiRange {
 	 * @param value The data to calculate the intersetion.
 	 */
 	public intersect(value: Initializer): MultiRange {
-		if (value === void 0) {
+		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 		 	let result = [];
@@ -248,7 +248,7 @@ export class MultiRange {
 	 */
 	public has(value: Initializer): boolean
 	{
-		if (value === void 0) {
+		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
 			let s = 0;
@@ -306,7 +306,7 @@ export class MultiRange {
 	 */
 	public equals(cmp: Initializer): boolean
 	{
-		if (cmp === void 0) {
+		if (cmp === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (cmp instanceof MultiRange) {
 			if (cmp === this) return true;
