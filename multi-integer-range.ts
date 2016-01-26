@@ -377,6 +377,6 @@ if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
 }
 
 // A shorthand function to get a new MultiRange instance
-export function multirange(data: string | number[] | MultiRange): MultiRange {
+export function multirange(data?: Initializer): MultiRange {
 	return new MultiRange(data);
 }
