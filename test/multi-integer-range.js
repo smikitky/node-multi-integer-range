@@ -91,6 +91,9 @@ describe('MultiRange', function() {
 			t(mr('5-10,15-20').append([[12, 13]]), '5-10,12-13,15-20');
 			t(mr('5-10,15-20').append(mr('11-14,21-25')), '5-25');
 		});
+		it('must throw an exception for empty call', function() {
+			assert.throws(function() { mr(5).append(); }, TypeError);
+		});
 		it('must be chainable', function() {
 			t(mr('1-50').append(60).append('70').append(mr([80])).appendRange(90,90),
 				'1-50,60,70,80,90');
@@ -115,6 +118,9 @@ describe('MultiRange', function() {
 			t(mr('1-20').subtract([5,10,15]), '1-4,6-9,11-14,16-20');
 			t(mr('1-20').subtract([[5,10]]), '1-4,11-20');
 			t(mr('1-20').subtract(new mr('5,10-15')), '1-4,6-9,16-20');
+		});
+		it('must throw an exception for empty call', function() {
+			assert.throws(function() { mr(5).subtract(); }, TypeError);
 		});
 		it('must be chainable', function() {
 			t(mr('1-50').subtract(40).subtract('30').subtract(mr([20])).subtractRange(10,10),
@@ -145,6 +151,9 @@ describe('MultiRange', function() {
 			t(mr('10-15').intersect([12,15,17]), '12,15');
 			t(mr('10-15').intersect([[12,17]]), '12-15');
 			t(mr('10-15').intersect(mr('12-17')), '12-15');
+		});
+		it('must throw an exception for empty call', function() {
+			assert.throws(function() { mr(5).intersect(); }, TypeError);
 		});
 		it('must be chainable', function() {
 			t(mr('1-100').intersect('20-150').intersect('10-40'), '20-40');
@@ -182,6 +191,9 @@ describe('MultiRange', function() {
 			assert.isFalse(mr('5-20,25-100,150-300').has([[10,20],[21,25],[30,50]]));
 			assert.isTrue(mr('5-20,25-100,150-300').has(mr('30')));
 			assert.isFalse(mr('5-20,25-100,150-300').has(mr('23')));
+		});
+		it('must throw an exception for empty call', function() {
+			assert.throws(function() { mr(5).has(); }, TypeError);
 		});
 	});
 
