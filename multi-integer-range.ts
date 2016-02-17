@@ -13,6 +13,9 @@ export class MultiRange {
 	 * Creates a new MultiRange object.
 	 */
 	constructor(data?: Initializer) {
+		function isArray(x): x is Array<any> {
+			return Object.prototype.toString.call(x) === '[object Array]'
+		}
 		this.ranges = [];
 		if (typeof data === 'string') {
 			this.parseString(data);
@@ -20,9 +23,9 @@ export class MultiRange {
 			this.ranges.push([data, data]);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
-		} else if (Array.isArray(data)) {
+		} else if (isArray(data)) {
 			for (let item of <(number|Range)[]>data) {
-				if (Array.isArray(item)) {
+				if (isArray(item)) {
 					if (item.length === 2) {
 						this.appendRange(item[0], item[1]);
 					} else {
