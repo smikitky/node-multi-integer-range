@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=master)](https://travis-ci.org/smikitky/node-multi-integer-range)
 
-A library which parses and manipulates comma-delimited positive integer ranges (such as "1-3,8-10").
+A small library which parses and manipulates comma-delimited positive integer ranges (such as "1-3,8-10").
 
 Such strings are typically used in print dialogs to indicate which pages to print.
 
@@ -12,7 +12,8 @@ Supported operations include:
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
-- Array creation
+- Iteration using `for ... of`
+- Array creation ("flatten")
 
 Internal data are always *sorted and normalized* to the smallest possible
 representation.
@@ -31,7 +32,6 @@ pages.append(6).append([7,8]).append('9-11').subtract(2);
 console.log(pages.toString()); // '1,3-15'
 console.log(pages.has('5,9,12-14')); // true
 
-// output
 console.log(pages.toArray()); // [1, 3, 4, 5, ... , 15]
 console.log(pages.getRanges()); // [[1, 1], [3, 15]]
 console.log(pages.isContinuous()); // false
@@ -40,8 +40,8 @@ console.log(pages.isContinuous()); // false
 ### Initialization
 
 Some methods (and the constructor) take one *Initializer* parameter.
-An initializer is an integer array, an array of `[number, number]` tuples,
-a string, a single integer, or another MultiRange instance.
+An initializer is a string, an integer array, an array of `[number, number]` tuples,
+a single integer, or another MultiRange instance.
 
 Pass it to the constructor to create a MultiRange object,
 or pass nothing to create an empty MultiRange object.
@@ -119,7 +119,7 @@ for (let page of multirange('2,5-7')) {
 // prints 2, 5, 6, 7
 ```
 
-If `Symbol.iterator` is not defined, you can still access the iterator
+If `Symbol.iterator` is not available, you can still access the iterator
 implementation and use it manually like this:
 
 ```js
@@ -132,7 +132,7 @@ while (!(page = it.next()).done) {
 
 ## Use in Browsers
 
-This library should be Browserify-friendly.
+This library has no external dependencies, and should be Browserify-friendly.
 
 ## Development
 
