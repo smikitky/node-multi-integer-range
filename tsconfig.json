@@ -5,7 +5,7 @@
 	"compilerOptions": {
 		"outDir": "lib",
 		"target": "es5",
-		"module": "UMD",
+		"module": "commonjs",
 		"newLine": "LF",
 		"declaration": true
 	}
