@@ -93,19 +93,23 @@ To get the copy of the instance, use `clone()`, or alternatively the copy constr
 - `new MultiRange(data?: Initializer)` Creates a new MultiRange object.
 - `clone(): MultiRange` Clones this instance.
 - `append(value: Initializer): MultiRange` Appends to this instance.
-- `appendRange(min: number, max: number): MultiRange` Appends one range specified by the two parameters.
 - `subtract(value: Initializer): MultiRange` Subtracts from this instance.
-- `subtractRange(min: number, max: number): MultiRange` Subtracts one range specified by the two parameters.
 - `intersect(value: Initializer): MultiRange` Remove integers which are not included in `value` (aka intersection).
 - `has(value: Initializer): boolean` Checks if the instance contains the specified value.
-- `hasRange(min: number, max: number): boolean` Checks if the instance contains the range specified by the two parameters.
-- `isContinuous(): boolean` Checks if the current instance is continuous. Note that this returns false if the current range is empty.
-- `length(): number` Calculates how many numbers are effectively included in this instance. (`multirange('1-10,51-60,90').length()` returns 21)
+- `length(): number` Calculates how many numbers are effectively included in this instance. (ie, 5 for '3,5-7,9')
+- `segmentLength(): number` Returns the number of range segments (ie, 3 for '3,5-7,9' and 0 for an empty range)
 - `equals(cmp: Initializer): boolean` Checks if two MultiRange data are identical.
 - `toString(): string` Returns the string respresentation of this MultiRange.
 - `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
 - `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
 - `getIterator(): Object` Returns ES6-compatible iterator. See the description below.
+
+The following methods are deprecated and may be removed in future releases:
+
+- `appendRange(min: number, max: number): MultiRange` Use `append([[min, max]])` instead.
+- `subtractRange(min: number, max: number): MultiRange` Use `subtract([[min, max]])` instead.
+- `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
+- `isContinuous(): boolean` Use `segmentLength() === 1` instead.
 
 ### Iteration
 

@@ -216,6 +216,13 @@ describe('MultiRange', function() {
 		assert.equal(mr('1,3,10-15,20-21').length(), 10);
 	});
 
+	it('#segmentLength', function() {
+		assert.equal(mr('').segmentLength(), 0);
+		assert.equal(mr('5').segmentLength(), 1);
+		assert.equal(mr('5-10').segmentLength(), 1);
+		assert.equal(mr('1,3,10-15,20-21').segmentLength(), 4);
+	});
+
 	it('#equals', function() {
 		assert.isTrue(mr('').equals(''));
 		assert.isTrue(mr('5').equals(mr('5')));
