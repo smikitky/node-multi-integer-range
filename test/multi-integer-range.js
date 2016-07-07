@@ -31,9 +31,6 @@ describe('MultiRange', function() {
 			t(mr([]), '');
 			t(mr([1,10,8,5,9]), '1,5,8-10');
 			t(mr([[2,5],[7,10]]), '2-5,7-10');
-
-			// Mixed array like this is not recommended nor explicitly
-			// documented, but it works
 			t(mr([5,[8,10],[12,15]]), '5,8-10,12-15');
 		});
 
@@ -52,9 +49,13 @@ describe('MultiRange', function() {
 			assert.throws(function() { mr(null); }, TypeError);
 			// followings are valid
 			assert.doesNotThrow(function() { mr(undefined); }, Error);
+			t(mr(undefined), '');
 			assert.doesNotThrow(function() { mr([]); }, Error);
+			t(mr([]), '');
 			assert.doesNotThrow(function() { mr(); }, Error);
+			t(mr(), '');
 			assert.doesNotThrow(function() { mr(''); }, Error);
+			t(mr(''), '');
 		});
 	});
 
