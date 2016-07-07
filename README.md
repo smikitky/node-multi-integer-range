@@ -34,7 +34,7 @@ console.log(pages.has('5,9,12-14')); // true
 
 console.log(pages.toArray()); // [1, 3, 4, 5, ... , 15]
 console.log(pages.getRanges()); // [[1, 1], [3, 15]]
-console.log(pages.isContinuous()); // false
+console.log(pages.segmentLength()); // 2
 ```
 
 ### Initialization
