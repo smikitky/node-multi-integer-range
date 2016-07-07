@@ -40,18 +40,22 @@ console.log(pages.segmentLength()); // 2
 ### Initialization
 
 Some methods (and the constructor) take one *Initializer* parameter.
-An initializer is a string, an integer array, an array of `[number, number]` tuples,
-a single integer, or another MultiRange instance.
+An initializer is one of:
+
+- a valid string (eg `'1-3,5'`)
+- an array of integers (eg `[1, 2, 3, 5]`)
+- an array of `[number, number]` tuples (eg `[[1, 3], [5, 5]]`)
+- mixture of the above (eg `[[1, 3], 5]`)
+- a single integer (eg `1`)
+- another MultiRange instance
 
 Pass it to the constructor to create a MultiRange object,
 or pass nothing to create an empty MultiRange object.
 
 ```ts
 type Initializer =
-    string |
-    number |
-    ( number | [number,number] )[] |
-    MultiRange;
+    string | number | MultiRange
+    ( number | [number,number] )[];
 ```
 
 A shorthand constructor function `multirange()` is also available.
