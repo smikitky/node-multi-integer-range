@@ -293,3 +293,20 @@ describe('MultiRange', function() {
 		t(a, '5,12-15,100');
 	});
 });
+
+
+// the followings are meta tests to check our assertion methods
+// handle Inifinite numbers consistently across various runtimes
+describe('Assertion', function() {
+	it('must perform comparison on inifite numbers', function() {
+		assert.isTrue(Infinity === Infinity);
+		assert.isTrue(-Infinity === -Infinity);
+		assert.isTrue(10000000 < Infinity && -Infinity < -10000000);
+		assert.equal(Infinity, Infinity);
+		assert.equal(-Infinity, -Infinity);
+		assert.deepEqual(
+			[3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY],
+			[3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY]
+		);
+	})
+});
