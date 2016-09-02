@@ -47,13 +47,18 @@ export class MultiRange {
 	 * Override this if you need to customize the parsing strategy.
 	 */
 	protected parseString(data: string): void {
+
+		function toInt(str: string): number {
+			return parseInt(str.match(/^\(?(\-?\d+)/)[1], 10);
+		}
+
 		let s = data.replace(/\s/g, '');
 		if (s.length === 0) return;
 		for (let r of s.split(',')) {
-			let match = r.match(/^(\d+)(\-(\d+))?$/);
+			let match = r.match(/^(\d+|\(\-?\d+\))(\-(\d+|\(\-?\d+\)))?$/);
 			if (match) {
-				let min = parseInt(match[1]);
-				let max = typeof match[3] !== 'undefined' ? parseInt(match[3]) : min;
+				let min = toInt(match[1]);
+				let max = typeof match[3] !== 'undefined' ? toInt(match[3]) : min;
 				this.appendRange(min, max);
 			} else {
 				throw new SyntaxError('Invalid input');
@@ -90,7 +95,7 @@ export class MultiRange {
 	 * @deprecated Use `.append([[min, max]])` instead.
 	 */
 	public appendRange(min: number, max: number): MultiRange {
-		let newRange: Range = [Math.max(0, min), max];
+		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
@@ -344,9 +349,12 @@ export class MultiRange {
 	 */
 	public toString(): string
 	{
-		let ranges = [];
+		function wrap(i: number): string {
+			return (i >= 0 ? String(i) : `(${i})`);
+		}
+		const ranges = [];
 		for (let r of this.ranges)
-			ranges.push(r[0] == r[1] ? String(r[0]) : r[0] + '-' + r[1]);
+			ranges.push(r[0] == r[1] ? wrap(r[0]) : wrap(r[0]) + '-' + wrap(r[1]));
 		return ranges.join(',');
 	}
 
