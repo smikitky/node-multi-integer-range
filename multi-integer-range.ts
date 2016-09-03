@@ -127,7 +127,7 @@ export class MultiRange {
 	 */
 	public subtractRange(min: number, max: number): MultiRange
 	{
-		let newRange: Range = [Math.max(0, min), max];
+		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
