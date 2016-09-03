@@ -84,11 +84,6 @@ describe('MultiRange', function() {
 			t(mr('5-10').append(4), '4-10');
 			t(mr('5-10').append(15), '5-10,15');
 			t(mr('5-10').append(1), '1,5-10');
-
-			t(mr('(-5)-(-3)').append(-6), '(-6)-(-3)');
-			t(mr('(-5)-(-3)').append(-2), '(-5)-(-2)');
-			t(mr('(-5)-(-3)').append(3), '(-5)-(-3),3');
-
 			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
 			t(mr('5-10,15-20').append(3), '3,5-10,15-20');
 			t(mr('5-10,15-20').append(25), '5-10,15-20,25');
@@ -96,6 +91,12 @@ describe('MultiRange', function() {
 			t(mr('1-10,12-15,17-20').append([[1,100]]), '1-100');
 			t(mr('1-10,12-15,17-20,100').append([[5,14]]), '1-15,17-20,100');
 			t(mr('1-10,12-15,17-20').append([[14,19]]), '1-10,12-20');
+		});
+		it('must append negative values correctly', function() {
+			t(mr('(-5)-(-3)').append([-6, -2, 4, 5]), '(-6)-(-2),4-5');
+			t(mr('(-5)-(-3)').append(3), '(-5)-(-3),3');
+			t(mr('(-5)-(-3)').append([[-8, -1], [3, 9]]), '(-8)-(-1),3-9');
+			t(mr('(-5)-(-3),(-10)-(-8),0-6').append([-6, -7, [-2, -1]]), '(-10)-6');
 		});
 		it('must accept various input types', function() {
 			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
@@ -125,6 +126,13 @@ describe('MultiRange', function() {
 			t(mr('1-10,20-30').subtractRange(11, 19), '1-10,20-30');
 			t(mr('1-10,20-30').subtractRange(5, 25), '1-4,26-30');
 		});
+		it('must subtract negative values correctly', function() {
+			t(mr('(-10)-(-3)').subtract(5), '(-10)-(-3)');
+			t(mr('(-10)-(-3)').subtract(-10), '(-9)-(-3)');
+			t(mr('(-10)-(-3)').subtract(-3), '(-10)-(-4)');
+			t(mr('(-10)-(-3)').subtract(-5), '(-10)-(-6),(-4)-(-3)');
+			t(mr('(-30),(-20)-(-10),(-8)-0,8').subtract([-20, [-12, -5]]), '(-30),(-19)-(-13),(-4)-0,8');
+		});
 		it('must accept various input types', function() {
 			t(mr('1-20').subtract(5), '1-4,6-20');
 			t(mr('1-20').subtract('5,10-15'), '1-4,6-9,16-20');
@@ -142,12 +150,14 @@ describe('MultiRange', function() {
 	});
 
 	describe('#intersect', function() {
+
+		// the result must remain consistent when operands are swapped
+		function t2(r1, r2, expected) {
+			t(mr(r1).intersect(r2), expected);
+			t(mr(r2).intersect(r1), expected);
+		}
+
 		it('must calculate intersections correctly', function() {
-			// the result must remain consistent when operands are swapped
-			function t2(r1, r2, expected) {
-				t(mr(r1).intersect(r2), expected);
-				t(mr(r2).intersect(r1), expected);
-			}
 			t2('1-5', '8', '');
 			t2('5-100', '1,10,50,70,80,90,100,101', '10,50,70,80,90,100');
 			t2('5-100', '1-10,90-110', '5-10,90-100');
@@ -157,6 +167,14 @@ describe('MultiRange', function() {
 			t2('10-12,14-16,18-20', '11,13,15,17,19,21', '11,15,19');
 			t2('10-12,14-16,18-20', '10-12,14-16,18-20', '10-12,14-16,18-20');
 			t2('10-12,14-16,18-20', '20-22,24-26,28-30', '20');
+		});
+		it('must calculate negative intersections correctly', function() {
+			t2('0', '0', '0');
+			t2('(-50)-50', '(-30)-30', '(-30)-30');
+			t2('(-50)-50', '5-30', '5-30');
+			t2('(-50)-50', '(-100)-(-20)', '(-50)-(-20)');
+			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '1-50', '');
+			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '(-19)-(-12)', '(-19)-(-18),(-16)-(-14),(-12)');
 		});
 		it('must accept various input types', function() {
 			t(mr('10-15').intersect(12), '12');
@@ -185,6 +203,9 @@ describe('MultiRange', function() {
 			assert.isTrue(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250'));
 			assert.isTrue(mr('5-20,25-100,150-300').has(''));
 
+			assert.isTrue(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-250)-(-280)'));
+			assert.isTrue(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-200)-(-250),(-280)-(-220)'));
+
 			assert.isFalse(mr('5-20,25-100,150-300').has('3'));
 			assert.isFalse(mr('5-20,25-100,150-300').has('22'));
 			assert.isFalse(mr('5-20,25-100,150-300').has('500'));
@@ -192,6 +213,8 @@ describe('MultiRange', function() {
 			assert.isFalse(mr('5-20,25-100,150-300').has('149-400'));
 			assert.isFalse(mr('5-20,25-100,150-300').has('5-20,25-103,150-300'));
 			assert.isFalse(mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250,301'));
+
+			assert.isFalse(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-100)'));
 		});
 		it('must accept various input types', function() {
 			assert.isTrue(mr('5-20,25-100,150-300').has(30));
@@ -227,6 +250,7 @@ describe('MultiRange', function() {
 		assert.equal(mr('5').length(), 1);
 		assert.equal(mr('5-10').length(), 6);
 		assert.equal(mr('1,3,10-15,20-21').length(), 10);
+		assert.equal(mr('(-7)-(-4),(-1)-3,5').length(), 10);
 	});
 
 	it('#segmentLength', function() {
@@ -234,6 +258,7 @@ describe('MultiRange', function() {
 		assert.equal(mr('5').segmentLength(), 1);
 		assert.equal(mr('5-10').segmentLength(), 1);
 		assert.equal(mr('1,3,10-15,20-21').segmentLength(), 4);
+		assert.equal(mr('(-7)-(-4),(-1)-3,5').segmentLength(), 3);
 	});
 
 	it('#equals', function() {
@@ -241,6 +266,7 @@ describe('MultiRange', function() {
 		assert.isTrue(mr('5').equals(mr('5')));
 		assert.isTrue(mr('2-8').equals('2-8'));
 		assert.isTrue(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20'));
+		assert.isTrue(mr('(-7)-(-4),(-1)-3,5').equals('(-7)-(-4),(-1)-3,5'));
 		assert.isFalse(mr('').equals('5'));
 		assert.isFalse(mr('5').equals('5-6'));
 		assert.isFalse(mr('2-8').equals('2-7'));
@@ -249,6 +275,8 @@ describe('MultiRange', function() {
 
 	it('#toString', function() {
 		assert.equal('' + mr('15-20'), '15-20');
+		assert.equal('' + mr('0'), '0');
+		assert.equal('' + mr('(-8)-(-5)'), '(-8)-(-5)');
 	});
 
 	it('#toArray', function() {
@@ -256,6 +284,7 @@ describe('MultiRange', function() {
 		assert.deepEqual(mr('2').toArray(), [2]);
 		assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
 		assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
+		assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8,-7,-6,0,2,3]);
 	});
 
 	describe('Iteration', function() {
@@ -274,6 +303,7 @@ describe('MultiRange', function() {
 			testIter(mr('8'), [8]);
 			testIter(mr('2-5'), [2,3,4,5]);
 			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
+			testIter(mr('(-8)-(-6),0,2-3'), [-8,-7,-6,0,2,3]);
 		});
 
 		if (typeof Symbol.iterator !== 'symbol') {
@@ -293,6 +323,7 @@ describe('MultiRange', function() {
 			testIter(mr('8'), [8]);
 			testIter(mr('2-5'), [2,3,4,5]);
 			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
+			testIter(mr('(-8)-(-6),0,2-3'), [-8,-7,-6,0,2,3]);
 		});
 
 	});
