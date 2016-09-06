@@ -54,8 +54,7 @@ or pass nothing to create an empty MultiRange object.
 
 ```ts
 type Initializer =
-    string | number | MultiRange
-    ( number | [number,number] )[];
+    string | number | MultiRange | (number | [number, number])[];
 ```
 
 A shorthand constructor function `multirange()` is also available.
@@ -115,7 +114,7 @@ The following methods are deprecated and may be removed in future releases:
 - `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
 - `isContinuous(): boolean` Use `segmentLength() === 1` instead.
 
-### Negative ranges
+### Ranges Containing Zero or Negative Integers
 
 You can handle ranges containing zero or negative integers.
 To pass negative integers to the string parser, always contain them in parentheses.
@@ -151,7 +150,7 @@ while (!(page = it.next()).done) {
 
 ## Use in Browsers
 
-This library has no external dependencies, and should be Browserify-friendly.
+This library has no external dependencies, and can be used with Webpack and Browserify.
 
 ## Development
 
