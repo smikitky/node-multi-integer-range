@@ -64,7 +64,7 @@ export class MultiRange {
 				const max = match[2] === undefined ? +Infinity : toInt(match[2]);
 				this.appendRange(min, max);
 			} else {
-				throw new SyntaxError('Invalid input: ' + data);
+				throw new SyntaxError('Invalid input');
 			}
 		};
 	}
