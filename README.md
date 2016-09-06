@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=master)](https://travis-ci.org/smikitky/node-multi-integer-range)
 
 A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10").
-
 Such strings are typically used in print dialogs to indicate which pages to print.
 
 Supported operations include:
@@ -119,7 +118,8 @@ The following methods are deprecated and may be removed in future releases:
 
 ### Unbounded ranges
 
-Starting from version 2.1, you can use unbounded (or infinite) ranges which look like this:
+Starting from version 2.1, you can use unbounded (or infinite) ranges,
+which look like this:
 
 ```js
 // using the string parser...
@@ -127,13 +127,13 @@ var unbounded1 = new MultiRange('5-'); // all integers >= 5
 var unbounded2 = new MultiRange('-3'); // all integers <= 3
 var unbounded3 = new MultiRange('-'); // all integers
 
-// or programatically, using the JavaScript constant `Infinity`...
+// or programmatically, using the JavaScript constant `Infinity`...
 var unbounded4 = new MultiRange([[5, Infinity]]); // all integers >= 5
 var unbounded5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
 var unbounded6 = new MultiRange([[-Infinity, Infinity]]); // all integers
 ```
 
-The manipulation methods should work just as expected:
+The manipulation methods work just as expected with unbounded ranges:
 
 ```js
 console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
@@ -144,11 +144,11 @@ console.log(multirange('-5,10-').has('-3,20')); // true
 var userInput = '-10,15-20,90-';
 var pagesInMyDoc = '1-100';
 var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
-console.log(pagesToPrint);
-// prints '1-10,15-20,90-100'
+console.log(pagesToPrint); // prints '1-10,15-20,90-100'
 ```
 
-Unbounded ranges cannot be iterated over, and you cannot call `#toArray()` for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
+Unbounded ranges cannot be iterated over, and you cannot call `#toArray()`
+for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
 
 ### Negative ranges
 
@@ -163,8 +163,9 @@ console.log(mr1 + ''); // prints '(-5)-0'
 ```
 
 Again, note that passing `-5` to the string parser means
-"all integers <=5 (including 0 and -10000)" rather than "minus five".
-If you are only interested in positive numbers, use
+"all integers <=5 (including 0 and all negative integers)"
+rather than "minus five".
+If you are only interested in positive numbers, you can use
 `.intersect('0-')` to drop all negative integers.
 
 ### Iteration
