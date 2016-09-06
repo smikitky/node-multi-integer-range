@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=master)](https://travis-ci.org/smikitky/node-multi-integer-range)
 
-A small library which parses and manipulates comma-delimited positive integer ranges (such as "1-3,8-10").
+A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10").
 
 Such strings are typically used in print dialogs to indicate which pages to print.
 
@@ -114,6 +114,17 @@ The following methods are deprecated and may be removed in future releases:
 - `subtractRange(min: number, max: number): MultiRange` Use `subtract([[min, max]])` instead.
 - `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
 - `isContinuous(): boolean` Use `segmentLength() === 1` instead.
+
+### Negative ranges
+
+You can handle ranges containing zero or negative integers.
+To pass negative integers to the string parser, always contain them in parentheses.
+
+```js
+var mr1 = new MultiRange('(-5),(-1)-0');
+mr1.append([[-4, -2]]); // -4 to -2
+console.log(mr1 + ''); // prints '(-5)-0'
+```
 
 ### Iteration
 
