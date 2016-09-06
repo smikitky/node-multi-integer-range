@@ -399,6 +399,9 @@ export class MultiRange {
 	 */
 	public toArray(): number[]
 	{
+		if (this.isInfinite()) {
+			throw new RangeError('You cannot build an array from an open-ended range');
+		}
 		const result = new Array(this.length());
 		let idx = 0;
 		for (let r of this.ranges) {

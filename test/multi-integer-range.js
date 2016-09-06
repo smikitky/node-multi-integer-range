@@ -368,12 +368,18 @@ describe('MultiRange', function() {
 		assert.equal('' + mr([[10, Infinity]]), '10-');
 	});
 
-	it('#toArray', function() {
-		assert.deepEqual(mr('').toArray(), []);
-		assert.deepEqual(mr('2').toArray(), [2]);
-		assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
-		assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
-		assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8,-7,-6,0,2,3]);
+	describe('#toArray', function() {
+		it('must build an array from a finite multirange', function() {
+			assert.deepEqual(mr('').toArray(), []);
+			assert.deepEqual(mr('2').toArray(), [2]);
+			assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
+			assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
+			assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8,-7,-6,0,2,3]);
+		});
+		it('must throw an error for an infinite multirange', function() {
+			assert.throws(function() { mr('-5').toArray() }, RangeError);
+			assert.throws(function() { mr('-').toArray() }, RangeError);
+		});
 	});
 
 	describe('Iteration', function() {
