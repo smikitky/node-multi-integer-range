@@ -150,9 +150,9 @@ console.log(pagesToPrint); // prints '1-10,15-20,90-100'
 Unbounded ranges cannot be iterated over, and you cannot call `#toArray()`
 for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
 
-### Ranges Containing Zero or Negative Integers
+### Ranges Containing Zero and Negative Integers
 
-You can handle ranges containing zero or negative integers.
+You can handle ranges containing zero and negative integers.
 To pass negative integers to the string parser, always contain them in parentheses.
 Otherwise, it will be parsed as an unbounded range.
 
@@ -190,6 +190,11 @@ while (!(page = it.next()).done) {
     console.log(page.value);
 }
 ```
+
+## TypeScript Definition File
+
+This library includes TypeScript definition file. Starting from TypeScript 1.6,
+The TypeScript compiler can find this definition file automatically.
 
 ## Use in Browsers
 
