@@ -21,6 +21,13 @@ describe('MultiRange', function() {
 			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
 		});
 
+		it('must parse unbounded ranges', function() {
+			t(mr('10-'), '10-');
+			t(mr('-10'), '-10');
+			t(mr('5,10-'), '5,10-');
+			t(mr('-10,20,50'), '-10,20,50');
+		});
+
 		it('must parse string with random/reverse order', function() {
 			t(mr('1,8,2-4,7,5-6,10-9'), '1-10');
 			t(mr('10-8,7-5,1-4'), '1-10');
@@ -50,7 +57,6 @@ describe('MultiRange', function() {
 			assert.throws(function() { mr('1.5'); }, SyntaxError);
 			assert.throws(function() { mr('2-5,8-10,*,99'); }, SyntaxError);
 			assert.throws(function() { mr(','); }, SyntaxError);
-			assert.throws(function() { mr('-'); }, SyntaxError);
 			assert.throws(function() { mr(['abc']); }, TypeError);
 			assert.throws(function() { mr([1,[5,9,7]]); }, TypeError);
 			assert.throws(function() { mr(null); }, TypeError);
@@ -63,6 +69,15 @@ describe('MultiRange', function() {
 			t(mr(), '');
 			assert.doesNotThrow(function() { mr(''); }, Error);
 			t(mr(''), '');
+		});
+
+		it('must throw an error for Infinity not as part of an unbounded range', function() {
+			assert.throws(function() { mr(Infinity); }, RangeError);
+			assert.throws(function() { mr([Infinity]); }, RangeError);
+			assert.throws(function() { mr([[Infinity, Infinity]]); }, RangeError);
+			assert.throws(function() { mr(-Infinity); }, RangeError);
+			assert.throws(function() { mr([-Infinity]); }, RangeError);
+			assert.throws(function() { mr([[-Infinity, -Infinity]]); }, RangeError);
 		});
 	});
 
@@ -98,6 +113,27 @@ describe('MultiRange', function() {
 			t(mr('(-5)-(-3)').append([[-8, -1], [3, 9]]), '(-8)-(-1),3-9');
 			t(mr('(-5)-(-3),(-10)-(-8),0-6').append([-6, -7, [-2, -1]]), '(-10)-6');
 		});
+		it('must append unbounded ranges correctly', function() {
+			t(mr('5-').append(10), '5-');
+			t(mr('5-').append(4), '4-');
+			t(mr('5-').append(3), '3,5-');
+			t(mr('5-').append('10-'), '5-');
+			t(mr('5-').append('2-'), '2-');
+			t(mr('-5').append(10), '-5,10');
+			t(mr('-5').append(6), '-6');
+			t(mr('-5').append(2), '-5');
+			t(mr('-5').append('-10'), '-10');
+			t(mr('-5').append('-2'), '-5');
+			t(mr('-5').append('3-'), '-');
+			t(mr('-5').append('6-'), '-');
+			t(mr('-5,8-').append('1-10'), '-');
+			t(mr('-3').append('5-'), '-3,5-');
+			t(mr('-(-10)').append('(-8),0,10-'), '-(-10),(-8),0,10-');
+			t(mr('-(-10)').append('(-8),0,10-'), '-(-10),(-8),0,10-');
+			t(mr('-').append('(-8),0,10-'), '-');
+			t(mr('-').append('-'), '-');
+			t(mr().append('-'), '-');
+		});
 		it('must accept various input types', function() {
 			t(mr('5-10,15-20').append(12), '5-10,12,15-20');
 			t(mr('5-10,15-20').append('11-14,21-25'), '5-25');
@@ -132,6 +168,19 @@ describe('MultiRange', function() {
 			t(mr('(-10)-(-3)').subtract(-3), '(-10)-(-4)');
 			t(mr('(-10)-(-3)').subtract(-5), '(-10)-(-6),(-4)-(-3)');
 			t(mr('(-30),(-20)-(-10),(-8)-0,8').subtract([-20, [-12, -5]]), '(-30),(-19)-(-13),(-4)-0,8');
+		});
+		it('must subtract unbounded ranges correctly', function() {
+			t(mr('10-20').subtract('15-'), '10-14');
+			t(mr('10-20').subtract('-15'), '16-20');
+			t(mr('10-20').subtract('-12,18-'), '13-17');
+			t(mr('-12,18-').subtract('5'), '-4,6-12,18-');
+			t(mr('-12,18-').subtract('5,20'), '-4,6-12,18-19,21-');
+			t(mr('-12,18-').subtract('-20,3-'), '');
+			t(mr('-12,18-').subtract('-'), '');
+			t(mr('-').subtract('200-205'), '-199,206-');
+			t(mr('-').subtract('-100,150-'), '101-149');
+			t(mr('-').subtract('-100,120,130,150-'), '101-119,121-129,131-149');
+			t(mr('-').subtract('-'), '');
 		});
 		it('must accept various input types', function() {
 			t(mr('1-20').subtract(5), '1-4,6-20');
@@ -176,6 +225,18 @@ describe('MultiRange', function() {
 			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '1-50', '');
 			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '(-19)-(-12)', '(-19)-(-18),(-16)-(-14),(-12)');
 		});
+		it('must calculate unbounded range intersections correctly', function() {
+			t2('1-', '4-', '4-');
+			t2('100-', '-300', '100-300');
+			t2('-5', '-0', '-0');
+			t2('-10,50,90-', '0-100', '0-10,50,90-100');
+			t2('-40,70,80-', '-50,70,90-', '-40,70,90-');
+			t2('-10', '80-', '');
+			t2('-', '-', '-');
+			t2('-', '-90', '-90');
+			t2('-', '80-', '80-');
+			t2('-', '40-45,(-20)', '(-20),40-45');
+		});
 		it('must accept various input types', function() {
 			t(mr('10-15').intersect(12), '12');
 			t(mr('10-15').intersect('12-17'), '12-15');
@@ -216,6 +277,18 @@ describe('MultiRange', function() {
 
 			assert.isFalse(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-100)'));
 		});
+		it('must perform correct inclusion check for unbounded ranges', function() {
+			assert.isTrue(mr('-').has('5'));
+			assert.isTrue(mr('-20,40-').has('70'));
+			assert.isTrue(mr('-20,40').has('10'));
+			assert.isTrue(mr('-20,30-35,40-').has('-10,30,31,50-'));
+			assert.isTrue(mr('-').has('-'));
+			assert.isFalse(mr('-20,40-').has('30'));
+			assert.isFalse(mr('-20,40-').has('10-50'));
+			assert.isFalse(mr('-20,40-').has('10-'));
+			assert.isFalse(mr('-20,40-').has('-50'));
+			assert.isFalse(mr('-20,40-').has('-'));
+		});
 		it('must accept various input types', function() {
 			assert.isTrue(mr('5-20,25-100,150-300').has(30));
 			assert.isFalse(mr('5-20,25-100,150-300').has(23));
@@ -251,6 +324,9 @@ describe('MultiRange', function() {
 		assert.equal(mr('5-10').length(), 6);
 		assert.equal(mr('1,3,10-15,20-21').length(), 10);
 		assert.equal(mr('(-7)-(-4),(-1)-3,5').length(), 10);
+		assert.equal(mr('-5').length(), Infinity);
+		assert.equal(mr('8-').length(), Infinity);
+		assert.equal(mr('-').length(), Infinity);
 	});
 
 	it('#segmentLength', function() {
@@ -259,6 +335,8 @@ describe('MultiRange', function() {
 		assert.equal(mr('5-10').segmentLength(), 1);
 		assert.equal(mr('1,3,10-15,20-21').segmentLength(), 4);
 		assert.equal(mr('(-7)-(-4),(-1)-3,5').segmentLength(), 3);
+		assert.equal(mr('-3,8-').segmentLength(), 2);
+		assert.equal(mr('-').segmentLength(), 1);
 	});
 
 	it('#equals', function() {
@@ -267,24 +345,41 @@ describe('MultiRange', function() {
 		assert.isTrue(mr('2-8').equals('2-8'));
 		assert.isTrue(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20'));
 		assert.isTrue(mr('(-7)-(-4),(-1)-3,5').equals('(-7)-(-4),(-1)-3,5'));
+		assert.isTrue(mr('-8,20-').equals('-8,20-'));
+		assert.isTrue(mr('-').equals('1-,-0'));
 		assert.isFalse(mr('').equals('5'));
 		assert.isFalse(mr('5').equals('5-6'));
 		assert.isFalse(mr('2-8').equals('2-7'));
 		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
 	});
 
+	it('#isUnbounded', function() {
+		assert.isTrue(mr([[-Infinity, 5]]).isUnbounded());
+		assert.isTrue(mr([[0, 5], [10, Infinity]]).isUnbounded());
+		assert.isFalse(mr(8).isUnbounded());
+	});
+
 	it('#toString', function() {
 		assert.equal('' + mr('15-20'), '15-20');
 		assert.equal('' + mr('0'), '0');
 		assert.equal('' + mr('(-8)-(-5)'), '(-8)-(-5)');
+		assert.equal('' + mr([[-Infinity, Infinity]]), '-');
+		assert.equal('' + mr([[-Infinity, 10]]), '-10');
+		assert.equal('' + mr([[10, Infinity]]), '10-');
 	});
 
-	it('#toArray', function() {
-		assert.deepEqual(mr('').toArray(), []);
-		assert.deepEqual(mr('2').toArray(), [2]);
-		assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
-		assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
-		assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8,-7,-6,0,2,3]);
+	describe('#toArray', function() {
+		it('must build an array from a finite multirange', function() {
+			assert.deepEqual(mr('').toArray(), []);
+			assert.deepEqual(mr('2').toArray(), [2]);
+			assert.deepEqual(mr('2-5').toArray(), [2,3,4,5]);
+			assert.deepEqual(mr('2-3,8,10-12').toArray(), [2,3,8,10,11,12]);
+			assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8,-7,-6,0,2,3]);
+		});
+		it('must throw an error for an infinite multirange', function() {
+			assert.throws(function() { mr('-5').toArray() }, RangeError);
+			assert.throws(function() { mr('-').toArray() }, RangeError);
+		});
 	});
 
 	describe('Iteration', function() {
@@ -304,6 +399,12 @@ describe('MultiRange', function() {
 			testIter(mr('2-5'), [2,3,4,5]);
 			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
 			testIter(mr('(-8)-(-6),0,2-3'), [-8,-7,-6,0,2,3]);
+		});
+
+		it('must throw an error for unbounded ranges', function() {
+			assert.throws(function() {
+				mr([[8, Infinity]]).getIterator();
+			}, RangeError);
 		});
 
 		if (typeof Symbol.iterator !== 'symbol') {

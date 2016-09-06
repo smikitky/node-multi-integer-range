@@ -20,7 +20,7 @@ export class MultiRange {
 		if (typeof data === 'string') {
 			this.parseString(data);
 		} else if (typeof data === 'number') {
-			this.ranges.push([data, data]);
+			this.appendRange(data, data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
 		} else if (isArray(data)) {
@@ -53,15 +53,18 @@ export class MultiRange {
 		}
 
 		const s = data.replace(/\s/g, '');
-		if (s.length === 0) return;
+		if (!s.length) return;
+		let match;
 		for (let r of s.split(',')) {
-			let match = r.match(/^(\d+|\(\-?\d+\))(\-(\d+|\(\-?\d+\)))?$/);
-			if (match) {
-				const min = toInt(match[1]);
-				const max = typeof match[3] !== 'undefined' ? toInt(match[3]) : min;
+			if (match = r.match(/^(\d+|\(\-?\d+\))$/)) {
+				const val = toInt(match[1]);
+				this.appendRange(val, val);
+			} else if (match = r.match(/^(\d+|\(\-?\d+\))?\-(\d+|\(\-?\d+\))?$/)) {
+				const min = match[1] === undefined ? -Infinity : toInt(match[1]);
+				const max = match[2] === undefined ? +Infinity : toInt(match[2]);
 				this.appendRange(min, max);
 			} else {
-				throw new SyntaxError('Invalid input');
+				throw new SyntaxError('Invalid input: ' + data);
 			}
 		};
 	}
@@ -98,6 +101,11 @@ export class MultiRange {
 		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
+		}
+		if (newRange[0] === Infinity && newRange[1] === Infinity ||
+			newRange[0] === -Infinity && newRange[1] === -Infinity
+		) {
+			throw new RangeError('Infinity can be used only within an unbounded range');
 		}
 		const overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);
@@ -315,8 +323,10 @@ export class MultiRange {
 	 * Calculates how many numbers are effectively included in this instance.
 	 * (i.e. '1-10,51-60,90' returns 21)
 	 * @return The number of integer values in this instance.
+	 *    Returns `Infinity` for unbounded ranges.
 	 */
 	public length(): number {
+		if (this.isUnbounded()) return Infinity;
 		let result = 0;
 		for (let r of this.ranges) result += r[1] - r[0] + 1;
 		return result;
@@ -345,6 +355,18 @@ export class MultiRange {
 	}
 
 	/**
+	 * Checks if the current instance is unbounded (i.e., infinite).
+	 */
+	public isUnbounded(): boolean
+	{
+		return (
+			this.ranges.length > 0
+			&& (this.ranges[0][0] === -Infinity ||
+				this.ranges[this.ranges.length-1][1] === Infinity)
+		);
+	}
+
+	/**
 	 * Returns the string respresentation of this MultiRange.
 	 */
 	public toString(): string
@@ -352,9 +374,22 @@ export class MultiRange {
 		function wrap(i: number): string {
 			return (i >= 0 ? String(i) : `(${i})`);
 		}
-		const ranges = [];
-		for (let r of this.ranges)
-			ranges.push(r[0] == r[1] ? wrap(r[0]) : wrap(r[0]) + '-' + wrap(r[1]));
+		const ranges: string[] = [];
+		for (let r of this.ranges) {
+			if (r[0] === -Infinity) {
+				if (r[1] === Infinity) {
+					ranges.push('-');
+				} else {
+					ranges.push(`-${wrap(r[1])}`);
+				}
+			} else if (r[1] === Infinity) {
+				ranges.push(`${wrap(r[0])}-`);
+			} else if (r[0] == r[1]) {
+				ranges.push(wrap(r[0]));
+			} else {
+				ranges.push(`${wrap(r[0])}-${wrap(r[1])}`);
+			}
+		}
 		return ranges.join(',');
 	}
 
@@ -364,6 +399,9 @@ export class MultiRange {
 	 */
 	public toArray(): number[]
 	{
+		if (this.isUnbounded()) {
+			throw new RangeError('You cannot build an array from an unbounded range');
+		}
 		const result = new Array(this.length());
 		let idx = 0;
 		for (let r of this.ranges) {
@@ -379,6 +417,9 @@ export class MultiRange {
 	 */
 	public getIterator(): { next: () => { done: boolean, value: number }}
 	{
+		if (this.isUnbounded()) {
+			throw new RangeError('Unbounded ranges cannot be iterated over');
+		}
 		let i = 0,
 			curRange: Range = this.ranges[i],
 			j = curRange ? curRange[0] : undefined;

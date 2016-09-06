@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=master)](https://travis-ci.org/smikitky/node-multi-integer-range)
 
 A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10").
-
 Such strings are typically used in print dialogs to indicate which pages to print.
 
 Supported operations include:
@@ -12,8 +11,9 @@ Supported operations include:
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
+- Unbounded ranges (e.g., `5-` to mean "all integers >= 5")
 - Iteration using `for ... of`
-- Array creation ("flatten")
+- Array creation (a.k.a. "flatten")
 
 Internal data are always *sorted and normalized* to the smallest possible
 representation.
@@ -102,6 +102,7 @@ To get the copy of the instance, use `clone()`, or alternatively the copy constr
 - `length(): number` Calculates how many numbers are effectively included in this instance. (ie, 5 for '3,5-7,9')
 - `segmentLength(): number` Returns the number of range segments (ie, 3 for '3,5-7,9' and 0 for an empty range)
 - `equals(cmp: Initializer): boolean` Checks if two MultiRange data are identical.
+- `isUnbounded(): boolean` Returns if the instance is unbounded.
 - `toString(): string` Returns the string respresentation of this MultiRange.
 - `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
 - `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
@@ -114,16 +115,58 @@ The following methods are deprecated and may be removed in future releases:
 - `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
 - `isContinuous(): boolean` Use `segmentLength() === 1` instead.
 
+
+### Unbounded ranges
+
+Starting from version 2.1, you can use unbounded (or infinite) ranges,
+which look like this:
+
+```js
+// using the string parser...
+var unbounded1 = new MultiRange('5-'); // all integers >= 5
+var unbounded2 = new MultiRange('-3'); // all integers <= 3
+var unbounded3 = new MultiRange('-'); // all integers
+
+// or programmatically, using the JavaScript constant `Infinity`...
+var unbounded4 = new MultiRange([[5, Infinity]]); // all integers >= 5
+var unbounded5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
+var unbounded6 = new MultiRange([[-Infinity, Infinity]]); // all integers
+```
+
+The manipulation methods work just as expected with unbounded ranges:
+
+```js
+console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
+console.log(multirange('-').subtract('3-5,9') + ''); // '-2,6-8,10-'
+console.log(multirange('-5,10-').has('-3,20')); // true
+
+// intersection is especially useful to "trim" any unbounded ranges:
+var userInput = '-10,15-20,90-';
+var pagesInMyDoc = '1-100';
+var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
+console.log(pagesToPrint); // prints '1-10,15-20,90-100'
+```
+
+Unbounded ranges cannot be iterated over, and you cannot call `#toArray()`
+for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
+
 ### Ranges Containing Zero or Negative Integers
 
 You can handle ranges containing zero or negative integers.
 To pass negative integers to the string parser, always contain them in parentheses.
+Otherwise, it will be parsed as an unbounded range.
 
 ```js
-var mr1 = new MultiRange('(-5),(-1)-0');
+var mr1 = new MultiRange('(-5),(-1)-0'); // -5, -1 and 0
 mr1.append([[-4, -2]]); // -4 to -2
 console.log(mr1 + ''); // prints '(-5)-0'
 ```
+
+Again, note that passing `-5` to the string parser means
+"all integers <=5 (including 0 and all negative integers)"
+rather than "minus five".
+If you are only interested in positive numbers, you can use
+`.intersect('0-')` to drop all negative integers.
 
 ### Iteration
 
