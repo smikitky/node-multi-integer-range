@@ -12,9 +12,9 @@ Supported operations include:
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
-- Iteration using `for ... of`
-- Array creation ("flatten")
 - Open-ended ranges (e.g., `5-` to mean "all integers >= 5")
+- Iteration using `for ... of`
+- Array creation (a.k.a. "flatten")
 
 Internal data are always *sorted and normalized* to the smallest possible
 representation.
@@ -127,32 +127,28 @@ var open1 = new MultiRange('5-'); // all integers >= 5
 var open2 = new MultiRange('-3'); // all integers <= 3
 var open3 = new MultiRange('-'); // all integers
 
-// or programatically, using the JavaScript constant Infinity...
+// or programatically, using the JavaScript constant `Infinity`...
 var open4 = new MultiRange([[5, Infinity]]); // all integers >= 5
 var open5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
 var open6 = new MultiRange([[-Infinity, Infinity]]); // all integers
 ```
 
-Ordinary manipulation methods should work just as expected:
+The manipulation methods should work just as expected:
 
 ```js
-console.log(multirange('5-10,15-').append('11-14') + ''); // '5-'
+console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
 console.log(multirange('-').subtract('3-5,9') + ''); // '-2,6-8,10-'
 console.log(multirange('-5,10-').has('-3,20')); // true
 
-// intersection is especially useful
+// intersection is especially useful to "trim" any open-ended ranges:
 var userInput = '-10,15-20,90-';
-var actualPagesInMyDoc = '1-100';
-
-console.log('Pages to print: ' + multirange(userInput).intersect(actualPagesInMyDoc));
-// '1-10,15-20,90-100'
+var pagesInMyDoc = '1-100';
+var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
+console.log(pagesToPrint);
+// prints '1-10,15-20,90-100'
 ```
 
-Notes for open-ended ranges:
-
-- They cannot be iterated over.
-- You cannot call `#toArray()` for the obvious reason.
-- Calling `#length()` returns `Infinity`.
+Open-ended ranges cannot be iterated over, and you cannot call `#toArray()` for the obvious reason. Calling `#length()` for open-ended ranges will return `Infinity`.
 
 ### Negative ranges
 
@@ -165,6 +161,11 @@ var mr1 = new MultiRange('(-5),(-1)-0'); // -5, -1 and 0
 mr1.append([[-4, -2]]); // -4 to -2
 console.log(mr1 + ''); // prints '(-5)-0'
 ```
+
+Again, note that passing `-5` to the string parser means
+"all integers <=5 (including 0 and -10000)" rather than "minus five".
+If you are only interested in positive numbers, use
+`.intersect('0-')` to drop all negative integers.
 
 ### Iteration
 
