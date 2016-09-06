@@ -21,6 +21,13 @@ describe('MultiRange', function() {
 			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
 		});
 
+		it('must parse open ranges', function() {
+			t(mr('10-'), '10-');
+			t(mr('-10'), '-10');
+			t(mr('5,10-'), '5,10-');
+			t(mr('-10,20,50'), '-10,20,50');
+		});
+
 		it('must parse string with random/reverse order', function() {
 			t(mr('1,8,2-4,7,5-6,10-9'), '1-10');
 			t(mr('10-8,7-5,1-4'), '1-10');
@@ -50,7 +57,6 @@ describe('MultiRange', function() {
 			assert.throws(function() { mr('1.5'); }, SyntaxError);
 			assert.throws(function() { mr('2-5,8-10,*,99'); }, SyntaxError);
 			assert.throws(function() { mr(','); }, SyntaxError);
-			assert.throws(function() { mr('-'); }, SyntaxError);
 			assert.throws(function() { mr(['abc']); }, TypeError);
 			assert.throws(function() { mr([1,[5,9,7]]); }, TypeError);
 			assert.throws(function() { mr(null); }, TypeError);
@@ -294,6 +300,9 @@ describe('MultiRange', function() {
 		assert.equal('' + mr('15-20'), '15-20');
 		assert.equal('' + mr('0'), '0');
 		assert.equal('' + mr('(-8)-(-5)'), '(-8)-(-5)');
+		assert.equal('' + mr([[-Infinity, Infinity]]), '-');
+		assert.equal('' + mr([[-Infinity, 10]]), '-10');
+		assert.equal('' + mr([[10, Infinity]]), '10-');
 	});
 
 	it('#toArray', function() {

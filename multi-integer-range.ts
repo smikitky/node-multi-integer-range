@@ -53,15 +53,18 @@ export class MultiRange {
 		}
 
 		const s = data.replace(/\s/g, '');
-		if (s.length === 0) return;
+		if (!s.length) return;
+		let match;
 		for (let r of s.split(',')) {
-			let match = r.match(/^(\d+|\(\-?\d+\))(\-(\d+|\(\-?\d+\)))?$/);
-			if (match) {
-				const min = toInt(match[1]);
-				const max = typeof match[3] !== 'undefined' ? toInt(match[3]) : min;
+			if (match = r.match(/^(\d+|\(\-?\d+\))$/)) {
+				const val = toInt(match[1]);
+				this.appendRange(val, val);
+			} else if (match = r.match(/^(\d+|\(\-?\d+\))?\-(\d+|\(\-?\d+\))?$/)) {
+				const min = match[1] === undefined ? -Infinity : toInt(match[1]);
+				const max = match[2] === undefined ? +Infinity : toInt(match[2]);
 				this.appendRange(min, max);
 			} else {
-				throw new SyntaxError('Invalid input');
+				throw new SyntaxError('Invalid input: ' + data);
 			}
 		};
 	}
@@ -371,9 +374,22 @@ export class MultiRange {
 		function wrap(i: number): string {
 			return (i >= 0 ? String(i) : `(${i})`);
 		}
-		const ranges = [];
-		for (let r of this.ranges)
-			ranges.push(r[0] == r[1] ? wrap(r[0]) : wrap(r[0]) + '-' + wrap(r[1]));
+		const ranges: string[] = [];
+		for (let r of this.ranges) {
+			if (r[0] === -Infinity) {
+				if (r[1] === Infinity) {
+					ranges.push('-');
+				} else {
+					ranges.push(`-${wrap(r[1])}`);
+				}
+			} else if (r[1] === Infinity) {
+				ranges.push(`${wrap(r[0])}-`);
+			} else if (r[0] == r[1]) {
+				ranges.push(wrap(r[0]));
+			} else {
+				ranges.push(`${wrap(r[0])}-${wrap(r[1])}`);
+			}
+		}
 		return ranges.join(',');
 	}
 
