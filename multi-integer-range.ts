@@ -320,8 +320,10 @@ export class MultiRange {
 	 * Calculates how many numbers are effectively included in this instance.
 	 * (i.e. '1-10,51-60,90' returns 21)
 	 * @return The number of integer values in this instance.
+	 *    Returns `Infinity` for open-ended ranges.
 	 */
 	public length(): number {
+		if (this.isInfinite()) return Infinity;
 		let result = 0;
 		for (let r of this.ranges) result += r[1] - r[0] + 1;
 		return result;
@@ -347,6 +349,18 @@ export class MultiRange {
 		} else {
 			return this.equals(new MultiRange(cmp));
 		}
+	}
+
+	/**
+	 * Checks if the current instance has an open-ended range.
+	 */
+	public isInfinite(): boolean
+	{
+		return (
+			this.ranges.length > 0
+			&& (this.ranges[0][0] === -Infinity ||
+				this.ranges[this.ranges.length-1][1] === Infinity)
+		);
 	}
 
 	/**
@@ -384,6 +398,9 @@ export class MultiRange {
 	 */
 	public getIterator(): { next: () => { done: boolean, value: number }}
 	{
+		if (this.isInfinite()) {
+			throw new RangeError('Open-ended ranges cannot be iterated over');
+		}
 		let i = 0,
 			curRange: Range = this.ranges[i],
 			j = curRange ? curRange[0] : undefined;

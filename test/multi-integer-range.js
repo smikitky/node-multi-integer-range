@@ -260,6 +260,8 @@ describe('MultiRange', function() {
 		assert.equal(mr('5-10').length(), 6);
 		assert.equal(mr('1,3,10-15,20-21').length(), 10);
 		assert.equal(mr('(-7)-(-4),(-1)-3,5').length(), 10);
+		assert.equal(mr([[-Infinity, 5]]).length(), Infinity);
+		assert.equal(mr([[8, Infinity]]).length(), Infinity);
 	});
 
 	it('#segmentLength', function() {
@@ -280,6 +282,12 @@ describe('MultiRange', function() {
 		assert.isFalse(mr('5').equals('5-6'));
 		assert.isFalse(mr('2-8').equals('2-7'));
 		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
+	});
+
+	it('#isInfinite', function() {
+		assert.isTrue(mr([[-Infinity, 5]]).isInfinite());
+		assert.isTrue(mr([[0, 5], [10, Infinity]]).isInfinite());
+		assert.isFalse(mr(8).isInfinite());
 	});
 
 	it('#toString', function() {
@@ -313,6 +321,12 @@ describe('MultiRange', function() {
 			testIter(mr('2-5'), [2,3,4,5]);
 			testIter(mr('2-5,8-10'), [2,3,4,5,8,9,10]);
 			testIter(mr('(-8)-(-6),0,2-3'), [-8,-7,-6,0,2,3]);
+		});
+
+		it('must throw an error for open ranges', function() {
+			assert.throws(function() {
+				mr([[8, Infinity]]).getIterator();
+			}, RangeError);
 		});
 
 		if (typeof Symbol.iterator !== 'symbol') {
