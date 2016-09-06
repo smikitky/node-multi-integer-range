@@ -105,7 +105,7 @@ export class MultiRange {
 		if (newRange[0] === Infinity && newRange[1] === Infinity ||
 			newRange[0] === -Infinity && newRange[1] === -Infinity
 		) {
-			throw new RangeError('Infinity can be used only within an open range');
+			throw new RangeError('Infinity can be used only within an unbounded range');
 		}
 		const overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);
@@ -323,10 +323,10 @@ export class MultiRange {
 	 * Calculates how many numbers are effectively included in this instance.
 	 * (i.e. '1-10,51-60,90' returns 21)
 	 * @return The number of integer values in this instance.
-	 *    Returns `Infinity` for open-ended ranges.
+	 *    Returns `Infinity` for unbounded ranges.
 	 */
 	public length(): number {
-		if (this.isInfinite()) return Infinity;
+		if (this.isUnbounded()) return Infinity;
 		let result = 0;
 		for (let r of this.ranges) result += r[1] - r[0] + 1;
 		return result;
@@ -355,9 +355,9 @@ export class MultiRange {
 	}
 
 	/**
-	 * Checks if the current instance has an open-ended range.
+	 * Checks if the current instance is unbounded (i.e., infinite).
 	 */
-	public isInfinite(): boolean
+	public isUnbounded(): boolean
 	{
 		return (
 			this.ranges.length > 0
@@ -399,8 +399,8 @@ export class MultiRange {
 	 */
 	public toArray(): number[]
 	{
-		if (this.isInfinite()) {
-			throw new RangeError('You cannot build an array from an open-ended range');
+		if (this.isUnbounded()) {
+			throw new RangeError('You cannot build an array from an unbounded range');
 		}
 		const result = new Array(this.length());
 		let idx = 0;
@@ -417,8 +417,8 @@ export class MultiRange {
 	 */
 	public getIterator(): { next: () => { done: boolean, value: number }}
 	{
-		if (this.isInfinite()) {
-			throw new RangeError('Open-ended ranges cannot be iterated over');
+		if (this.isUnbounded()) {
+			throw new RangeError('Unbounded ranges cannot be iterated over');
 		}
 		let i = 0,
 			curRange: Range = this.ranges[i],

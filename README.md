@@ -12,7 +12,7 @@ Supported operations include:
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
-- Open-ended ranges (e.g., `5-` to mean "all integers >= 5")
+- Unbounded ranges (e.g., `5-` to mean "all integers >= 5")
 - Iteration using `for ... of`
 - Array creation (a.k.a. "flatten")
 
@@ -104,7 +104,7 @@ To get the copy of the instance, use `clone()`, or alternatively the copy constr
 - `length(): number` Calculates how many numbers are effectively included in this instance. (ie, 5 for '3,5-7,9')
 - `segmentLength(): number` Returns the number of range segments (ie, 3 for '3,5-7,9' and 0 for an empty range)
 - `equals(cmp: Initializer): boolean` Checks if two MultiRange data are identical.
-- `isInfinite(): boolean` Returns if the instance has an open-ended range.
+- `isUnbounded(): boolean` Returns if the instance is unbounded.
 - `toString(): string` Returns the string respresentation of this MultiRange.
 - `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
 - `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
@@ -117,20 +117,20 @@ The following methods are deprecated and may be removed in future releases:
 - `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
 - `isContinuous(): boolean` Use `segmentLength() === 1` instead.
 
-### Open-ended ranges
+### Unbounded ranges
 
-As of version 2.1, you can use open-ended (infinity) ranges which look like this:
+Starting from version 2.1, you can use unbounded (or infinite) ranges which look like this:
 
 ```js
 // using the string parser...
-var open1 = new MultiRange('5-'); // all integers >= 5
-var open2 = new MultiRange('-3'); // all integers <= 3
-var open3 = new MultiRange('-'); // all integers
+var unbounded1 = new MultiRange('5-'); // all integers >= 5
+var unbounded2 = new MultiRange('-3'); // all integers <= 3
+var unbounded3 = new MultiRange('-'); // all integers
 
 // or programatically, using the JavaScript constant `Infinity`...
-var open4 = new MultiRange([[5, Infinity]]); // all integers >= 5
-var open5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
-var open6 = new MultiRange([[-Infinity, Infinity]]); // all integers
+var unbounded4 = new MultiRange([[5, Infinity]]); // all integers >= 5
+var unbounded5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
+var unbounded6 = new MultiRange([[-Infinity, Infinity]]); // all integers
 ```
 
 The manipulation methods should work just as expected:
@@ -140,7 +140,7 @@ console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
 console.log(multirange('-').subtract('3-5,9') + ''); // '-2,6-8,10-'
 console.log(multirange('-5,10-').has('-3,20')); // true
 
-// intersection is especially useful to "trim" any open-ended ranges:
+// intersection is especially useful to "trim" any unbounded ranges:
 var userInput = '-10,15-20,90-';
 var pagesInMyDoc = '1-100';
 var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
@@ -148,13 +148,13 @@ console.log(pagesToPrint);
 // prints '1-10,15-20,90-100'
 ```
 
-Open-ended ranges cannot be iterated over, and you cannot call `#toArray()` for the obvious reason. Calling `#length()` for open-ended ranges will return `Infinity`.
+Unbounded ranges cannot be iterated over, and you cannot call `#toArray()` for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
 
 ### Negative ranges
 
 You can handle ranges containing zero or negative integers.
 To pass negative integers to the string parser, always contain them in parentheses.
-Otherwise, it will be parsed as an open-ended range.
+Otherwise, it will be parsed as an unbounded range.
 
 ```js
 var mr1 = new MultiRange('(-5),(-1)-0'); // -5, -1 and 0

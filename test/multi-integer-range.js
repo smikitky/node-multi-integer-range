@@ -21,7 +21,7 @@ describe('MultiRange', function() {
 			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
 		});
 
-		it('must parse open ranges', function() {
+		it('must parse unbounded ranges', function() {
 			t(mr('10-'), '10-');
 			t(mr('-10'), '-10');
 			t(mr('5,10-'), '5,10-');
@@ -71,7 +71,7 @@ describe('MultiRange', function() {
 			t(mr(''), '');
 		});
 
-		it('must throw an error for Infinity not as part of an open range', function() {
+		it('must throw an error for Infinity not as part of an unbounded range', function() {
 			assert.throws(function() { mr(Infinity); }, RangeError);
 			assert.throws(function() { mr([Infinity]); }, RangeError);
 			assert.throws(function() { mr([[Infinity, Infinity]]); }, RangeError);
@@ -113,7 +113,7 @@ describe('MultiRange', function() {
 			t(mr('(-5)-(-3)').append([[-8, -1], [3, 9]]), '(-8)-(-1),3-9');
 			t(mr('(-5)-(-3),(-10)-(-8),0-6').append([-6, -7, [-2, -1]]), '(-10)-6');
 		});
-		it('must append open ranges correctly', function() {
+		it('must append unbounded ranges correctly', function() {
 			t(mr('5-').append(10), '5-');
 			t(mr('5-').append(4), '4-');
 			t(mr('5-').append(3), '3,5-');
@@ -169,7 +169,7 @@ describe('MultiRange', function() {
 			t(mr('(-10)-(-3)').subtract(-5), '(-10)-(-6),(-4)-(-3)');
 			t(mr('(-30),(-20)-(-10),(-8)-0,8').subtract([-20, [-12, -5]]), '(-30),(-19)-(-13),(-4)-0,8');
 		});
-		it('must subtract open ranges correctly', function() {
+		it('must subtract unbounded ranges correctly', function() {
 			t(mr('10-20').subtract('15-'), '10-14');
 			t(mr('10-20').subtract('-15'), '16-20');
 			t(mr('10-20').subtract('-12,18-'), '13-17');
@@ -225,7 +225,7 @@ describe('MultiRange', function() {
 			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '1-50', '');
 			t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '(-19)-(-12)', '(-19)-(-18),(-16)-(-14),(-12)');
 		});
-		it('must calculate open range intersections correctly', function() {
+		it('must calculate unbounded range intersections correctly', function() {
 			t2('1-', '4-', '4-');
 			t2('100-', '-300', '100-300');
 			t2('-5', '-0', '-0');
@@ -277,7 +277,7 @@ describe('MultiRange', function() {
 
 			assert.isFalse(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-100)'));
 		});
-		it('must perform correct inclusion check for open ranges', function() {
+		it('must perform correct inclusion check for unbounded ranges', function() {
 			assert.isTrue(mr('-').has('5'));
 			assert.isTrue(mr('-20,40-').has('70'));
 			assert.isTrue(mr('-20,40').has('10'));
@@ -353,10 +353,10 @@ describe('MultiRange', function() {
 		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
 	});
 
-	it('#isInfinite', function() {
-		assert.isTrue(mr([[-Infinity, 5]]).isInfinite());
-		assert.isTrue(mr([[0, 5], [10, Infinity]]).isInfinite());
-		assert.isFalse(mr(8).isInfinite());
+	it('#isUnbounded', function() {
+		assert.isTrue(mr([[-Infinity, 5]]).isUnbounded());
+		assert.isTrue(mr([[0, 5], [10, Infinity]]).isUnbounded());
+		assert.isFalse(mr(8).isUnbounded());
 	});
 
 	it('#toString', function() {
@@ -401,7 +401,7 @@ describe('MultiRange', function() {
 			testIter(mr('(-8)-(-6),0,2-3'), [-8,-7,-6,0,2,3]);
 		});
 
-		it('must throw an error for open ranges', function() {
+		it('must throw an error for unbounded ranges', function() {
 			assert.throws(function() {
 				mr([[8, Infinity]]).getIterator();
 			}, RangeError);
