@@ -64,6 +64,15 @@ describe('MultiRange', function() {
 			assert.doesNotThrow(function() { mr(''); }, Error);
 			t(mr(''), '');
 		});
+
+		it('must throw an error for Infinity not as part of an open range', function() {
+			assert.throws(function() { mr(Infinity); }, RangeError);
+			assert.throws(function() { mr([Infinity]); }, RangeError);
+			assert.throws(function() { mr([[Infinity, Infinity]]); }, RangeError);
+			assert.throws(function() { mr(-Infinity); }, RangeError);
+			assert.throws(function() { mr([-Infinity]); }, RangeError);
+			assert.throws(function() { mr([[-Infinity, -Infinity]]); }, RangeError);
+		});
 	});
 
 	it('#clone', function() {

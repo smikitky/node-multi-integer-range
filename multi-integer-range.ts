@@ -20,7 +20,7 @@ export class MultiRange {
 		if (typeof data === 'string') {
 			this.parseString(data);
 		} else if (typeof data === 'number') {
-			this.ranges.push([data, data]);
+			this.appendRange(data, data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
 		} else if (isArray(data)) {
@@ -98,6 +98,11 @@ export class MultiRange {
 		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
+		}
+		if (newRange[0] === Infinity && newRange[1] === Infinity ||
+			newRange[0] === -Infinity && newRange[1] === -Infinity
+		) {
+			throw new RangeError('Infinity can be used only within an open range');
 		}
 		const overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);
