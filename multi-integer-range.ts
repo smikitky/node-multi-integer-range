@@ -52,13 +52,13 @@ export class MultiRange {
 			return parseInt(str.match(/^\(?(\-?\d+)/)[1], 10);
 		}
 
-		let s = data.replace(/\s/g, '');
+		const s = data.replace(/\s/g, '');
 		if (s.length === 0) return;
 		for (let r of s.split(',')) {
 			let match = r.match(/^(\d+|\(\-?\d+\))(\-(\d+|\(\-?\d+\)))?$/);
 			if (match) {
-				let min = toInt(match[1]);
-				let max = typeof match[3] !== 'undefined' ? toInt(match[3]) : min;
+				const min = toInt(match[1]);
+				const max = typeof match[3] !== 'undefined' ? toInt(match[3]) : min;
 				this.appendRange(min, max);
 			} else {
 				throw new SyntaxError('Invalid input');
@@ -99,7 +99,7 @@ export class MultiRange {
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
-		let overlap = this.findOverlap(newRange);
+		const overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);
 		return this;
 	}
@@ -131,9 +131,9 @@ export class MultiRange {
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
 		}
-		let overlap = this.findOverlap(newRange);
+		const overlap = this.findOverlap(newRange);
 		if (overlap.count > 0) {
-			let remain = [];
+			const remain = [];
 			if (this.ranges[overlap.lo][0] < newRange[0]) {
 				remain.push([this.ranges[overlap.lo][0], newRange[0] - 1]);
 			}
@@ -153,16 +153,16 @@ export class MultiRange {
 		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
-		 	let result = [];
+		 	const result = [];
 			let jstart = 0; // used for optimization
 			for (let i = 0; i < this.ranges.length; i++) {
-				let r1 = this.ranges[i];
+				const r1 = this.ranges[i];
 				for (let j = jstart; j < value.ranges.length; j++) {
-					let r2 = value.ranges[j];
+					const r2 = value.ranges[j];
 					if (r1[0] <= r2[1] && r1[1] >= r2[0]) {
 							jstart = j;
-							let min = Math.max(r1[0], r2[0]);
-							let max = Math.min(r1[1], r2[1]);
+							const min = Math.max(r1[0], r2[0]);
+							const max = Math.min(r1[1], r2[1]);
 							result.push([min, max]);
 					} else if (r1[1] < r2[0]) {
 						break;
@@ -206,7 +206,7 @@ export class MultiRange {
 		// meaning (C) is between (2) and (3) but overlaps/touches neither of them.
 
 		for (let hi = this.ranges.length - 1; hi >= 0; hi--) {
-			let r = this.ranges[hi];
+			const r = this.ranges[hi];
 			let union;
 			if (union = this.calcUnion(r, target)) {
 				let count = 1;
@@ -246,7 +246,7 @@ export class MultiRange {
 	 */
 	public getRanges(): Range[]
 	{
-		let result = []
+		const result = []
 		for (let r of this.ranges) result.push(<Range>[r[0], r[1]]);
 		return result;
 	}
@@ -261,8 +261,8 @@ export class MultiRange {
 		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
-			let s = 0;
-			let len = this.ranges.length;
+			const s = 0;
+			const len = this.ranges.length;
 			for (let tr of value.ranges) {
 				let i: number;
 				for (i = s; i < len; i++) {
@@ -364,7 +364,7 @@ export class MultiRange {
 	 */
 	public toArray(): number[]
 	{
-		let result = new Array(this.length());
+		const result = new Array(this.length());
 		let idx = 0;
 		for (let r of this.ranges) {
 			for (let n = r[0]; n <= r[1]; n++) {
@@ -385,7 +385,7 @@ export class MultiRange {
 		return {
 			next: () => {
 				if (!curRange) return { done: true, value: undefined };
-				let ret = j;
+				const ret = j;
 				if (++j > curRange[1]) {
 					curRange = this.ranges[++i];
 					j = curRange ? curRange[0] : undefined;
