@@ -144,7 +144,7 @@ console.log(multirange('-5,10-').has('-3,20')); // true
 var userInput = '-10,15-20,90-';
 var pagesInMyDoc = '1-100';
 var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
-console.log(pagesToPrint); // prints '1-10,15-20,90-100'
+console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 ```
 
 Unbounded ranges cannot be iterated over, and you cannot call `#toArray()`
