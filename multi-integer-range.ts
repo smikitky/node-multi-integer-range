@@ -105,7 +105,7 @@ export class MultiRange {
 		if (newRange[0] === Infinity && newRange[1] === Infinity ||
 			newRange[0] === -Infinity && newRange[1] === -Infinity
 		) {
-			throw new RangeError('Infinity can be used only within an unbounded range');
+			throw new RangeError('Infinity can be used only within an unbounded range segment');
 		}
 		const overlap = this.findOverlap(newRange);
 		this.ranges.splice(overlap.lo, overlap.count, overlap.union);

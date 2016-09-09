@@ -71,7 +71,7 @@ describe('MultiRange', function() {
 			t(mr(''), '');
 		});
 
-		it('must throw an error for Infinity not as part of an unbounded range', function() {
+		it('must throw an error for Infinity not as part of an unbounded range segment', function() {
 			assert.throws(function() { mr(Infinity); }, RangeError);
 			assert.throws(function() { mr([Infinity]); }, RangeError);
 			assert.throws(function() { mr([[Infinity, Infinity]]); }, RangeError);
