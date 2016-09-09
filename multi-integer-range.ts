@@ -415,7 +415,7 @@ export class MultiRange {
 	/**
 	 * Returns ES6-compatible iterator.
 	 */
-	public getIterator(): { next: () => { done: boolean, value: number }}
+	public getIterator(): { next: () => { done?: boolean, value?: number }}
 	{
 		if (this.isUnbounded()) {
 			throw new RangeError('Unbounded ranges cannot be iterated over');
@@ -425,13 +425,13 @@ export class MultiRange {
 			j = curRange ? curRange[0] : undefined;
 		return {
 			next: () => {
-				if (!curRange) return { done: true, value: undefined };
+				if (!curRange) return { done: true };
 				const ret = j;
 				if (++j > curRange[1]) {
 					curRange = this.ranges[++i];
 					j = curRange ? curRange[0] : undefined;
 				}
-				return { done: false, value: ret };
+				return { value: ret };
 			}
 		}
 	}
