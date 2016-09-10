@@ -12,7 +12,7 @@ Supported operations include:
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
 - Unbounded ranges (e.g., `5-` to mean "all integers >= 5")
-- Iteration using `for ... of`
+- ES6 iterator (`for ... of`, spread operator)
 - Array creation (a.k.a. "flatten")
 
 Internal data are always *sorted and normalized* to the smallest possible
@@ -171,13 +171,16 @@ If you are only interested in positive numbers, you can use
 ### Iteration
 
 **ES6 iterator**: If `Symbol.iterator` is defined in the runtime,
-you can simply iterate over the instance using the `for ... of` statement:
+you can simply iterate over the instance like this:
 
 ```js
 for (let page of multirange('2,5-7')) {
     console.log(page);
-}
-// prints 2, 5, 6, 7
+} // prints 2, 5, 6, 7
+
+// Instead of calling toArray() ...
+var arr = [...multirange('2,5-7')]; // array spreading
+// arr becomes [2, 5, 6, 7]
 ```
 
 If `Symbol.iterator` is not available, you can still access the iterator
@@ -193,8 +196,21 @@ while (!(page = it.next()).done) {
 
 ## TypeScript Definition File
 
-This library includes TypeScript definition file. Starting from TypeScript 1.6,
+This library comes with a TypeScript definition file. Starting from TypeScript 1.6,
 The TypeScript compiler can find this definition file automatically.
+
+The definition file only contains declarations that are compatible with ES5.
+If your TypeScript project targets ES6 (`--target ES6`) and uses iterators,
+add the following snippet somewhere in your project (eg, "typings" directory)
+to avoid compile-time errors.
+
+```ts
+declare module "multi-integer-range" {
+    interface MultiRange {
+        [Symbol.iterator](): Iterator<number>;
+    }
+}
+```
 
 ## Use in Browsers
 
@@ -206,7 +222,7 @@ This library has no external dependencies, and can be used with Webpack and Brow
 
 ```
 npm install
-npm run-script build
+npm run build
 npm test
 ```
 
