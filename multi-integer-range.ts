@@ -49,7 +49,8 @@ export class MultiRange {
 	protected parseString(data: string): void {
 
 		function toInt(str: string): number {
-			return parseInt(str.match(/^\(?(\-?\d+)/)[1], 10);
+			const m = str.match(/^\(?(\-?\d+)/) as any;
+			return parseInt(m[1], 10);
 		}
 
 		const s = data.replace(/\s/g, '');
@@ -141,7 +142,7 @@ export class MultiRange {
 		}
 		const overlap = this.findOverlap(newRange);
 		if (overlap.count > 0) {
-			const remain = [];
+			const remain: Range[] = [];
 			if (this.ranges[overlap.lo][0] < newRange[0]) {
 				remain.push([this.ranges[overlap.lo][0], newRange[0] - 1]);
 			}
@@ -161,7 +162,7 @@ export class MultiRange {
 		if (value === undefined) {
 			throw new TypeError('Invalid input');
 		} else if (value instanceof MultiRange) {
-		 	const result = [];
+		 	const result: Range[] = [];
 			let jstart = 0; // used for optimization
 			for (let i = 0; i < this.ranges.length; i++) {
 				const r1 = this.ranges[i];
@@ -241,7 +242,7 @@ export class MultiRange {
 	 * @param b Range B
 	 * @return Union of a and b. Null if a and b do not touch nor intersect.
 	 */
-	private calcUnion(a: Range, b: Range): Range
+	private calcUnion(a: Range, b: Range): Range | null
 	{
 		if (a[1] + 1 < b[0] || a[0] - 1 > b[1]) {
 			return null; // cannot make union
@@ -254,8 +255,8 @@ export class MultiRange {
 	 */
 	public getRanges(): Range[]
 	{
-		const result = []
-		for (let r of this.ranges) result.push(<Range>[r[0], r[1]]);
+		const result: Range[] = []
+		for (let r of this.ranges) result.push([r[0], r[1]]);
 		return result;
 	}
 
