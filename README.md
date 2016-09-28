@@ -21,9 +21,14 @@ representation.
 
 ## Usage
 
-### Basic Example
+### Install
 
 Install via npm: `npm install multi-integer-range`
+
+This library has no external dependencies, and can be used with Webpack and Browserify.
+
+### Basic Example
+
 
 ```js
 var MultiRange = require('multi-integer-range').MultiRange;
@@ -38,9 +43,9 @@ console.log(pages.getRanges()); // [[1, 1], [3, 15]]
 console.log(pages.segmentLength()); // 2
 ```
 
-### Initialization
+### Initializers
 
-Some methods (and the constructor) take one *Initializer* parameter.
+Some methods and the constructor take one *Initializer* parameter.
 An initializer is one of:
 
 - a valid string (eg `'1-3,5'`)
@@ -138,12 +143,12 @@ The manipulation methods work just as expected with unbounded ranges:
 
 ```js
 console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
-console.log(multirange('-').subtract('3-5,9') + ''); // '-2,6-8,10-'
+console.log(multirange('-').subtract('3-5,7,11-') + ''); // '-2,6,8-10'
 console.log(multirange('-5,10-').has('-3,20')); // true
 
 // intersection is especially useful to "trim" any unbounded ranges:
 var userInput = '-10,15-20,90-';
-var pagesInMyDoc = '1-100';
+var pagesInMyDoc = [[1, 100]]; // '1-100'
 var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
 console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 ```
@@ -155,7 +160,9 @@ for the obvious reason. Calling `#length()` for unbounded ranges will return `In
 
 You can handle ranges containing zero and negative integers.
 To pass negative integers to the string parser, always contain them in parentheses.
-Otherwise, it will be parsed as an unbounded range.
+Otherwise, it may be parsed as an unbounded range.
+For example, passing `-5` to the string parser means
+"all integers <=5 (including 0 and all negative integers)" rather than "minus five".
 
 ```js
 var mr1 = new MultiRange('(-5),(-1)-0'); // -5, -1 and 0
@@ -163,15 +170,12 @@ mr1.append([[-4, -2]]); // -4 to -2
 console.log(mr1 + ''); // prints '(-5)-0'
 ```
 
-Again, note that passing `-5` to the string parser means
-"all integers <=5 (including 0 and all negative integers)"
-rather than "minus five".
 If you are only interested in positive numbers, you can use
-`.intersect('0-')` to drop all negative integers.
+`.intersect('1-')` to drop all negative integers and zero.
 
 ### Iteration
 
-**ES6 iterator**: If `Symbol.iterator` is defined in the runtime,
+**ES2015 (ES6) iterator**: If `Symbol.iterator` is defined in the runtime,
 you can simply iterate over the instance like this:
 
 ```js
@@ -202,7 +206,7 @@ The TypeScript compiler can find this definition file automatically.
 
 The definition file only contains declarations that are compatible with ES5.
 If your TypeScript project targets ES6 (`--target ES6`) and uses iterators,
-add the following snippet somewhere in your project (eg, "typings" directory)
+add the following snippet somewhere in your project (e.g., "typings" directory)
 to avoid compile-time errors.
 
 ```ts
@@ -212,10 +216,6 @@ declare module "multi-integer-range" {
     }
 }
 ```
-
-## Use in Browsers
-
-This library has no external dependencies, and can be used with Webpack and Browserify.
 
 ## Development
 
@@ -231,7 +231,11 @@ npm test
 
 Report any bugs and suggestions using GitHub issues.
 
-**Performance Considerations**: This library works efficiently for large ranges as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmentated set of integers which are scarcely continuous (for example, random 10000 integers between 1 to 1000000).
+**Performance Considerations**: This library works efficiently for large ranges
+as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`).
+However, this library is not intended to be efficient
+with a heavily fragmentated set of integers which are scarcely continuous
+(e.g., random 10000 integers between 1 to 1000000).
 
 ## Author
 
