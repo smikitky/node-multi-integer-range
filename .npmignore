@@ -1,4 +1,5 @@
 multi-integer-range.ts
 tsconfig.json
-test/
-examples/
+/test
+/coverage
+.*
