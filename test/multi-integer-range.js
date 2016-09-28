@@ -159,6 +159,7 @@ describe('MultiRange', function() {
 			t(mr('1-10').subtract(10), '1-9');
 			t(mr('1-10').subtractRange(1, 10), '');
 			t(mr('1-10').subtractRange(5, 8), '1-4,9-10');
+			t(mr('1-10').subtractRange(8, 5), '1-4,9-10');
 			t(mr('1-10,20-30').subtractRange(11, 19), '1-10,20-30');
 			t(mr('1-10,20-30').subtractRange(5, 25), '1-4,26-30');
 		});
@@ -340,6 +341,9 @@ describe('MultiRange', function() {
 	});
 
 	it('#equals', function() {
+		var foo = multirange('4,8,10-12');
+		assert.isTrue(foo.equals(foo));
+
 		assert.isTrue(mr('').equals(''));
 		assert.isTrue(mr('5').equals(mr('5')));
 		assert.isTrue(mr('2-8').equals('2-8'));
@@ -351,6 +355,8 @@ describe('MultiRange', function() {
 		assert.isFalse(mr('5').equals('5-6'));
 		assert.isFalse(mr('2-8').equals('2-7'));
 		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
+
+		assert.throws(function() { mr('').equals() }, TypeError);
 	});
 
 	it('#isUnbounded', function() {

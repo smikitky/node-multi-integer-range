@@ -255,7 +255,7 @@ export class MultiRange {
 	 */
 	public getRanges(): Range[]
 	{
-		const result: Range[] = []
+		const result: Range[] = [];
 		for (let r of this.ranges) result.push([r[0], r[1]]);
 		return result;
 	}
