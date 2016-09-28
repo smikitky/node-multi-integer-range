@@ -7,7 +7,8 @@
   "typings": "./lib/multi-integer-range.d.ts",
   "scripts": {
     "test": "mocha",
-    "build": "tsc"
+    "build": "tsc",
+    "coverage": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
     "integer",
@@ -21,7 +22,9 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.14",
     "mocha": "^3.0.2",
+    "mocha-lcov-reporter": "^1.2.0",
     "typescript": "^2.0.3"
   },
   "tonicExample": "var MultiRange = require('multi-integer-range').MultiRange;"
