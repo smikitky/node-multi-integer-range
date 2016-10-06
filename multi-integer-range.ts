@@ -235,7 +235,6 @@ export class MultiRange {
 		return { lo: 0, count: 0, union: target };
 	}
 
-
 	/**
 	 * Calculates the union of two specified ranges.
 	 * @param a Range A
@@ -365,6 +364,47 @@ export class MultiRange {
 			&& (this.ranges[0][0] === -Infinity ||
 				this.ranges[this.ranges.length-1][1] === Infinity)
 		);
+	}
+
+	/**
+	 * Returns the minimum number contained in this insntance. Can be -Infinity or undefined.
+	 */
+	public min(): number | undefined
+	{
+		if (this.ranges.length === 0) return undefined;
+		return this.ranges[0][0];
+	}
+
+
+	/**
+	 * Returns the maximum number contained in this insntance. Can be +Infinity or undefined.
+	 */
+	public max(): number | undefined
+	{
+		if (this.ranges.length === 0) return undefined;
+		return this.ranges[this.ranges.length - 1][1];
+	}
+
+	/**
+	 * Removes the smallest integer from this instance and returns that integer.
+	 */
+	public shift(): number | undefined
+	{
+		const min = this.min();
+		if (min === -Infinity) throw new RangeError('shift() was invoked on an unbounded MultiRange which contains -Infinity')
+		if (min !== undefined) this.subtract(min);
+		return min;
+	}
+
+	/**
+	 * Removes the largest integer from this instance and returns that integer.
+	 */
+	public pop(): number | undefined
+	{
+		const max = this.max();
+		if (max === Infinity) throw new RangeError('pop() was invoked on an unbounded MultiRange which contains +Infinity');
+		if (max !== undefined) this.subtract(max);
+		return max;
 	}
 
 	/**

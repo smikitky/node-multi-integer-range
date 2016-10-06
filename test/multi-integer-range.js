@@ -365,6 +365,56 @@ describe('MultiRange', function() {
 		assert.isFalse(mr(8).isUnbounded());
 	});
 
+	it('#min', function() {
+		assert.strictEqual(mr('1,5,10-15').min(), 1);
+		assert.strictEqual(mr('-1,5,10').min(), -Infinity);
+		assert.strictEqual(mr().min(), undefined);
+	});
+
+	it('#max', function() {
+		assert.strictEqual(mr('1,5,10-15').max(), 15);
+		assert.strictEqual(mr('1,5,10-').max(), Infinity);
+		assert.strictEqual(mr().max(), undefined);
+	});
+
+	it('#pop', function() {
+		var r = mr('5,8-9');
+		assert.strictEqual(r.pop(), 9);
+		assert.strictEqual(r.pop(), 8);
+		assert.strictEqual(r.pop(), 5);
+		assert.strictEqual(r.pop(), undefined);
+		assert.strictEqual(r.pop(), undefined);
+		assert.strictEqual(r.segmentLength(), 0);
+
+		r = mr('-5,9');
+		assert.strictEqual(r.pop(), 9);
+		assert.strictEqual(r.pop(), 5);
+		assert.strictEqual(r.pop(), 4);
+		assert.strictEqual(r.pop(), 3);
+		assert.isTrue(r.equals('-2'));
+
+		assert.throws(function() { mr('8-').pop(); }, RangeError);
+	});
+
+	it('#shift', function() {
+		var r = mr('5,8-9');
+		assert.strictEqual(r.shift(), 5);
+		assert.strictEqual(r.shift(), 8);
+		assert.strictEqual(r.shift(), 9);
+		assert.strictEqual(r.shift(), undefined);
+		assert.strictEqual(r.shift(), undefined);
+		assert.strictEqual(r.segmentLength(), 0);
+
+		r = mr('5,9-');
+		assert.strictEqual(r.shift(), 5);
+		assert.strictEqual(r.shift(), 9);
+		assert.strictEqual(r.shift(), 10);
+		assert.strictEqual(r.shift(), 11);
+		assert.isTrue(r.equals('12-'));
+
+		assert.throws(function() { mr('-8').shift(); }, RangeError);
+	});
+
 	it('#toString', function() {
 		assert.equal('' + mr('15-20'), '15-20');
 		assert.equal('' + mr('0'), '0');
