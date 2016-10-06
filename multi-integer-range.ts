@@ -147,7 +147,7 @@ export class MultiRange {
 			if (newRange[1] < this.ranges[overlap.lo + overlap.count - 1][1]) {
 				remain.push([newRange[1] + 1, this.ranges[overlap.lo + overlap.count - 1][1]]);
 			}
-			this.ranges.splice(overlap.lo, overlap.count, ... remain);
+			this.ranges.splice.apply(this.ranges, (<any>[overlap.lo, overlap.count]).concat(remain));
 		}
 		return this;
 	}
@@ -466,6 +466,7 @@ export class MultiRange {
 }
 
 // Set ES6 iterator, if Symbol.iterator is defined
+/* istanbul ignore else */
 if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
 	MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
 }
