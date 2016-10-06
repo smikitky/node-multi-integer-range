@@ -101,20 +101,24 @@ To get the copy of the instance, use `clone()`, or alternatively the copy constr
 
 - `new MultiRange(data?: Initializer)` Creates a new MultiRange object.
 - `clone(): MultiRange` Clones this instance.
-- `append(value: Initializer): MultiRange` Appends to this instance.
-- `subtract(value: Initializer): MultiRange` Subtracts from this instance.
+- `append(value: Initializer): MultiRange` Appends `value` to this instance.
+- `subtract(value: Initializer): MultiRange` Subtracts `value` from this instance.
 - `intersect(value: Initializer): MultiRange` Remove integers which are not included in `value` (aka intersection).
-- `has(value: Initializer): boolean` Checks if the instance contains the specified value.
-- `length(): number` Calculates how many numbers are effectively included in this instance. (ie, 5 for '3,5-7,9')
+- `has(value: Initializer): boolean` Checks if the instance contains `value`.
+- `length(): number` Calculates how many numbers are effectively included in this instance (ie, 5 for '3,5-7,9'). Returns Inifnity for an unbounded range.
 - `segmentLength(): number` Returns the number of range segments (ie, 3 for '3,5-7,9' and 0 for an empty range)
 - `equals(cmp: Initializer): boolean` Checks if two MultiRange data are identical.
 - `isUnbounded(): boolean` Returns if the instance is unbounded.
+- `min(): number | undefined` Returns the minimum integer. May return -Infinity.
+- `max(): number | undefined` Returns the maxinum integer. May return Infinity.
+- `shift(): number | undefined` Removes the minimum integer and returns it.
+- `pop(): number | undefined` Removes the maxinum integer and returns it.
 - `toString(): string` Returns the string respresentation of this MultiRange.
 - `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
 - `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
 - `getIterator(): Object` Returns ES6-compatible iterator. See the description below.
 
-The following methods are deprecated and may be removed in future releases:
+The following methods were removed:
 
 - `appendRange(min: number, max: number): MultiRange` Use `append([[min, max]])` instead.
 - `subtractRange(min: number, max: number): MultiRange` Use `subtract([[min, max]])` instead.
@@ -216,6 +220,10 @@ declare module "multi-integer-range" {
     }
 }
 ```
+
+## Changelog
+
+See [the relase page on GitHub](https://github.com/smikitky/node-multi-integer-range/releases).
 
 ## Development
 
