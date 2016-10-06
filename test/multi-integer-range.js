@@ -415,6 +415,7 @@ describe('MultiRange', function() {
 		assert.equal('' + mr([[-Infinity, Infinity]]), '-');
 		assert.equal('' + mr([[-Infinity, 10]]), '-10');
 		assert.equal('' + mr([[10, Infinity]]), '10-');
+		assert.strictEqual('' + mr(), '');
 	});
 
 	describe('#toArray', function() {
