@@ -312,13 +312,6 @@ describe('MultiRange', function() {
 		assert.isFalse(mr('5-20,25-100,150-300').hasRange(3,10));
 	});
 
-	it('#isContinuous', function() {
-		assert.isTrue(mr('1').isContinuous());
-		assert.isTrue(mr('5-10').isContinuous());
-		assert.isFalse(mr('').isContinuous());
-		assert.isFalse(mr('5-10,12-15').isContinuous());
-	});
-
 	it('#length', function() {
 		assert.equal(mr('').length(), 0);
 		assert.equal(mr('5').length(), 1);

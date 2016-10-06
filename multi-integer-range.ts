@@ -96,9 +96,8 @@ export class MultiRange {
 	 * Appends a specified range of integers to this isntance.
 	 * @param min The minimum value of the range to append.
 	 * @param max The minimum value of the range to append.
-	 * @deprecated Use `.append([[min, max]])` instead.
 	 */
-	public appendRange(min: number, max: number): MultiRange {
+	private appendRange(min: number, max: number): MultiRange {
 		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
 			newRange = [newRange[1], newRange[0]];
@@ -132,9 +131,8 @@ export class MultiRange {
 	 * Subtracts a specified range of integers from this instance.
 	 * @param min The minimum value of the range to subtract.
 	 * @param max The minimum value of the range to subtract.
-	 * @deprecated Use `.subtract([[min, max]])` instead.
 	 */
-	public subtractRange(min: number, max: number): MultiRange
+	private subtractRange(min: number, max: number): MultiRange
 	{
 		let newRange: Range = [min, max];
 		if (newRange[0] > newRange[1]) {
@@ -290,9 +288,8 @@ export class MultiRange {
 	 * @param min The minimum value of the range to subtract.
 	 * @param max The minimum value of the range to subtract.
 	 * @return True if the specified value is included in the instance.
-	 * @deprecated Use `.has([[min, max]])` instead.
 	 */
-	public hasRange(min: number, max: number): boolean
+	private hasRange(min: number, max: number): boolean
 	{
 		return this.has(new MultiRange([[min, max]]));
 	}
@@ -306,17 +303,6 @@ export class MultiRange {
 	public segmentLength(): number
 	{
 		return this.ranges.length;
-	}
-
-	/**
-	 * Checks if the current instance is continuous.
-	 * Note that this returns false if the current range is empty.
-	 * @return True if the current range is continuous.
-	 * @deprecated Use `.segmentLength() === 1` instead.
-	 */
-	public isContinuous(): boolean
-	{
-		return this.ranges.length === 1;
 	}
 
 	/**
