@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=dev)](https://travis-ci.org/smikitky/node-multi-integer-range)
 [![Coverage Status](https://coveralls.io/repos/github/smikitky/node-multi-integer-range/badge.svg?branch=dev)](https://coveralls.io/github/smikitky/node-multi-integer-range)
+[![npm version](https://badge.fury.io/js/multi-integer-range.svg)](https://badge.fury.io/js/multi-integer-range)
 
 A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10").
 Such strings are typically used in print dialogs to indicate which pages to print.
