@@ -13,7 +13,8 @@ Supported operations include:
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
 - Inclusion check (e.g., `3,7-9` is in `1-10`)
 - Intersection (e.g., `1-5` ∩ `2-8` => `2-5`)
-- Unbounded ranges (e.g., `5-` to mean "all integers >= 5")
+- Unbounded ranges (e.g., `5-` to mean "all integers >= 5") (optional)
+- Ranges including negative integers or zero
 - ES6 iterator (`for ... of`, spread operator)
 - Array creation (a.k.a. "flatten")
 
@@ -28,13 +29,16 @@ Install via npm: `npm install multi-integer-range`
 
 This library has no external dependencies, and can be used with Webpack and Browserify.
 
+
 ### Basic Example
 
-
 ```js
-var MultiRange = require('multi-integer-range').MultiRange;
+import MultiRange from 'multi-integer-range';
+// OR:
+// const MultiRange = require('multi-integer-range').MultiRange;
+// const MultiRange = require('multi-integer-range').default;
 
-var pages = new MultiRange('1-5,12-15');
+const pages = new MultiRange('1-5,12-15');
 pages.append(6).append([7,8]).append('9-11').subtract(2);
 console.log(pages.toString()); // '1,3-15'
 console.log(pages.has('5,9,12-14')); // true
@@ -44,15 +48,16 @@ console.log(pages.getRanges()); // [[1, 1], [3, 15]]
 console.log(pages.segmentLength()); // 2
 ```
 
+
 ### Initializers
 
 Some methods and the constructor take one *Initializer* parameter.
-An initializer is one of:
+An initializer is one of the followings:
 
 - a valid string (eg `'1-3,5'`)
 - an array of integers (eg `[1, 2, 3, 5]`)
 - an array of `[number, number]` tuples (eg `[[1, 3], [5, 5]]`)
-- mixture of the above (eg `[[1, 3], 5]`)
+- mixture of integers and tuples (eg `[[1, 3], 5]`)
 - a single integer (eg `1`)
 - another MultiRange instance
 
@@ -64,20 +69,22 @@ type Initializer =
     string | number | MultiRange | (number | [number, number])[];
 ```
 
+```js
+const mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
+const mr2 = new MultiRange('1-2, 3, 7-9');
+const mr3 = new MultiRange([[1,3], [7,9]]);
+const mr4 = new MultiRange(mr1); // clone
+```
+
 A shorthand constructor function `multirange()` is also available.
 Use whichever you prefer.
 
 ```js
-var MultiRange = require('multi-integer-range').MultiRange;
+import { multirange } from 'multi-integer-range';
+// OR
+// const { multirange } = require('multi-integer-range');
 
-var mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
-var mr2 = new MultiRange('1-2, 3, 7-9');
-var mr3 = new MultiRange([[1,3], [7,9]]);
-var mr4 = new MultiRange(mr1); // clone
-
-// function-style
-var multirange = require('multi-integer-range').multirange;
-var mr5 = multirange('1,2,3,7,8,9'); // the same as `new MultiRange`
+const mr5 = multirange('1,2,3,7,8,9');
 ```
 
 Internal data are always sorted and normalized,
@@ -88,23 +95,25 @@ before/after comma/hyphens. Order is not important either, and
 overlapped numbers are silently ignored.
 
 ```js
-var mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
+const mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
 console.log(mr.toString()); // prints '2-10'
 ```
 
-### Methods
+
+### API
 
 Manipulation methods are mutable and chainable by design.
 That is, for example, when you call `append(5)`, it will change
 the internal representation and return the modified self,
 rather than returning a new instance.
-To get the copy of the instance, use `clone()`, or alternatively the copy constructor (`var copy = new MultiRange(orig)`).
+To get a copy of the instance, use `clone()`, or alternatively the copy constructor (`var copy = new MultiRange(orig)`).
 
-- `new MultiRange(data?: Initializer)` Creates a new MultiRange object.
+- `new MultiRange(data?: Initializer, options?)` Creates a new MultiRange object.
+  The `options` object modifies the parsing behavior (see below).
 - `clone(): MultiRange` Clones this instance.
 - `append(value: Initializer): MultiRange` Appends `value` to this instance.
 - `subtract(value: Initializer): MultiRange` Subtracts `value` from this instance.
-- `intersect(value: Initializer): MultiRange` Remove integers which are not included in `value` (aka intersection).
+- `intersect(value: Initializer): MultiRange` Removes integers which are not included in `value` (aka intersection).
 - `has(value: Initializer): boolean` Checks if the instance contains `value`.
 - `length(): number` Calculates how many numbers are effectively included in this instance (ie, 5 for '3,5-7,9'). Returns Inifnity for an unbounded range.
 - `segmentLength(): number` Returns the number of range segments (ie, 3 for '3,5-7,9' and 0 for an empty range)
@@ -115,11 +124,16 @@ To get the copy of the instance, use `clone()`, or alternatively the copy constr
 - `shift(): number | undefined` Removes the minimum integer and returns it.
 - `pop(): number | undefined` Removes the maxinum integer and returns it.
 - `toString(): string` Returns the string respresentation of this MultiRange.
-- `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] arrays.
-- `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. Note that this may be slow and memory-consuming for large ranges such as '1-10000'.
+- `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] tuples.
+- `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. This may be slow and memory-consuming for large ranges such as '1-10000'.
 - `getIterator(): Object` Returns ES6-compatible iterator. See the description below.
 
-The following methods were removed:
+Available `options` that can be passed to the constructor:
+
+- `parseNegative` (boolean, default = false): Enables parsing negative ranges (eg `(-10)-(-3)`).
+- `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (eg `-5,10-`).
+
+The following methods have been removed:
 
 - `appendRange(min: number, max: number): MultiRange` Use `append([[min, max]])` instead.
 - `subtractRange(min: number, max: number): MultiRange` Use `subtract([[min, max]])` instead.
@@ -127,56 +141,75 @@ The following methods were removed:
 - `isContinuous(): boolean` Use `segmentLength() === 1` instead.
 
 
-### Unbounded ranges
+### Unbounded Ranges (optional)
 
-Starting from version 2.1, you can use unbounded (or infinite) ranges,
-which look like this:
+You can use unbounded (or infinite) ranges.
+Parsing unbounded ranges are disabled by default,
+and you have to enable them via the `parseUnbounded` option parameter.
 
 ```js
-// using the string parser...
-var unbounded1 = new MultiRange('5-'); // all integers >= 5
-var unbounded2 = new MultiRange('-3'); // all integers <= 3
-var unbounded3 = new MultiRange('-'); // all integers
+// The `parseUnbounded` option enables unbounded ranges.
+const unbounded = value => multirange(value, { parseUnbounded: true });
 
-// or programmatically, using the JavaScript constant `Infinity`...
-var unbounded4 = new MultiRange([[5, Infinity]]); // all integers >= 5
-var unbounded5 = new MultiRange([[-Infinity, 3]]); // all integers <= 3
-var unbounded6 = new MultiRange([[-Infinity, Infinity]]); // all integers
+const range1 = unbounded('5-'); // all integers >= 5
+const range2 = unbounded('-3'); // all integers <= 3
+const range3 = unbounded('-'); // all integers
+
+// Or use the JavaScript constant `Infinity`
+// to programmatically create unbounded ranges.
+const range4 = multirange([[5, Infinity]]); // all integers >= 5
+const range5 = multirange([[-Infinity, 3]]); // all integers <= 3
+const range6 = multirange([[-Infinity, Infinity]]); // all integers
 ```
+
+Note that the `parseUnbounded` option only affects the way *string* initializers are parsed.
+You have to pass no option to create unbounded ranges using non-string initializers.
+Once `parseUnbounded` is enabled at the constructor,
+subsequent chained methods will also correctly parse unbounded ranges.
 
 The manipulation methods work just as expected with unbounded ranges:
 
 ```js
-console.log(multirange('5-10,15-').append('0,11-14') + ''); // '0,5-'
-console.log(multirange('-').subtract('3-5,7,11-') + ''); // '-2,6,8-10'
-console.log(multirange('-5,10-').has('-3,20')); // true
+const unbounded = value => multirange(value, { parseUnbounded: true });
 
-// intersection is especially useful to "trim" any unbounded ranges:
+// Chained methods recognize unbounded ranges, too
+console.log(unbounded('5-10,15-').append('0,11-14') + ''); // '0,5-'
+console.log(unbounded('-').subtract('3-5,7,11-') + ''); // '-2,6,8-10'
+console.log(unbounded('-5,10-').has('-3,20')); // true
+
+// Intersection is especially useful to "trim" any unbounded ranges:
 var userInput = '-10,15-20,90-';
 var pagesInMyDoc = [[1, 100]]; // '1-100'
-var pagesToPrint = multirange(userInput).intersect(pagesInMyDoc);
+var pagesToPrint = unbounded(userInput).intersect(pagesInMyDoc);
 console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 ```
 
-Unbounded ranges cannot be iterated over, and you cannot call `#toArray()`
-for the obvious reason. Calling `#length()` for unbounded ranges will return `Infinity`.
+Unbounded ranges cannot be iterated over, and you cannot call `#toArray()` for obvious reasons.
+Calling `#length()` for unbounded ranges will return `Infinity`.
+
 
 ### Ranges Containing Zero and Negative Integers
 
-You can handle ranges containing zero and negative integers.
-To pass negative integers to the string parser, always contain them in parentheses.
-Otherwise, it may be parsed as an unbounded range.
-For example, passing `-5` to the string parser means
-"all integers <=5 (including 0 and all negative integers)" rather than "minus five".
+You can safely handle ranges containing zero and negative integers, including `-Infinity`.
+
+The syntax for denoting negative integers in a string initializer is a bit tricky, though;
+you need to *always* contain all negative integers in parentheses.
+You also need to pass `parseNegative` option to make the parser recognize
+negative integers contained in parentheses.
 
 ```js
-var mr1 = new MultiRange('(-5),(-1)-0'); // -5, -1 and 0
+const mr1 = new MultiRange('(-5),(-1)-0', { parseNegative: true }); // -5, -1 and 0
 mr1.append([[-4, -2]]); // -4 to -2
 console.log(mr1 + ''); // prints '(-5)-0'
 ```
 
-If you are only interested in positive numbers, you can use
-`.intersect('1-')` to drop all negative integers and zero.
+Once `parseNegative` is enabled at the constructor,
+subsequent chained methods will also recognize and parse negative ranges.
+
+```js
+const mr2 = multirange('(-5)', { parseNegative: true }).append('(-3)');
+console.log(mr2); // prints '(-5),(-3)'
+```
 
 ### Iteration
 
