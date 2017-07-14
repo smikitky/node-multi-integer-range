@@ -27,5 +27,5 @@
     "mocha-lcov-reporter": "^1.2.0",
     "typescript": "~2.4.1"
   },
-  "tonicExample": "var { MultiRange, multirange } = require('multi-integer-range');"
+  "tonicExample": "import MultiRange, { multirange } from 'multi-integer-range';"
 }
