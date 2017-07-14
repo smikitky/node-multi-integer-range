@@ -6,23 +6,41 @@ export type Initializer = string | number | (number|Range)[] | MultiRange;
 
 declare var Symbol: any;
 
+export type Options = {
+	parseNegative?: boolean;
+	parseUnbounded?: boolean;
+};
+
+const defaultOptions: Options = { parseNegative: true, parseUnbounded: true };
+
 export class MultiRange {
 	private ranges: Range[];
+	private options: Options;
 
 	/**
 	 * Creates a new MultiRange object.
 	 */
-	constructor(data?: Initializer) {
+	constructor(data?: Initializer, options: Options = defaultOptions) {
 		function isArray(x): x is Array<any> {
 			return Object.prototype.toString.call(x) === '[object Array]'
 		}
+
 		this.ranges = [];
+		this.options = {
+			parseNegative: !!options.parseNegative,
+			parseUnbounded: !!options.parseUnbounded
+		};
+
 		if (typeof data === 'string') {
 			this.parseString(data);
 		} else if (typeof data === 'number') {
 			this.appendRange(data, data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
+			this.options = {
+				parseNegative: this.options.parseNegative,
+				parseUnbounded: this.options.parseUnbounded
+			};
 		} else if (isArray(data)) {
 			for (let item of <(number|Range)[]>data) {
 				if (isArray(item)) {
@@ -56,11 +74,22 @@ export class MultiRange {
 		const s = data.replace(/\s/g, '');
 		if (!s.length) return;
 		let match;
+
+		const int = this.options.parseNegative ? '(\\d+|\\(\\-?\\d+\\))' : '(\\d+)';
+		const intMatch = new RegExp('^' + int + '$');
+		const rangeMatch = new RegExp('^' + int + '?\\-' + int + '?$');
+
 		for (let r of s.split(',')) {
-			if (match = r.match(/^(\d+|\(\-?\d+\))$/)) {
+			if (match = r.match(intMatch)) {
 				const val = toInt(match[1]);
 				this.appendRange(val, val);
-			} else if (match = r.match(/^(\d+|\(\-?\d+\))?\-(\d+|\(\-?\d+\))?$/)) {
+			} else if (match = r.match(rangeMatch)) {
+				if (
+					!this.options.parseUnbounded &&
+					(match[1] === undefined || match[2] === undefined)
+				) {
+					throw new SyntaxError('Unexpected unbouded range notation');
+				}
 				const min = match[1] === undefined ? -Infinity : toInt(match[1]);
 				const max = match[2] === undefined ? +Infinity : toInt(match[2]);
 				this.appendRange(min, max);
@@ -88,7 +117,7 @@ export class MultiRange {
 			for (let r of value.ranges) this.appendRange(r[0], r[1]);
 			return this;
 		} else {
-			return this.append(new MultiRange(value));
+			return this.append(new MultiRange(value, this.options));
 		}
 	}
 
@@ -123,7 +152,7 @@ export class MultiRange {
 			for (let r of value.ranges) this.subtractRange(r[0], r[1]);
 			return this;
 		} else {
-			return this.subtract(new MultiRange(value));
+			return this.subtract(new MultiRange(value, this.options));
 		}
 	}
 
@@ -179,7 +208,7 @@ export class MultiRange {
 			this.ranges = result;
 			return this;
 		} else {
-			return this.intersect(new MultiRange(value));
+			return this.intersect(new MultiRange(value, this.options));
 		}
 	}
 
@@ -279,7 +308,7 @@ export class MultiRange {
 			}
 			return true;
 		} else {
-			return this.has(new MultiRange(value));
+			return this.has(new MultiRange(value, this.options));
 		}
 	}
 
@@ -336,7 +365,7 @@ export class MultiRange {
 			}
 			return true;
 		} else {
-			return this.equals(new MultiRange(cmp));
+			return this.equals(new MultiRange(cmp, this.options));
 		}
 	}
 
@@ -472,6 +501,6 @@ if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
 }
 
 // A shorthand function to get a new MultiRange instance
-export function multirange(data?: Initializer): MultiRange {
-	return new MultiRange(data);
+export function multirange(data?: Initializer, options?: Options): MultiRange {
+	return new MultiRange(data, options);
 }
