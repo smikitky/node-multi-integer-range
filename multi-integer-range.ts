@@ -494,6 +494,8 @@ export class MultiRange {
 
 }
 
+export default MultiRange;
+
 // Set ES6 iterator, if Symbol.iterator is defined
 /* istanbul ignore else */
 if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
