@@ -6,7 +6,8 @@ var assert = require('chai').assert;
 describe('MultiRange', function() {
 	function mr(i) {
 		return multirange(i, { parseNegative: true, parseUnbounded: true });
-	};
+	}
+
 	var mrd = multirange;
 
 	function t(mr, expected) {
@@ -41,7 +42,7 @@ describe('MultiRange', function() {
 				function() { mrd('-(-1)', { parseNegative: true }); },
 				SyntaxError
 			);
-		})
+		});
 
 		it('must parse unbounded ranges', function() {
 			t(mr('10-'), '10-');
@@ -172,11 +173,11 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mrd('1', { parseNegative: false }).append(3).append('(-5)')
-			}, SyntaxError)
+				mrd('1', { parseNegative: false }).append(3).append('(-5)');
+			}, SyntaxError);
 			assert.throws(function() {
-				mrd('1', { parseUnbounded: false }).append(3).append('3-')
-			}, SyntaxError)
+				mrd('1', { parseUnbounded: false }).append(3).append('3-');
+			}, SyntaxError);
 		});
 	});
 
@@ -229,11 +230,11 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mrd('1-10', { parseNegative: false }).subtract(3).subtract('(-5)')
-			}, SyntaxError)
+				mrd('1-10', { parseNegative: false }).subtract(3).subtract('(-5)');
+			}, SyntaxError);
 			assert.throws(function() {
-				mrd('1-10', { parseUnbounded: false }).subtract(3).subtract('3-')
-			}, SyntaxError)
+				mrd('1-10', { parseUnbounded: false }).subtract(3).subtract('3-');
+			}, SyntaxError);
 		});
 	});
 
@@ -291,11 +292,11 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mrd('1-10', { parseNegative: false }).intersect(5).intersect('(-5)')
-			}, SyntaxError)
+				mrd('1-10', { parseNegative: false }).intersect(5).intersect('(-5)');
+			}, SyntaxError);
 			assert.throws(function() {
-				mrd('1-10', { parseUnbounded: false }).intersect(5).intersect('3-')
-			}, SyntaxError)
+				mrd('1-10', { parseUnbounded: false }).intersect(5).intersect('3-');
+			}, SyntaxError);
 		});
 	});
 
@@ -353,11 +354,11 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mrd('1', { parseNegative: false }).has('(-5)')
-			}, SyntaxError)
+				mrd('1', { parseNegative: false }).has('(-5)');
+			}, SyntaxError);
 			assert.throws(function() {
-				mrd('1', { parseUnbounded: false }).has('3-')
-			}, SyntaxError)
+				mrd('1', { parseUnbounded: false }).has('3-');
+			}, SyntaxError);
 		});
 	});
 
@@ -560,5 +561,5 @@ describe('Assertion', function() {
 			[3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY],
 			[3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY]
 		);
-	})
+	});
 });
