@@ -33,7 +33,7 @@ describe('MultiRange', function() {
 
 		it('must throw if parseUnbounded is turned off', function() {
 			assert.throws(function() { mrd('1-'); }, SyntaxError);
-			assert.throws(function() { mrd('-',); }, SyntaxError);
+			assert.throws(function() { mrd('-'); }, SyntaxError);
 			assert.throws(function() { mrd('-1'); }, SyntaxError);
 			assert.throws(
 				function() { mrd('-(-1)', { parseNegative: true }); },
