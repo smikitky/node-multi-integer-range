@@ -25,7 +25,7 @@
     "coveralls": "^2.11.14",
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
-    "typescript": "^2.0.3"
+    "typescript": "~2.0.3"
   },
   "tonicExample": "var { MultiRange, multirange } = require('multi-integer-range');"
 }
