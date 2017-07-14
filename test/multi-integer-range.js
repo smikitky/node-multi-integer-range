@@ -21,6 +21,17 @@ describe('MultiRange', function() {
 			t(mr('1 -3,  5,\t7-10\n'), '1-3,5,7-10');
 		});
 
+		it('must throw if parseNegative is turned off', function() {
+			assert.throws(function() { mr('(-1)', { parseNegative: false }); }, SyntaxError);
+			assert.throws(function() { mr('(-5)-(-1)', { parseNegative: false }); }, SyntaxError);
+		});
+
+		it('must throw if parseUnbounded is turned off', function() {
+			assert.throws(function() { mr('1-', { parseUnbounded: false }); }, SyntaxError);
+			assert.throws(function() { mr('-', { parseUnbounded: false }); }, SyntaxError);
+			assert.throws(function() { mr('-1', { parseUnbounded: false }); }, SyntaxError);
+		})
+
 		it('must parse unbounded ranges', function() {
 			t(mr('10-'), '10-');
 			t(mr('-10'), '-10');
@@ -148,6 +159,14 @@ describe('MultiRange', function() {
 			t(mr('1-50').append(60).append('70').append(mr([80])).appendRange(90,90),
 				'1-50,60,70,80,90');
 		});
+		it('must pass options correctly', function() {
+			assert.throws(function() {
+				mr('1', { parseNegative: false }).append(3).append('(-5)')
+			}, SyntaxError)
+			assert.throws(function() {
+				mr('1', { parseUnbounded: false }).append(3).append('3-')
+			}, SyntaxError)
+		});
 	});
 
 	describe('#substract', function() {
@@ -196,6 +215,14 @@ describe('MultiRange', function() {
 		it('must be chainable', function() {
 			t(mr('1-50').subtract(40).subtract('30').subtract(mr([20])).subtractRange(10,10),
 				'1-9,11-19,21-29,31-39,41-50');
+		});
+		it('must pass options correctly', function() {
+			assert.throws(function() {
+				mr('1-10', { parseNegative: false }).subtract(3).subtract('(-5)')
+			}, SyntaxError)
+			assert.throws(function() {
+				mr('1-10', { parseUnbounded: false }).subtract(3).subtract('3-')
+			}, SyntaxError)
 		});
 	});
 
@@ -251,6 +278,14 @@ describe('MultiRange', function() {
 		it('must be chainable', function() {
 			t(mr('1-100').intersect('20-150').intersect('10-40'), '20-40');
 		});
+		it('must pass options correctly', function() {
+			assert.throws(function() {
+				mr('1-10', { parseNegative: false }).intersect(5).intersect('(-5)')
+			}, SyntaxError)
+			assert.throws(function() {
+				mr('1-10', { parseUnbounded: false }).intersect(5).intersect('3-')
+			}, SyntaxError)
+		});
 	});
 
 	describe('#has', function() {
@@ -305,6 +340,14 @@ describe('MultiRange', function() {
 		it('must throw an exception for empty call', function() {
 			assert.throws(function() { mr(5).has(); }, TypeError);
 		});
+		it('must pass options correctly', function() {
+			assert.throws(function() {
+				mr('1', { parseNegative: false }).has('(-5)')
+			}, SyntaxError)
+			assert.throws(function() {
+				mr('1', { parseUnbounded: false }).has('3-')
+			}, SyntaxError)
+		});
 	});
 
 	it('#hasRange', function() {
@@ -350,6 +393,10 @@ describe('MultiRange', function() {
 		assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
 
 		assert.throws(function() { mr('').equals() }, TypeError);
+
+		assert.throws(function() {
+			mr('1-10', { parseNegative: false }).equals('(-5)');
+		}, SyntaxError);
 	});
 
 	it('#isUnbounded', function() {
