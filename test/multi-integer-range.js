@@ -4,7 +4,9 @@ var multirange = multi_integer_range.multirange;
 var assert = require('chai').assert;
 
 describe('MultiRange', function() {
-	var mr = i => multirange(i, { parseNegative: true, parseUnbounded: true });
+	function mr(i) {
+		return multirange(i, { parseNegative: true, parseUnbounded: true });
+	};
 	var mrd = multirange;
 
 	function t(mr, expected) {
