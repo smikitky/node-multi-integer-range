@@ -11,7 +11,7 @@ export type Options = {
 	parseUnbounded?: boolean;
 };
 
-const defaultOptions: Options = { parseNegative: true, parseUnbounded: true };
+const defaultOptions: Options = { parseNegative: false, parseUnbounded: false };
 
 export class MultiRange {
 	private ranges: Range[];

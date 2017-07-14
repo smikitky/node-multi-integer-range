@@ -4,7 +4,8 @@ var multirange = multi_integer_range.multirange;
 var assert = require('chai').assert;
 
 describe('MultiRange', function() {
-	var mr = multirange;
+	var mr = i => multirange(i, { parseNegative: true, parseUnbounded: true });
+	var mrd = multirange;
 
 	function t(mr, expected) {
 		assert.strictEqual(mr.toString(), expected);
@@ -22,14 +23,22 @@ describe('MultiRange', function() {
 		});
 
 		it('must throw if parseNegative is turned off', function() {
-			assert.throws(function() { mr('(-1)', { parseNegative: false }); }, SyntaxError);
-			assert.throws(function() { mr('(-5)-(-1)', { parseNegative: false }); }, SyntaxError);
+			assert.throws(function() { mrd('(-1)'); }, SyntaxError);
+			assert.throws(function() { mrd('(-5)-(-1)'); }, SyntaxError);
+			assert.throws(
+				function() { mrd('(-5)-', { parseUnbounded: true }); },
+				SyntaxError
+			);
 		});
 
 		it('must throw if parseUnbounded is turned off', function() {
-			assert.throws(function() { mr('1-', { parseUnbounded: false }); }, SyntaxError);
-			assert.throws(function() { mr('-', { parseUnbounded: false }); }, SyntaxError);
-			assert.throws(function() { mr('-1', { parseUnbounded: false }); }, SyntaxError);
+			assert.throws(function() { mrd('1-'); }, SyntaxError);
+			assert.throws(function() { mrd('-',); }, SyntaxError);
+			assert.throws(function() { mrd('-1'); }, SyntaxError);
+			assert.throws(
+				function() { mrd('-(-1)', { parseNegative: true }); },
+				SyntaxError
+			);
 		})
 
 		it('must parse unbounded ranges', function() {
@@ -161,10 +170,10 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mr('1', { parseNegative: false }).append(3).append('(-5)')
+				mrd('1', { parseNegative: false }).append(3).append('(-5)')
 			}, SyntaxError)
 			assert.throws(function() {
-				mr('1', { parseUnbounded: false }).append(3).append('3-')
+				mrd('1', { parseUnbounded: false }).append(3).append('3-')
 			}, SyntaxError)
 		});
 	});
@@ -207,7 +216,7 @@ describe('MultiRange', function() {
 			t(mr('1-20').subtract('5,10-15'), '1-4,6-9,16-20');
 			t(mr('1-20').subtract([5,10,15]), '1-4,6-9,11-14,16-20');
 			t(mr('1-20').subtract([[5,10]]), '1-4,11-20');
-			t(mr('1-20').subtract(new mr('5,10-15')), '1-4,6-9,16-20');
+			t(mr('1-20').subtract(mr('5,10-15')), '1-4,6-9,16-20');
 		});
 		it('must throw an exception for empty call', function() {
 			assert.throws(function() { mr(5).subtract(); }, TypeError);
@@ -218,10 +227,10 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mr('1-10', { parseNegative: false }).subtract(3).subtract('(-5)')
+				mrd('1-10', { parseNegative: false }).subtract(3).subtract('(-5)')
 			}, SyntaxError)
 			assert.throws(function() {
-				mr('1-10', { parseUnbounded: false }).subtract(3).subtract('3-')
+				mrd('1-10', { parseUnbounded: false }).subtract(3).subtract('3-')
 			}, SyntaxError)
 		});
 	});
@@ -280,10 +289,10 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mr('1-10', { parseNegative: false }).intersect(5).intersect('(-5)')
+				mrd('1-10', { parseNegative: false }).intersect(5).intersect('(-5)')
 			}, SyntaxError)
 			assert.throws(function() {
-				mr('1-10', { parseUnbounded: false }).intersect(5).intersect('3-')
+				mrd('1-10', { parseUnbounded: false }).intersect(5).intersect('3-')
 			}, SyntaxError)
 		});
 	});
@@ -342,10 +351,10 @@ describe('MultiRange', function() {
 		});
 		it('must pass options correctly', function() {
 			assert.throws(function() {
-				mr('1', { parseNegative: false }).has('(-5)')
+				mrd('1', { parseNegative: false }).has('(-5)')
 			}, SyntaxError)
 			assert.throws(function() {
-				mr('1', { parseUnbounded: false }).has('3-')
+				mrd('1', { parseUnbounded: false }).has('3-')
 			}, SyntaxError)
 		});
 	});
@@ -395,7 +404,7 @@ describe('MultiRange', function() {
 		assert.throws(function() { mr('').equals() }, TypeError);
 
 		assert.throws(function() {
-			mr('1-10', { parseNegative: false }).equals('(-5)');
+			mrd('1-10', { parseNegative: false }).equals('(-5)');
 		}, SyntaxError);
 	});
 
