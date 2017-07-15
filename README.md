@@ -133,19 +133,12 @@ Available `options` that can be passed to the constructor:
 - `parseNegative` (boolean, default = false): Enables parsing negative ranges (eg `(-10)-(-3)`).
 - `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (eg `-5,10-`).
 
-The following methods have been removed:
-
-- `appendRange(min: number, max: number): MultiRange` Use `append([[min, max]])` instead.
-- `subtractRange(min: number, max: number): MultiRange` Use `subtract([[min, max]])` instead.
-- `hasRange(min: number, max: number): boolean` Use `has([[min, max]])` instead.
-- `isContinuous(): boolean` Use `segmentLength() === 1` instead.
-
 
 ### Unbounded Ranges (optional)
 
-You can use unbounded (or infinite) ranges.
-Parsing unbounded ranges are disabled by default,
-and you have to enable them via the `parseUnbounded` option parameter.
+You can use unbounded (aka infinite) ranges.
+Parsing unbounded ranges is disabled by default,
+and you have to enable it via the `parseUnbounded` option parameter.
 
 ```js
 // The `parseUnbounded` option enables unbounded ranges.
@@ -163,7 +156,7 @@ const range6 = multirange([[-Infinity, Infinity]]); // all integers
 ```
 
 Note that the `parseUnbounded` option only affects the way *string* initializers are parsed.
-You have to pass no option to create unbounded ranges using non-string initializers.
+You do not have to pass any option to create unbounded ranges using non-string initializers.
 Once `parseUnbounded` is enabled at the constructor,
 subsequent chained methods will also correctly parse unbounded ranges.
 
@@ -178,9 +171,9 @@ console.log(unbounded('-').subtract('3-5,7,11-') + ''); // '-2,6,8-10'
 console.log(unbounded('-5,10-').has('-3,20')); // true
 
 // Intersection is especially useful to "trim" any unbounded ranges:
-var userInput = '-10,15-20,90-';
-var pagesInMyDoc = [[1, 100]]; // '1-100'
-var pagesToPrint = unbounded(userInput).intersect(pagesInMyDoc);
+const userInput = '-10,15-20,90-';
+const pagesInMyDoc = [[1, 100]]; // '1-100'
+const pagesToPrint = unbounded(userInput).intersect(pagesInMyDoc);
 console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 ```
 
@@ -203,6 +196,9 @@ mr1.append([[-4, -2]]); // -4 to -2
 console.log(mr1 + ''); // prints '(-5)-0'
 ```
 
+Note that the `parseNegative` option only affects the way string initializers are parsed.
+You do not have to pass any option to create negative ranges using non-string initializers.
+
 Once `parseNegative` is enabled at the constructor,
 subsequent chained methods will also recognize and parse negative ranges.
 
@@ -211,18 +207,19 @@ const mr2 = multirange('(-5)', { parseNegative: true }).append('(-3)');
 console.log(mr2); // prints '(-5),(-3)'
 ```
 
+
 ### Iteration
 
-**ES2015 (ES6) iterator**: If `Symbol.iterator` is defined in the runtime,
-you can simply iterate over the instance like this:
+**ES2015 (ES6) iterator**: If `Symbol.iterator` is defined
+(either natively or by a polyfill), you can simply iterate over the instance like this:
 
 ```js
-for (let page of multirange('2,5-7')) {
+for (const page of multirange('2,5-7')) {
     console.log(page);
-} // prints 2, 5, 6, 7
+} // prints 2, 5, 6 and 7
 
 // Instead of calling toArray() ...
-var arr = [...multirange('2,5-7')]; // array spreading
+const arr = [...multirange('2,5-7')]; // array spreading
 // arr becomes [2, 5, 6, 7]
 ```
 
@@ -237,14 +234,15 @@ while (!(page = it.next()).done) {
 }
 ```
 
+
 ## TypeScript Definition File
 
 This library comes with a TypeScript definition file. Starting from TypeScript 1.6,
 The TypeScript compiler can find this definition file automatically.
 
 The definition file only contains declarations that are compatible with ES5.
-If your TypeScript project targets ES6 (`--target ES6`) and uses iterators,
-add the following snippet somewhere in your project (e.g., "typings" directory)
+If your TypeScript project needs support for iterators,
+add the following snippet somewhere in your project (eg "typings" directory)
 to avoid compile-time errors.
 
 ```ts
@@ -255,9 +253,15 @@ declare module "multi-integer-range" {
 }
 ```
 
+Note that downlevel iteration for `--target=es5` needs a polyfill for symbols and
+`--downlevelIteration` compile flag, available since TypeScript 2.3.
+If these bothers you, you can always manually use `getIterator` as described above.
+
+
 ## Changelog
 
-See [the relase page on GitHub](https://github.com/smikitky/node-multi-integer-range/releases).
+See [the release page on GitHub](https://github.com/smikitky/node-multi-integer-range/releases).
+
 
 ## Development
 
@@ -279,9 +283,11 @@ However, this library is not intended to be efficient
 with a heavily fragmentated set of integers which are scarcely continuous
 (e.g., random 10000 integers between 1 to 1000000).
 
+
 ## Author
 
 Soichiro Miki (https://github.com/smikitky)
+
 
 ## License
 
