@@ -5,10 +5,9 @@
 	"compilerOptions": {
 		"outDir": "lib",
 		"target": "es5",
-		"lib": ["es5", "es2015.iterable"],
 		"module": "commonjs",
 		"newLine": "LF",
-		"strict": true,
+		"strictNullChecks": true,
 		"declaration": true
 	}
 }

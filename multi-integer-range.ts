@@ -4,6 +4,8 @@ export type Range = [number, number];
 
 export type Initializer = string | number | (number|Range)[] | MultiRange;
 
+declare var Symbol: any;
+
 export type Options = {
 	parseNegative?: boolean;
 	parseUnbounded?: boolean;
@@ -467,40 +469,38 @@ export class MultiRange {
 	}
 
 	/**
-	 * The iterator that enables this instance usable in for..of loops and such
+	 * Returns ES6-compatible iterator.
 	 */
-	public [Symbol.iterator](): Iterator<number|undefined>
+	public getIterator(): { next: () => { done?: boolean, value?: number }}
 	{
 		if (this.isUnbounded()) {
 			throw new RangeError('Unbounded ranges cannot be iterated over');
 		}
 		let i = 0,
-			curRange: Range|undefined = this.ranges[i],
+			curRange: Range = this.ranges[i],
 			j = curRange ? curRange[0] : undefined;
 		return {
 			next: () => {
-				if (!curRange || j === undefined) return { done: true, value: undefined };
+				if (!curRange || j === undefined) return { done: true };
 				const ret = j;
 				if (++j > curRange[1]) {
 					curRange = this.ranges[++i];
 					j = curRange ? curRange[0] : undefined;
 				}
-				return { done: false, value: ret };
+				return { value: ret };
 			}
 		}
-	}
-
-	/**
-	 * Returns ES6-compatible iterator.
-	 */
-	public getIterator(): Iterator<number|undefined>
-	{
-		return this[Symbol.iterator]();
 	}
 
 }
 
 export default MultiRange;
+
+// Set ES6 iterator, if Symbol.iterator is defined
+/* istanbul ignore else */
+if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+	MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
+}
 
 // A shorthand function to get a new MultiRange instance
 export function multirange(data?: Initializer, options?: Options): MultiRange {
