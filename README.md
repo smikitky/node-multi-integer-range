@@ -54,11 +54,11 @@ console.log(pages.segmentLength()); // 2
 Some methods and the constructor take one *Initializer* parameter.
 An initializer is one of the followings:
 
-- a valid string (eg `'1-3,5'`)
-- an array of integers (eg `[1, 2, 3, 5]`)
-- an array of `[number, number]` tuples (eg `[[1, 3], [5, 5]]`)
-- mixture of integers and tuples (eg `[[1, 3], 5]`)
-- a single integer (eg `1`)
+- a valid string (e.g., `'1-3,5'`)
+- an array of integers (e.g., `[1, 2, 3, 5]`)
+- an array of `[min, max]` tuples (e.g., `[[1, 3], [5, 5]]`)
+- mixture of integers and tuples (e.g., `[[1, 3], 5]`)
+- a single integer (e.g., `1`)
 - another MultiRange instance
 
 Pass it to the constructor to create a MultiRange object,
@@ -126,12 +126,12 @@ To get a copy of the instance, use `clone()`, or alternatively the copy construc
 - `toString(): string` Returns the string respresentation of this MultiRange.
 - `getRanges(): [number, number][]` Exports the whole range data as an array of [number, number] tuples.
 - `toArray(): number[]` Builds an array of integer which holds all integers in this MultiRange. This may be slow and memory-consuming for large ranges such as '1-10000'.
-- `getIterator(): Object` Returns ES6-compatible iterator. See the description below.
+- `getIterator(): Object` Returns an ES6-compatible iterator. See the description below.
 
 Available `options` that can be passed to the constructor:
 
-- `parseNegative` (boolean, default = false): Enables parsing negative ranges (eg `(-10)-(-3)`).
-- `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (eg `-5,10-`).
+- `parseNegative` (boolean, default = false): Enables parsing negative ranges (e.g., `(-10)-(-3)`).
+- `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (e.g., `-5,10-`).
 
 
 ### Unbounded Ranges (optional)
@@ -177,8 +177,8 @@ const pagesToPrint = unbounded(userInput).intersect(pagesInMyDoc);
 console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 ```
 
-Unbounded ranges cannot be iterated over, and you cannot call `#toArray()` for obvious reasons.
-Calling `#length()` for unbounded ranges will return `Infinity`.
+Unbounded ranges cannot be iterated over, and you cannot call `toArray()` for obvious reasons.
+Calling `length()` for unbounded ranges will return `Infinity`.
 
 
 ### Ranges Containing Zero and Negative Integers
@@ -237,13 +237,12 @@ while (!(page = it.next()).done) {
 
 ## TypeScript Definition File
 
-This library comes with a TypeScript definition file. Starting from TypeScript 1.6,
-The TypeScript compiler can find this definition file automatically.
+This library comes with a TypeScript definition file.
+Starting from TS 1.6, the compiler can find this definition file automatically.
 
 The definition file only contains declarations that are compatible with ES5.
-If your TypeScript project needs support for iterators,
-add the following snippet somewhere in your project (eg "typings" directory)
-to avoid compile-time errors.
+If your TypeScript project needs support for iterators (e.g., `for ... of` or `[...multirange('1-5')]`),
+add the following snippet somewhere in your project to avoid compile-time errors.
 
 ```ts
 declare module "multi-integer-range" {
@@ -253,9 +252,10 @@ declare module "multi-integer-range" {
 }
 ```
 
-Note that downlevel iteration for `--target=es5` needs a polyfill for symbols and
-`--downlevelIteration` compile flag, available since TypeScript 2.3.
-If these bothers you, you can always manually use `getIterator` as described above.
+In addition, if your project is `--target es5`, you'll need a polyfill for symbols,
+`--downlevelIteration` compile option (available since TS 2.3),
+plus `--lib es2015.iterable` compile option.
+If these bother you, you can always manually use `getIterator()` as described above.
 
 
 ## Changelog
