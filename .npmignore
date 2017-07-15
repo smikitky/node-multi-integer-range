@@ -1,5 +1,6 @@
 multi-integer-range.ts
 tsconfig.json
+package-lock.json
 /test
 /coverage
 .*
