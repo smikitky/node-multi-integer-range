@@ -37,10 +37,12 @@ export class MultiRange {
 			this.appendRange(data, data);
 		} else if (data instanceof MultiRange) {
 			this.ranges = data.getRanges();
-			this.options = {
-				parseNegative: this.options.parseNegative,
-				parseUnbounded: this.options.parseUnbounded
-			};
+			if (arguments[1] === undefined) {
+				this.options = {
+					parseNegative: data.options.parseNegative,
+					parseUnbounded: data.options.parseUnbounded
+				};
+			}
 		} else if (isArray(data)) {
 			for (let item of <(number|Range)[]>data) {
 				if (isArray(item)) {

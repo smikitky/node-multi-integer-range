@@ -75,6 +75,19 @@ describe('MultiRange', function() {
 			t(mr(mr('5-10')), '5-10'); // aka clone
 		});
 
+		it('must copy the options when using copy constructor', function() {
+			var original = mrd('5-10', { parseNegative: true });
+
+			var b = mrd(original);
+			assert.isTrue(b.options.parseNegative);
+			assert.isFalse(b.options.parseUnbounded);
+
+			// If another options is explicitly provided, respect it
+			var c = mrd(original, { parseNegative: false, parseUnbounded: true });
+			assert.isFalse(c.options.parseNegative);
+			assert.isTrue(c.options.parseUnbounded);
+		});
+
 		it('must throw an error for invalid input', function() {
 			assert.throws(function() { mr('abc'); }, SyntaxError);
 			assert.throws(function() { mr('1.5'); }, SyntaxError);
