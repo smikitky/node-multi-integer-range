@@ -263,6 +263,20 @@ If these bother you, you can always manually use `getIterator()` as described ab
 See [the release page on GitHub](https://github.com/smikitky/node-multi-integer-range/releases).
 
 
+## Caveats
+
+**Performance Considerations**: This library works efficiently for large ranges
+as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`).
+However, this library is not intended to be efficient
+with a heavily fragmentated set of integers which are scarcely continuous
+(e.g., random 10000 integers between 1 to 1000000).
+
+**Integer Type Checking**: Make sure you are not passing floating-point `number`s
+to this library. For example, don't do `new MultiRange(0.5);`.
+For performance reasons, the library does not strickly check if a passed number
+is an integer (it's a costly operation than you might think).
+Passing a float will result in unexpected and unrecoverable behavior.
+
 ## Development
 
 ### Building and Testing
@@ -275,13 +289,7 @@ npm test
 
 ### Bugs
 
-Report any bugs and suggestions using GitHub issues.
-
-**Performance Considerations**: This library works efficiently for large ranges
-as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`).
-However, this library is not intended to be efficient
-with a heavily fragmentated set of integers which are scarcely continuous
-(e.g., random 10000 integers between 1 to 1000000).
+Please report any bugs and suggestions using GitHub issues.
 
 
 ## Author
