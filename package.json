@@ -9,7 +9,7 @@
     "test": "mocha",
     "build": "tsc",
     "coverage": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls",
-    "prettier": "prettier --write *.ts"
+    "prettier": "prettier --write *.ts test/*.js"
   },
   "keywords": [
     "integer",
