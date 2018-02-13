@@ -4,10 +4,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/smikitky/node-multi-integer-range/badge.svg?branch=dev)](https://coveralls.io/github/smikitky/node-multi-integer-range)
 [![npm version](https://badge.fury.io/js/multi-integer-range.svg)](https://badge.fury.io/js/multi-integer-range)
 
-A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10").
-Such strings are typically used in print dialogs to indicate which pages to print.
+A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10"), which are typically used in print dialogs to indicate which pages to print.
 
-Supported operations include:
+Supported operations:
 
 - Addition (e.g., `1-2,6` + `3-5` => `1-6`)
 - Subtraction (e.g., `1-10` - `5-9` => `1-4,10`)
@@ -16,19 +15,17 @@ Supported operations include:
 - Unbounded ranges (e.g., `5-` to mean "all integers >= 5") (optional)
 - Ranges including negative integers or zero
 - ES6 iterator (`for ... of`, spread operator)
-- Array creation (a.k.a. "flatten")
+- Array creation ("flatten")
 
-Internal data are always *sorted and normalized* to the smallest possible
-representation.
+Internal data are always *sorted and normalized* to the smallest possible representation.
 
 ## Usage
 
 ### Install
 
-Install via npm: `npm install multi-integer-range`
+Install via npm or yarn: `npm install multi-integer-range`
 
-This library has no external dependencies, and can be used with Webpack and Browserify.
-
+This library has no external dependencies, and can be used with module bundlers such as Webpack.
 
 ### Basic Example
 
@@ -63,6 +60,8 @@ An initializer is one of the followings:
 
 Pass it to the constructor to create a MultiRange object,
 or pass nothing to create an empty MultiRange object.
+A shorthand constructor function `multirange()` is also available,
+which you can use according to your preference.
 
 ```ts
 type Initializer =
@@ -70,25 +69,17 @@ type Initializer =
 ```
 
 ```js
+import MultiRange, { multirange } from 'multi-integer-range';
+
 const mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
 const mr2 = new MultiRange('1-2, 3, 7-9');
 const mr3 = new MultiRange([[1,3], [7,9]]);
 const mr4 = new MultiRange(mr1); // clone
-```
-
-A shorthand constructor function `multirange()` is also available.
-Use whichever you prefer.
-
-```js
-import { multirange } from 'multi-integer-range';
-// OR
-// const { multirange } = require('multi-integer-range');
-
 const mr5 = multirange('1,2,3,7,8,9');
 ```
 
-Internal data are always sorted and normalized,
-so the above five (`mr1`-`mr5`) hold a instance with identical range data.
+The above five (`mr1`-`mr5`) hold a instance with identical range data
+because internal data are always normalized.
 
 The string parser is permissive and accepts space characters
 before/after comma/hyphens. Order is not important either, and
@@ -273,8 +264,7 @@ with a heavily fragmentated set of integers which are scarcely continuous
 
 **Integer Type Checking**: Make sure you are not passing floating-point `number`s
 to this library. For example, don't do `new MultiRange(0.5);`.
-For performance reasons, the library does not strickly check if a passed number
-is an integer (it's a costly operation than you might think).
+For performance reasons, the library does not check if a passed number is an integer.
 Passing a float will result in unexpected and unrecoverable behavior.
 
 ## Development
