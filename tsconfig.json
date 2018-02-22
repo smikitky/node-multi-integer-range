@@ -1,13 +1,11 @@
 {
-	"files": [
-		"multi-integer-range.ts"
-	],
-	"compilerOptions": {
-		"outDir": "lib",
-		"target": "es5",
-		"module": "commonjs",
-		"newLine": "LF",
-		"strictNullChecks": true,
-		"declaration": true
-	}
+  "files": ["multi-integer-range.ts"],
+  "compilerOptions": {
+    "outDir": "lib",
+    "target": "es5",
+    "module": "commonjs",
+    "newLine": "LF",
+    "strictNullChecks": true,
+    "declaration": true
+  }
 }
