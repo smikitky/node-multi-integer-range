@@ -26,8 +26,8 @@
     "coveralls": "^2.11.14",
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
-    "prettier": "^1.10.2",
-    "typescript": "~2.4.1"
+    "prettier": "^1.13.5",
+    "typescript": "^2.4.2"
   },
   "prettier": {
     "singleQuote": true
