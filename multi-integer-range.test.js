@@ -1,7 +1,6 @@
-var multi_integer_range = require('../lib/multi-integer-range');
+var multi_integer_range = require('./lib/multi-integer-range');
 var MultiRange = multi_integer_range.MultiRange;
 var multirange = multi_integer_range.multirange;
-var assert = require('chai').assert;
 
 describe('MultiRange', function() {
   function mr(i) {
@@ -11,7 +10,7 @@ describe('MultiRange', function() {
   var mrd = multirange;
 
   function t(mr, expected) {
-    assert.strictEqual(mr.toString(), expected);
+    expect(mr.toString()).toBe(expected);
   }
 
   describe('constructor', function() {
@@ -26,30 +25,30 @@ describe('MultiRange', function() {
     });
 
     it('must throw if parseNegative is turned off', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('(-1)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('(-5)-(-1)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('(-5)-', { parseUnbounded: true });
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
 
     it('must throw if parseUnbounded is turned off', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('1-');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('-');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('-1');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('-(-1)', { parseNegative: true });
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
 
     it('must parse unbounded ranges', function() {
@@ -87,75 +86,75 @@ describe('MultiRange', function() {
       var original = mrd('5-10', { parseNegative: true });
 
       var b = mrd(original);
-      assert.isTrue(b.options.parseNegative);
-      assert.isFalse(b.options.parseUnbounded);
+      expect(b.options.parseNegative).toBe(true);
+      expect(b.options.parseUnbounded).toBe(false);
 
       // If another options is explicitly provided, respect it
       var c = mrd(original, { parseNegative: false, parseUnbounded: true });
-      assert.isFalse(c.options.parseNegative);
-      assert.isTrue(c.options.parseUnbounded);
+      expect(c.options.parseNegative).toBe(false);
+      expect(c.options.parseUnbounded).toBe(true);
     });
 
     it('must throw an error for invalid input', function() {
-      assert.throws(function() {
+      expect(function() {
         mr('abc');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mr('1.5');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mr('2-5,8-10,*,99');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mr(',');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mr(['abc']);
-      }, TypeError);
-      assert.throws(function() {
+      }).toThrow(TypeError);
+      expect(function() {
         mr([1, [5, 9, 7]]);
-      }, TypeError);
-      assert.throws(function() {
+      }).toThrow(TypeError);
+      expect(function() {
         mr(null);
-      }, TypeError);
+      }).toThrow(TypeError);
       // followings are valid
-      assert.doesNotThrow(function() {
+      expect(function() {
         mr(undefined);
-      }, Error);
+      }).not.toThrow();
       t(mr(undefined), '');
-      assert.doesNotThrow(function() {
+      expect(function() {
         mr([]);
-      }, Error);
+      }).not.toThrow();
       t(mr([]), '');
-      assert.doesNotThrow(function() {
+      expect(function() {
         mr();
-      }, Error);
+      }).not.toThrow();
       t(mr(), '');
-      assert.doesNotThrow(function() {
+      expect(function() {
         mr('');
-      }, Error);
+      }).not.toThrow();
       t(mr(''), '');
     });
 
     it('must throw an error for Infinity not as part of an unbounded range segment', function() {
-      assert.throws(function() {
+      expect(function() {
         mr(Infinity);
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr([Infinity]);
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr([[Infinity, Infinity]]);
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr(-Infinity);
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr([-Infinity]);
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr([[-Infinity, -Infinity]]);
-      }, RangeError);
+      }).toThrow(RangeError);
     });
   });
 
@@ -220,9 +219,9 @@ describe('MultiRange', function() {
       t(mr('5-10,15-20').append(mr('11-14,21-25')), '5-25');
     });
     it('must throw an exception for empty call', function() {
-      assert.throws(function() {
+      expect(function() {
         mr(5).append();
-      }, TypeError);
+      }).toThrow(TypeError);
     });
     it('must be chainable', function() {
       t(
@@ -235,16 +234,16 @@ describe('MultiRange', function() {
       );
     });
     it('must pass options correctly', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('1', { parseNegative: false })
           .append(3)
           .append('(-5)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('1', { parseUnbounded: false })
           .append(3)
           .append('3-');
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
   });
 
@@ -292,9 +291,9 @@ describe('MultiRange', function() {
       t(mr('1-20').subtract(mr('5,10-15')), '1-4,6-9,16-20');
     });
     it('must throw an exception for empty call', function() {
-      assert.throws(function() {
+      expect(function() {
         mr(5).subtract();
-      }, TypeError);
+      }).toThrow(TypeError);
     });
     it('must be chainable', function() {
       t(
@@ -307,16 +306,16 @@ describe('MultiRange', function() {
       );
     });
     it('must pass options correctly', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('1-10', { parseNegative: false })
           .subtract(3)
           .subtract('(-5)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('1-10', { parseUnbounded: false })
           .subtract(3)
           .subtract('3-');
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
   });
 
@@ -370,9 +369,9 @@ describe('MultiRange', function() {
       t(mr('10-15').intersect(mr('12-17')), '12-15');
     });
     it('must throw an exception for empty call', function() {
-      assert.throws(function() {
+      expect(function() {
         mr(5).intersect();
-      }, TypeError);
+      }).toThrow(TypeError);
     });
     it('must be chainable', function() {
       t(
@@ -383,229 +382,231 @@ describe('MultiRange', function() {
       );
     });
     it('must pass options correctly', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('1-10', { parseNegative: false })
           .intersect(5)
           .intersect('(-5)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('1-10', { parseUnbounded: false })
           .intersect(5)
           .intersect('3-');
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
   });
 
   describe('#has', function() {
     it('must perform correct inclusion check', function() {
-      assert.isTrue(mr('5-20,25-100,150-300').has('7'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('25'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('300'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('5-10'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('5-10,25'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('25-40,160'));
-      assert.isTrue(mr('5-20,25-100,150-300').has('5-20,25-100,150-300'));
-      assert.isTrue(
+      expect(mr('5-20,25-100,150-300').has('7')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('25')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('300')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('5-10')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('5-10,25')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('25-40,160')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('5-20,25-100,150-300')).toBe(true);
+      expect(
         mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250')
-      );
-      assert.isTrue(mr('5-20,25-100,150-300').has(''));
+      ).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('')).toBe(true);
 
-      assert.isTrue(
+      expect(
         mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-250)-(-280)')
-      );
-      assert.isTrue(
+      ).toBe(true);
+      expect(
         mr('(-300)-(-200),(-50)-(-30),20-25').has('(-200)-(-250),(-280)-(-220)')
-      );
+      ).toBe(true);
 
-      assert.isFalse(mr('5-20,25-100,150-300').has('3'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('22'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('500'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('10-21'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('149-400'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('5-20,25-103,150-300'));
-      assert.isFalse(
+      expect(mr('5-20,25-100,150-300').has('3')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('22')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('500')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('10-21')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('149-400')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('5-20,25-103,150-300')).toBe(false);
+      expect(
         mr('5-20,25-100,150-300').has('5,80,18-7,280,100,15-20,25,200-250,301')
-      );
+      ).toBe(false);
 
-      assert.isFalse(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-100)'));
+      expect(mr('(-300)-(-200),(-50)-(-30),20-25').has('(-40),(-100)')).toBe(
+        false
+      );
     });
     it('must perform correct inclusion check for unbounded ranges', function() {
-      assert.isTrue(mr('-').has('5'));
-      assert.isTrue(mr('-20,40-').has('70'));
-      assert.isTrue(mr('-20,40').has('10'));
-      assert.isTrue(mr('-20,30-35,40-').has('-10,30,31,50-'));
-      assert.isTrue(mr('-').has('-'));
-      assert.isFalse(mr('-20,40-').has('30'));
-      assert.isFalse(mr('-20,40-').has('10-50'));
-      assert.isFalse(mr('-20,40-').has('10-'));
-      assert.isFalse(mr('-20,40-').has('-50'));
-      assert.isFalse(mr('-20,40-').has('-'));
+      expect(mr('-').has('5')).toBe(true);
+      expect(mr('-20,40-').has('70')).toBe(true);
+      expect(mr('-20,40').has('10')).toBe(true);
+      expect(mr('-20,30-35,40-').has('-10,30,31,50-')).toBe(true);
+      expect(mr('-').has('-')).toBe(true);
+      expect(mr('-20,40-').has('30')).toBe(false);
+      expect(mr('-20,40-').has('10-50')).toBe(false);
+      expect(mr('-20,40-').has('10-')).toBe(false);
+      expect(mr('-20,40-').has('-50')).toBe(false);
+      expect(mr('-20,40-').has('-')).toBe(false);
     });
     it('must accept various input types', function() {
-      assert.isTrue(mr('5-20,25-100,150-300').has(30));
-      assert.isFalse(mr('5-20,25-100,150-300').has(23));
-      assert.isTrue(mr('5-20,25-100,150-300').has('30'));
-      assert.isFalse(mr('5-20,25-100,150-300').has('23'));
-      assert.isTrue(mr('5-20,25-100,150-300').has([10, 20, 30, 40]));
-      assert.isFalse(mr('5-20,25-100,150-300').has([10, 20, 30, 40, 120]));
-      assert.isTrue(mr('5-20,25-100,150-300').has([[10, 20], [30, 50]]));
-      assert.isFalse(
+      expect(mr('5-20,25-100,150-300').has(30)).toBe(true);
+      expect(mr('5-20,25-100,150-300').has(23)).toBe(false);
+      expect(mr('5-20,25-100,150-300').has('30')).toBe(true);
+      expect(mr('5-20,25-100,150-300').has('23')).toBe(false);
+      expect(mr('5-20,25-100,150-300').has([10, 20, 30, 40])).toBe(true);
+      expect(mr('5-20,25-100,150-300').has([10, 20, 30, 40, 120])).toBe(false);
+      expect(mr('5-20,25-100,150-300').has([[10, 20], [30, 50]])).toBe(true);
+      expect(
         mr('5-20,25-100,150-300').has([[10, 20], [21, 25], [30, 50]])
-      );
-      assert.isTrue(mr('5-20,25-100,150-300').has(mr('30')));
-      assert.isFalse(mr('5-20,25-100,150-300').has(mr('23')));
+      ).toBe(false);
+      expect(mr('5-20,25-100,150-300').has(mr('30'))).toBe(true);
+      expect(mr('5-20,25-100,150-300').has(mr('23'))).toBe(false);
     });
     it('must throw an exception for empty call', function() {
-      assert.throws(function() {
+      expect(function() {
         mr(5).has();
-      }, TypeError);
+      }).toThrow(TypeError);
     });
     it('must pass options correctly', function() {
-      assert.throws(function() {
+      expect(function() {
         mrd('1', { parseNegative: false }).has('(-5)');
-      }, SyntaxError);
-      assert.throws(function() {
+      }).toThrow(SyntaxError);
+      expect(function() {
         mrd('1', { parseUnbounded: false }).has('3-');
-      }, SyntaxError);
+      }).toThrow(SyntaxError);
     });
   });
 
   it('#hasRange', function() {
-    assert.isTrue(mr('5-20,25-100,150-300').hasRange(5, 15));
-    assert.isFalse(mr('5-20,25-100,150-300').hasRange(3, 10));
+    expect(mr('5-20,25-100,150-300').hasRange(5, 15)).toBe(true);
+    expect(mr('5-20,25-100,150-300').hasRange(3, 10)).toBe(false);
   });
 
   it('#length', function() {
-    assert.equal(mr('').length(), 0);
-    assert.equal(mr('5').length(), 1);
-    assert.equal(mr('5-10').length(), 6);
-    assert.equal(mr('1,3,10-15,20-21').length(), 10);
-    assert.equal(mr('(-7)-(-4),(-1)-3,5').length(), 10);
-    assert.equal(mr('-5').length(), Infinity);
-    assert.equal(mr('8-').length(), Infinity);
-    assert.equal(mr('-').length(), Infinity);
+    expect(mr('').length()).toBe(0);
+    expect(mr('5').length()).toBe(1);
+    expect(mr('5-10').length()).toBe(6);
+    expect(mr('1,3,10-15,20-21').length()).toBe(10);
+    expect(mr('(-7)-(-4),(-1)-3,5').length()).toBe(10);
+    expect(mr('-5').length()).toBe(Infinity);
+    expect(mr('8-').length()).toBe(Infinity);
+    expect(mr('-').length()).toBe(Infinity);
   });
 
   it('#segmentLength', function() {
-    assert.equal(mr('').segmentLength(), 0);
-    assert.equal(mr('5').segmentLength(), 1);
-    assert.equal(mr('5-10').segmentLength(), 1);
-    assert.equal(mr('1,3,10-15,20-21').segmentLength(), 4);
-    assert.equal(mr('(-7)-(-4),(-1)-3,5').segmentLength(), 3);
-    assert.equal(mr('-3,8-').segmentLength(), 2);
-    assert.equal(mr('-').segmentLength(), 1);
+    expect(mr('').segmentLength()).toBe(0);
+    expect(mr('5').segmentLength()).toBe(1);
+    expect(mr('5-10').segmentLength()).toBe(1);
+    expect(mr('1,3,10-15,20-21').segmentLength()).toBe(4);
+    expect(mr('(-7)-(-4),(-1)-3,5').segmentLength()).toBe(3);
+    expect(mr('-3,8-').segmentLength()).toBe(2);
+    expect(mr('-').segmentLength()).toBe(1);
   });
 
   it('#equals', function() {
     var foo = multirange('4,8,10-12');
-    assert.isTrue(foo.equals(foo));
+    expect(foo.equals(foo)).toBe(true);
 
-    assert.isTrue(mr('').equals(''));
-    assert.isTrue(mr('5').equals(mr('5')));
-    assert.isTrue(mr('2-8').equals('2-8'));
-    assert.isTrue(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20'));
-    assert.isTrue(mr('(-7)-(-4),(-1)-3,5').equals('(-7)-(-4),(-1)-3,5'));
-    assert.isTrue(mr('-8,20-').equals('-8,20-'));
-    assert.isTrue(mr('-').equals('1-,-0'));
-    assert.isFalse(mr('').equals('5'));
-    assert.isFalse(mr('5').equals('5-6'));
-    assert.isFalse(mr('2-8').equals('2-7'));
-    assert.isFalse(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25'));
+    expect(mr('').equals('')).toBe(true);
+    expect(mr('5').equals(mr('5'))).toBe(true);
+    expect(mr('2-8').equals('2-8')).toBe(true);
+    expect(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20')).toBe(true);
+    expect(mr('(-7)-(-4),(-1)-3,5').equals('(-7)-(-4),(-1)-3,5')).toBe(true);
+    expect(mr('-8,20-').equals('-8,20-')).toBe(true);
+    expect(mr('-').equals('1-,-0')).toBe(true);
+    expect(mr('').equals('5')).toBe(false);
+    expect(mr('5').equals('5-6')).toBe(false);
+    expect(mr('2-8').equals('2-7')).toBe(false);
+    expect(mr('2-8,10-12,15-20').equals('2-8,10-12,15-20,23-25')).toBe(false);
 
-    assert.throws(function() {
+    expect(function() {
       mr('').equals();
-    }, TypeError);
+    }).toThrow(TypeError);
 
-    assert.throws(function() {
+    expect(function() {
       mrd('1-10', { parseNegative: false }).equals('(-5)');
-    }, SyntaxError);
+    }).toThrow(SyntaxError);
   });
 
   it('#isUnbounded', function() {
-    assert.isTrue(mr([[-Infinity, 5]]).isUnbounded());
-    assert.isTrue(mr([[0, 5], [10, Infinity]]).isUnbounded());
-    assert.isFalse(mr(8).isUnbounded());
+    expect(mr([[-Infinity, 5]]).isUnbounded()).toBe(true);
+    expect(mr([[0, 5], [10, Infinity]]).isUnbounded()).toBe(true);
+    expect(mr(8).isUnbounded()).toBe(false);
   });
 
   it('#min', function() {
-    assert.strictEqual(mr('1,5,10-15').min(), 1);
-    assert.strictEqual(mr('-1,5,10').min(), -Infinity);
-    assert.strictEqual(mr().min(), undefined);
+    expect(mr('1,5,10-15').min()).toBe(1);
+    expect(mr('-1,5,10').min()).toBe(-Infinity);
+    expect(mr().min()).toBe(undefined);
   });
 
   it('#max', function() {
-    assert.strictEqual(mr('1,5,10-15').max(), 15);
-    assert.strictEqual(mr('1,5,10-').max(), Infinity);
-    assert.strictEqual(mr().max(), undefined);
+    expect(mr('1,5,10-15').max()).toBe(15);
+    expect(mr('1,5,10-').max()).toBe(Infinity);
+    expect(mr().max()).toBe(undefined);
   });
 
   it('#pop', function() {
     var r = mr('5,8-9');
-    assert.strictEqual(r.pop(), 9);
-    assert.strictEqual(r.pop(), 8);
-    assert.strictEqual(r.pop(), 5);
-    assert.strictEqual(r.pop(), undefined);
-    assert.strictEqual(r.pop(), undefined);
-    assert.strictEqual(r.segmentLength(), 0);
+    expect(r.pop()).toBe(9);
+    expect(r.pop()).toBe(8);
+    expect(r.pop()).toBe(5);
+    expect(r.pop()).toBe(undefined);
+    expect(r.pop()).toBe(undefined);
+    expect(r.segmentLength()).toBe(0);
 
     r = mr('-5,9');
-    assert.strictEqual(r.pop(), 9);
-    assert.strictEqual(r.pop(), 5);
-    assert.strictEqual(r.pop(), 4);
-    assert.strictEqual(r.pop(), 3);
-    assert.isTrue(r.equals('-2'));
+    expect(r.pop()).toBe(9);
+    expect(r.pop()).toBe(5);
+    expect(r.pop()).toBe(4);
+    expect(r.pop()).toBe(3);
+    expect(r.equals('-2')).toBe(true);
 
-    assert.throws(function() {
+    expect(function() {
       mr('8-').pop();
-    }, RangeError);
+    }).toThrow(RangeError);
   });
 
   it('#shift', function() {
     var r = mr('5,8-9');
-    assert.strictEqual(r.shift(), 5);
-    assert.strictEqual(r.shift(), 8);
-    assert.strictEqual(r.shift(), 9);
-    assert.strictEqual(r.shift(), undefined);
-    assert.strictEqual(r.shift(), undefined);
-    assert.strictEqual(r.segmentLength(), 0);
+    expect(r.shift()).toBe(5);
+    expect(r.shift()).toBe(8);
+    expect(r.shift()).toBe(9);
+    expect(r.shift()).toBe(undefined);
+    expect(r.shift()).toBe(undefined);
+    expect(r.segmentLength()).toBe(0);
 
     r = mr('5,9-');
-    assert.strictEqual(r.shift(), 5);
-    assert.strictEqual(r.shift(), 9);
-    assert.strictEqual(r.shift(), 10);
-    assert.strictEqual(r.shift(), 11);
-    assert.isTrue(r.equals('12-'));
+    expect(r.shift()).toBe(5);
+    expect(r.shift()).toBe(9);
+    expect(r.shift()).toBe(10);
+    expect(r.shift()).toBe(11);
+    expect(r.equals('12-')).toBe(true);
 
-    assert.throws(function() {
+    expect(function() {
       mr('-8').shift();
-    }, RangeError);
+    }).toThrow(RangeError);
   });
 
   it('#toString', function() {
-    assert.equal('' + mr('15-20'), '15-20');
-    assert.equal('' + mr('0'), '0');
-    assert.equal('' + mr('(-8)-(-5)'), '(-8)-(-5)');
-    assert.equal('' + mr([[-Infinity, Infinity]]), '-');
-    assert.equal('' + mr([[-Infinity, 10]]), '-10');
-    assert.equal('' + mr([[10, Infinity]]), '10-');
-    assert.strictEqual('' + mr(), '');
+    expect('' + mr('15-20')).toBe('15-20');
+    expect('' + mr('0')).toBe('0');
+    expect('' + mr('(-8)-(-5)')).toBe('(-8)-(-5)');
+    expect('' + mr([[-Infinity, Infinity]])).toBe('-');
+    expect('' + mr([[-Infinity, 10]])).toBe('-10');
+    expect('' + mr([[10, Infinity]])).toBe('10-');
+    expect('' + mr()).toBe('');
   });
 
   describe('#toArray', function() {
     it('must build an array from a finite multirange', function() {
-      assert.deepEqual(mr('').toArray(), []);
-      assert.deepEqual(mr('2').toArray(), [2]);
-      assert.deepEqual(mr('2-5').toArray(), [2, 3, 4, 5]);
-      assert.deepEqual(mr('2-3,8,10-12').toArray(), [2, 3, 8, 10, 11, 12]);
-      assert.deepEqual(mr('(-8)-(-6),0,2-3').toArray(), [-8, -7, -6, 0, 2, 3]);
+      expect(mr('').toArray()).toEqual([]);
+      expect(mr('2').toArray()).toEqual([2]);
+      expect(mr('2-5').toArray()).toEqual([2, 3, 4, 5]);
+      expect(mr('2-3,8,10-12').toArray()).toEqual([2, 3, 8, 10, 11, 12]);
+      expect(mr('(-8)-(-6),0,2-3').toArray()).toEqual([-8, -7, -6, 0, 2, 3]);
     });
     it('must throw an error for an infinite multirange', function() {
-      assert.throws(function() {
+      expect(function() {
         mr('-5').toArray();
-      }, RangeError);
-      assert.throws(function() {
+      }).toThrow(RangeError);
+      expect(function() {
         mr('-').toArray();
-      }, RangeError);
+      }).toThrow(RangeError);
     });
   });
 
@@ -616,18 +617,10 @@ describe('MultiRange', function() {
         var i = 0;
         var val = it.next();
         while (!val.done) {
-          assert.equal(
-            val.value,
-            expected[i++],
-            'iterator returned unexpected value'
-          );
+          expect(val.value).toBe(expected[i++]);
           val = it.next();
         }
-        assert.equal(
-          i,
-          expected.length,
-          'iterator returned less elements than expected	'
-        );
+        expect(i).toBe(expected.length);
       }
       testIter(mr(''), []);
       testIter(mr('8'), [8]);
@@ -637,9 +630,9 @@ describe('MultiRange', function() {
     });
 
     it('must throw an error for unbounded ranges', function() {
-      assert.throws(function() {
+      expect(function() {
         mr([[8, Infinity]]).getIterator();
-      }, RangeError);
+      }).toThrow(RangeError);
     });
 
     if (typeof Symbol.iterator !== 'symbol') {
@@ -651,9 +644,9 @@ describe('MultiRange', function() {
       function testIter(mr, expected) {
         var i = 0;
         for (var item of mr) {
-          assert.equal(item, expected[i++]);
+          expect(item).toBe(expected[i++]);
         }
-        assert.equal(i, expected.length);
+        expect(i).toBe(expected.length);
       }
       testIter(mr(''), []);
       testIter(mr('8'), [8]);
@@ -676,14 +669,16 @@ describe('MultiRange', function() {
 // handle Inifinite numbers consistently across various runtimes
 describe('Assertion', function() {
   it('must perform comparison on inifite numbers', function() {
-    assert.isTrue(Infinity === Infinity);
-    assert.isTrue(-Infinity === -Infinity);
-    assert.isTrue(10000000 < Infinity && -Infinity < -10000000);
-    assert.equal(Infinity, Infinity);
-    assert.equal(-Infinity, -Infinity);
-    assert.deepEqual(
-      [3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY],
-      [3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY]
-    );
+    expect(Infinity === Infinity).toBe(true);
+    expect(-Infinity === -Infinity).toBe(true);
+    expect(10000000 < Infinity && -Infinity < -10000000).toBe(true);
+    expect(Infinity).toBe(Infinity);
+    expect(-Infinity).toBe(-Infinity);
+    expect([3, Number.POSITIVE_INFINITY, 5, Number.NEGATIVE_INFINITY]).toEqual([
+      3,
+      Number.POSITIVE_INFINITY,
+      5,
+      Number.NEGATIVE_INFINITY
+    ]);
   });
 });

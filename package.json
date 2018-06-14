@@ -6,10 +6,10 @@
   "main": "./lib/multi-integer-range.js",
   "typings": "./lib/multi-integer-range.d.ts",
   "scripts": {
-    "test": "mocha",
+    "test": "jest --coverage",
     "build": "tsc",
-    "coverage": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls",
-    "prettier": "prettier --write *.ts test/*.js"
+    "coverage": "cat ./coverage/lcov.info | coveralls",
+    "prettier": "prettier --write *.ts *.js"
   },
   "keywords": [
     "integer",
@@ -22,10 +22,8 @@
   "author": "Soichiro Miki",
   "license": "MIT",
   "devDependencies": {
-    "chai": "^4.1.0",
     "coveralls": "^2.11.14",
-    "mocha": "^3.0.2",
-    "mocha-lcov-reporter": "^1.2.0",
+    "jest": "^23.1.0",
     "prettier": "^1.13.5",
     "typescript": "^2.4.2"
   },
