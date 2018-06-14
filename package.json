@@ -22,7 +22,7 @@
   "author": "Soichiro Miki",
   "license": "MIT",
   "devDependencies": {
-    "coveralls": "^2.11.14",
+    "coveralls": "^3.0.1",
     "jest": "^23.1.0",
     "prettier": "^1.13.5",
     "typescript": "^2.9.2"
