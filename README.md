@@ -17,7 +17,7 @@ Supported operations:
 - ES6 iterator (`for ... of`, spread operator)
 - Array creation ("flatten")
 
-Internal data are always *sorted and normalized* to the smallest possible representation.
+Internal data are always _sorted and normalized_ to the smallest possible representation.
 
 ## Usage
 
@@ -36,7 +36,11 @@ import MultiRange from 'multi-integer-range';
 // const MultiRange = require('multi-integer-range').default;
 
 const pages = new MultiRange('1-5,12-15');
-pages.append(6).append([7,8]).append('9-11').subtract(2);
+pages
+  .append(6)
+  .append([7, 8])
+  .append('9-11')
+  .subtract(2);
 console.log(pages.toString()); // '1,3-15'
 console.log(pages.has('5,9,12-14')); // true
 
@@ -45,10 +49,9 @@ console.log(pages.getRanges()); // [[1, 1], [3, 15]]
 console.log(pages.segmentLength()); // 2
 ```
 
-
 ### Initializers
 
-Some methods and the constructor take one *Initializer* parameter.
+Some methods and the constructor take one _Initializer_ parameter.
 An initializer is one of the followings:
 
 - a valid string (e.g., `'1-3,5'`)
@@ -64,8 +67,7 @@ A shorthand constructor function `multirange()` is also available,
 which you can use according to your preference.
 
 ```ts
-type Initializer =
-    string | number | MultiRange | (number | [number, number])[];
+type Initializer = string | number | MultiRange | (number | [number, number])[];
 ```
 
 ```js
@@ -73,7 +75,7 @@ import MultiRange, { multirange } from 'multi-integer-range';
 
 const mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
 const mr2 = new MultiRange('1-2, 3, 7-9');
-const mr3 = new MultiRange([[1,3], [7,9]]);
+const mr3 = new MultiRange([[1, 3], [7, 9]]);
 const mr4 = new MultiRange(mr1); // clone
 const mr5 = multirange('1,2,3,7,8,9');
 ```
@@ -89,7 +91,6 @@ overlapped numbers are silently ignored.
 const mr = new MultiRange('3,\t8-3,2,3,\n10, 9 - 7 ');
 console.log(mr.toString()); // prints '2-10'
 ```
-
 
 ### API
 
@@ -124,7 +125,6 @@ Available `options` that can be passed to the constructor:
 - `parseNegative` (boolean, default = false): Enables parsing negative ranges (e.g., `(-10)-(-3)`).
 - `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (e.g., `-5,10-`).
 
-
 ### Unbounded Ranges (optional)
 
 You can use unbounded (aka infinite) ranges.
@@ -146,7 +146,7 @@ const range5 = multirange([[-Infinity, 3]]); // all integers <= 3
 const range6 = multirange([[-Infinity, Infinity]]); // all integers
 ```
 
-Note that the `parseUnbounded` option only affects the way *string* initializers are parsed.
+Note that the `parseUnbounded` option only affects the way _string_ initializers are parsed.
 You do not have to pass any option to create unbounded ranges using non-string initializers.
 Once `parseUnbounded` is enabled at the constructor,
 subsequent chained methods will also correctly parse unbounded ranges.
@@ -171,13 +171,12 @@ console.log(pagesToPrint.toString()); // prints '1-10,15-20,90-100'
 Unbounded ranges cannot be iterated over, and you cannot call `toArray()` for obvious reasons.
 Calling `length()` for unbounded ranges will return `Infinity`.
 
-
 ### Ranges Containing Zero and Negative Integers
 
 You can safely handle ranges containing zero and negative integers, including `-Infinity`.
 
 The syntax for denoting negative integers in a string initializer is a bit tricky, though;
-you need to *always* contain all negative integers in parentheses.
+you need to _always_ contain all negative integers in parentheses.
 You also need to pass `parseNegative` option to make the parser recognize
 negative integers contained in parentheses.
 
@@ -198,7 +197,6 @@ const mr2 = multirange('(-5)', { parseNegative: true }).append('(-3)');
 console.log(mr2); // prints '(-5),(-3)'
 ```
 
-
 ### Iteration
 
 **ES2015 (ES6) iterator**: If `Symbol.iterator` is defined
@@ -206,7 +204,7 @@ console.log(mr2); // prints '(-5),(-3)'
 
 ```js
 for (const page of multirange('2,5-7')) {
-    console.log(page);
+  console.log(page);
 } // prints 2, 5, 6 and 7
 
 // Instead of calling toArray() ...
@@ -219,12 +217,11 @@ implementation and use it manually like this:
 
 ```js
 var it = multirange('2,5-7').getIterator(),
-    page;
+  page;
 while (!(page = it.next()).done) {
-    console.log(page.value);
+  console.log(page.value);
 }
 ```
-
 
 ## TypeScript Definition File
 
@@ -236,10 +233,10 @@ If your TypeScript project needs support for iterators (e.g., `for ... of` or `[
 add the following snippet somewhere in your project to avoid compile-time errors.
 
 ```ts
-declare module "multi-integer-range" {
-    interface MultiRange {
-        [Symbol.iterator](): Iterator<number>;
-    }
+declare module 'multi-integer-range' {
+  interface MultiRange {
+    [Symbol.iterator](): Iterator<number>;
+  }
 }
 ```
 
@@ -248,16 +245,14 @@ In addition, if your project is `--target es5`, you'll need a polyfill for symbo
 plus `--lib es2015.iterable` compile option.
 If these bother you, you can always manually use `getIterator()` as described above.
 
-
 ## Changelog
 
-See [the release page on GitHub](https://github.com/smikitky/node-multi-integer-range/releases).
-
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Caveats
 
 **Performance Considerations**: This library works efficiently for large ranges
-as long as they're *mostly* continuous (e.g., `1-10240000,20480000-50960000`).
+as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`).
 However, this library is not intended to be efficient
 with a heavily fragmentated set of integers which are scarcely continuous
 (e.g., random 10000 integers between 1 to 1000000).
@@ -281,11 +276,9 @@ npm test
 
 Please report any bugs and suggestions using GitHub issues.
 
-
 ## Author
 
 Soichiro Miki (https://github.com/smikitky)
-
 
 ## License
 
