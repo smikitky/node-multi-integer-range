@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.0.6
+
+- Made the parser throw a `RangeError` if an integer in a string is too big or small (#10).
+
 ## v4.0.5
 
 - Included CHANGELOG in the repository.
