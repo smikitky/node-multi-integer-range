@@ -136,6 +136,15 @@ describe('MultiRange', function() {
       t(mr(''), '');
     });
 
+    it('must thorw a RangeError for huge integer strings', function() {
+      expect(function() {
+        mr('1-900719925474099100');
+      }).toThrow(RangeError);
+      expect(function() {
+        mr('(-900719925474099100)');
+      }).toThrow(RangeError);
+    });
+
     it('must throw an error for Infinity not as part of an unbounded range segment', function() {
       expect(function() {
         mr(Infinity);

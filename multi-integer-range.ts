@@ -13,6 +13,9 @@ export type Options = {
 
 const defaultOptions: Options = { parseNegative: false, parseUnbounded: false };
 
+const MAX_SAFE_INTEGER = 9007199254740991;
+const MIN_SAFE_INTEGER = -9007199254740991;
+
 export class MultiRange {
   private ranges: Range[];
   private options: Options;
@@ -69,7 +72,10 @@ export class MultiRange {
   protected parseString(data: string): void {
     function toInt(str: string): number {
       const m = str.match(/^\(?(\-?\d+)/) as any;
-      return parseInt(m[1], 10);
+      const int = parseInt(m[1], 10);
+      if (int < MIN_SAFE_INTEGER || MAX_SAFE_INTEGER < int)
+        throw new RangeError('The number is too big or too small.');
+      return int;
     }
 
     const s = data.replace(/\s/g, '');
