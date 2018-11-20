@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.7
+
+- Improved the quality of tsdoc comments.
+- Refactored test codes.
+- Updated dependencies.
+
 ## v4.0.6
 
 - Made the parser throw a `RangeError` if an integer in a string is too big or small (#10).
