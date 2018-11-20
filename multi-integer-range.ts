@@ -66,7 +66,7 @@ export class MultiRange {
   }
 
   /**
-   * Parses the initialize string and build the range data.
+   * Parses the initializer string and build the range data.
    * Override this if you need to customize the parsing strategy.
    */
   protected parseString(data: string): void {
@@ -108,6 +108,7 @@ export class MultiRange {
 
   /**
    * Clones this instance.
+   * @returns The cloned instance.
    */
   public clone(): MultiRange {
     return new MultiRange(this);
@@ -115,7 +116,7 @@ export class MultiRange {
 
   /**
    * Appends to this instance.
-   * @parasm value The data to append.
+   * @param value The data to append.
    */
   public append(value: Initializer): MultiRange {
     if (value === undefined) {
@@ -131,7 +132,7 @@ export class MultiRange {
   /**
    * Appends a specified range of integers to this isntance.
    * @param min The minimum value of the range to append.
-   * @param max The minimum value of the range to append.
+   * @param max The maximum value of the range to append.
    */
   private appendRange(min: number, max: number): MultiRange {
     let newRange: Range = [min, max];
@@ -169,7 +170,7 @@ export class MultiRange {
   /**
    * Subtracts a specified range of integers from this instance.
    * @param min The minimum value of the range to subtract.
-   * @param max The minimum value of the range to subtract.
+   * @param max The maximum value of the range to subtract.
    */
   private subtractRange(min: number, max: number): MultiRange {
     let newRange: Range = [min, max];
@@ -197,8 +198,8 @@ export class MultiRange {
   }
 
   /**
-   * Remove integers which are not included in the given ranges
-   * (aka intersection).
+   * Remove integers which are not included in `value`,
+   * yielding the intersection of this and `value`.
    * @param value The data to calculate the intersetion.
    */
   public intersect(value: Initializer): MultiRange {
@@ -233,7 +234,7 @@ export class MultiRange {
    * This is a helper method that calculates how an append/subtract operation
    * affects the existing range members.
    * @param target The range array to test.
-   * @return An object containing information about how the given range
+   * @returns An object containing information about how the given range
    * overlaps or touches this instance.
    */
   private findOverlap(
@@ -284,9 +285,10 @@ export class MultiRange {
 
   /**
    * Calculates the union of two specified ranges.
-   * @param a Range A
-   * @param b Range B
-   * @return Union of a and b. Null if a and b do not touch nor intersect.
+   * @param a Range A.
+   * @param b Range B.
+   * @returns Union of `a` and `b`.
+   *   Returns `null` if `a` and `b` do not touch nor intersect.
    */
   private calcUnion(a: Range, b: Range): Range | null {
     if (a[1] + 1 < b[0] || a[0] - 1 > b[1]) {
@@ -297,6 +299,7 @@ export class MultiRange {
 
   /**
    * Exports the whole range data as an array of arrays.
+   * @returns An copied array of range segments.
    */
   public getRanges(): Range[] {
     const result: Range[] = [];
@@ -305,9 +308,9 @@ export class MultiRange {
   }
 
   /**
-   * Checks if the instance contains the specified value.
-   * @param value Value to be checked
-   * @return True if the specified value is included in the instance.
+   * Checks if this instance contains the specified value.
+   * @param value Value to be checked.
+   * @returns True if the specified value is included in the instance.
    */
   public has(value: Initializer): boolean {
     if (value === undefined) {
@@ -336,10 +339,10 @@ export class MultiRange {
   }
 
   /**
-   * Checks if the instance contains the range specified by the two parameters.
+   * Checks if this instance contains the range specified by the two parameters.
    * @param min The minimum value of the range to subtract.
    * @param max The minimum value of the range to subtract.
-   * @return True if the specified value is included in the instance.
+   * @returns True if the specified value is included in the instance.
    */
   private hasRange(min: number, max: number): boolean {
     return this.has(new MultiRange([[min, max]]));
@@ -347,9 +350,8 @@ export class MultiRange {
 
   /**
    * Returns the number of range segments.
-   * For example, the segmentLength of `2-5,7,9-11' is 3.
-   * Returns 0 for an empty instance.
-   * @return The number of segments.
+   * For example, the segmentLength of `2-5,7,9-11` is 3.
+   * @returns The number of segments. Returns 0 for an empty instance.
    */
   public segmentLength(): number {
     return this.ranges.length;
@@ -357,9 +359,9 @@ export class MultiRange {
 
   /**
    * Calculates how many numbers are effectively included in this instance.
-   * (i.e. '1-10,51-60,90' returns 21)
-   * @return The number of integer values in this instance.
-   *    Returns `Infinity` for unbounded ranges.
+   * For example, the length of `1-10,51-60,90` is 21.
+   * @returns The number of integer values in this instance.
+   *    Returns `Infinity` for an unbounded range.
    */
   public length(): number {
     if (this.isUnbounded()) return Infinity;
@@ -371,7 +373,7 @@ export class MultiRange {
   /**
    * Checks if two instances of MultiRange are identical.
    * @param cmp The data to compare.
-   * @return True if cmp is exactly the same as this instance.
+   * @returns True if `cmp` is exactly the same as this instance.
    */
   public equals(cmp: Initializer): boolean {
     if (cmp === undefined) {
@@ -404,8 +406,9 @@ export class MultiRange {
   }
 
   /**
-   * Returns the minimum number contained in this insntance.
+   * Returns the minimum integer contained in this insntance.
    * Can be -Infinity or undefined.
+   * @returns The minimum integer of this instance.
    */
   public min(): number | undefined {
     if (this.ranges.length === 0) return undefined;
@@ -414,7 +417,8 @@ export class MultiRange {
 
   /**
    * Returns the maximum number contained in this insntance.
-   * Can be +Infinity or undefined.
+   * Can be Infinity or undefined.
+   * @returns The maximum integer of this instance.
    */
   public max(): number | undefined {
     if (this.ranges.length === 0) return undefined;
@@ -422,7 +426,8 @@ export class MultiRange {
   }
 
   /**
-   * Removes the smallest integer from this instance and returns that integer.
+   * Removes the smallest integer from this instance and returns it.
+   * @returns The minimum integer removed from this instance.
    */
   public shift(): number | undefined {
     const min = this.min();
@@ -435,7 +440,8 @@ export class MultiRange {
   }
 
   /**
-   * Removes the largest integer from this instance and returns that integer.
+   * Removes the largest integer from this instance and returns it.
+   * @returns The maximum integer removed from this instance.
    */
   public pop(): number | undefined {
     const max = this.max();
@@ -474,9 +480,9 @@ export class MultiRange {
   }
 
   /**
-   * Builds an array of integer which holds all elements in this MultiRange.
-   * Note that this may be slow and memory-consuming for large ranges
-   * such as '1-10000'.
+   * Builds a flat array of integers which holds all elements in this instance.
+   * Note that this may be slow and memory-consuming for large ranges.
+   * Consider using the iterator whenever possible.
    */
   public toArray(): number[] {
     if (this.isUnbounded()) {
@@ -493,7 +499,7 @@ export class MultiRange {
   }
 
   /**
-   * Returns ES6-compatible iterator.
+   * Returns an ES6-compatible iterator.
    */
   public getIterator(): { next: () => { done?: boolean; value?: number } } {
     if (this.isUnbounded()) {
@@ -524,7 +530,10 @@ if (typeof Symbol === 'function' && 'iterator' in Symbol) {
   MultiRange.prototype[Symbol.iterator] = MultiRange.prototype.getIterator;
 }
 
-// A shorthand function to get a new MultiRange instance
+/**
+ * A shorthand function to construct a new MultiRange instance.
+ * @returns The new MultiRnage instance.
+ */
 export function multirange(data?: Initializer, options?: Options): MultiRange {
   return new MultiRange(data, options);
 }
