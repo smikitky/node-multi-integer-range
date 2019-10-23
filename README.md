@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/smikitky/node-multi-integer-range/badge.svg?branch=dev)](https://coveralls.io/github/smikitky/node-multi-integer-range)
 [![npm version](https://badge.fury.io/js/multi-integer-range.svg)](https://badge.fury.io/js/multi-integer-range)
 
-A small library which parses and manipulates comma-delimited integer ranges (such as "1-3,8-10"), which are typically used in print dialogs to indicate which pages to print.
+A small library which parses and manipulates comma-delimited integer ranges (such as `1-3,8-10`), which are typically used in print dialogs to indicate which pages to print.
 
 Supported operations:
 
@@ -52,7 +52,7 @@ console.log(pages.segmentLength()); // 2
 ### Initializers
 
 Some methods and the constructor take one _Initializer_ parameter.
-An initializer is one of the followings:
+An initializer is one of the following:
 
 - a valid string (e.g., `'1-3,5'`)
 - an array of integers (e.g., `[1, 2, 3, 5]`)
@@ -80,7 +80,7 @@ const mr4 = new MultiRange(mr1); // clone
 const mr5 = multirange('1,2,3,7,8,9');
 ```
 
-The above five (`mr1`-`mr5`) hold a instance with identical range data
+These five instances (`mr1`-`mr5`) hold identical range data
 because internal data are always normalized.
 
 The string parser is permissive and accepts space characters
@@ -225,8 +225,7 @@ while (!(page = it.next()).done) {
 
 ## TypeScript Definition File
 
-This library comes with a TypeScript definition file.
-Starting from TS 1.6, the compiler can find this definition file automatically.
+A TypeScript definition file (`*.d.ts`) is included in this package.
 
 The definition file only contains declarations that are compatible with ES5.
 If your TypeScript project needs support for iterators (e.g., `for ... of` or `[...multirange('1-5')]`),
@@ -257,10 +256,10 @@ However, this library is not intended to be efficient
 with a heavily fragmentated set of integers which are scarcely continuous
 (e.g., random 10000 integers between 1 to 1000000).
 
-**Integer Type Checking**: Make sure you are not passing floating-point `number`s
+**No Integer Type Checks**: Make sure you are not passing floating-point `number`s
 to this library. For example, don't do `new MultiRange(0.5);`.
 For performance reasons, the library does not check if a passed number is an integer.
-Passing a float will result in unexpected and unrecoverable behavior.
+Passing a float will result in an unexpected and unrecoverable behavior.
 
 ## Development
 
