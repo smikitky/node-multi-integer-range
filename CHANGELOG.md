@@ -1,5 +1,10 @@
 # Changelog
 
+## v4.0.8
+
+- Improved tsdoc comments.
+- Updated dependencies.
+
 ## v4.0.7
 
 - Improved the quality of tsdoc comments.
