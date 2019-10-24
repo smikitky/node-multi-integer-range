@@ -1,5 +1,8 @@
 /*! multi-integer-range (c) 2015 Soichiro Miki */
 
+/**
+ * A `[min, max]` tuple to denote one integer range.
+ */
 export type Range = [number, number];
 
 export type Initializer = string | number | (number | Range)[] | MultiRange;
@@ -7,7 +10,13 @@ export type Initializer = string | number | (number | Range)[] | MultiRange;
 declare var Symbol: any;
 
 export type Options = {
+  /**
+   * Parses negative integers enclosed in parentheses.
+   */
   parseNegative?: boolean;
+  /**
+   * Parses unbounded ranges like `10-` or `-10`.
+   */
   parseUnbounded?: boolean;
 };
 
@@ -16,6 +25,9 @@ const defaultOptions: Options = { parseNegative: false, parseUnbounded: false };
 const MAX_SAFE_INTEGER = 9007199254740991;
 const MIN_SAFE_INTEGER = -9007199254740991;
 
+/**
+ * Parses and manipulates multiple integer ranges.
+ */
 export class MultiRange {
   private ranges: Range[];
   private options: Options;
