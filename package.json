@@ -22,10 +22,10 @@
   "author": "Soichiro Miki",
   "license": "MIT",
   "devDependencies": {
-    "coveralls": "^3.0.2",
-    "jest": "^23.6.0",
-    "prettier": "^1.15.2",
-    "typescript": "^3.5.2"
+    "coveralls": "^3.0.7",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "typescript": "^3.6.4"
   },
   "prettier": {
     "singleQuote": true
