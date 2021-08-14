@@ -1,6 +1,6 @@
 # multi-integer-range
 
-[![Build Status](https://travis-ci.org/smikitky/node-multi-integer-range.svg?branch=dev)](https://travis-ci.org/smikitky/node-multi-integer-range)
+[![Build Status](https://github.com/smikitky/node-multi-integer-range/actions/workflows/tests.yml/badge.svg)](https://github.com/smikitky/node-multi-integer-range/actions)
 [![Coverage Status](https://coveralls.io/repos/github/smikitky/node-multi-integer-range/badge.svg?branch=dev)](https://coveralls.io/github/smikitky/node-multi-integer-range)
 [![npm version](https://badge.fury.io/js/multi-integer-range.svg)](https://badge.fury.io/js/multi-integer-range)
 
@@ -36,11 +36,7 @@ import MultiRange from 'multi-integer-range';
 // const MultiRange = require('multi-integer-range').default;
 
 const pages = new MultiRange('1-5,12-15');
-pages
-  .append(6)
-  .append([7, 8])
-  .append('9-11')
-  .subtract(2);
+pages.append(6).append([7, 8]).append('9-11').subtract(2);
 console.log(pages.toString()); // '1,3-15'
 console.log(pages.has('5,9,12-14')); // true
 
@@ -75,7 +71,10 @@ import MultiRange, { multirange } from 'multi-integer-range';
 
 const mr1 = new MultiRange([7, 2, 9, 1, 8, 3]);
 const mr2 = new MultiRange('1-2, 3, 7-9');
-const mr3 = new MultiRange([[1, 3], [7, 9]]);
+const mr3 = new MultiRange([
+  [1, 3],
+  [7, 9]
+]);
 const mr4 = new MultiRange(mr1); // clone
 const mr5 = multirange('1,2,3,7,8,9');
 ```
