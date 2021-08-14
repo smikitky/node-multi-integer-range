@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.0.9
+
+- Removed unnecessary files from the package.
+- Updated devDependencies to latest.
+
+## v4.0.8
+
+- Improved tsdoc comments.
+- Updated dependencies.
+
 ## v4.0.7
 
 - Improved the quality of tsdoc comments.
