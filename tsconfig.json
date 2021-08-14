@@ -1,8 +1,7 @@
 {
-  "files": ["multi-integer-range.ts"],
+  "files": ["index.ts"],
   "compilerOptions": {
     "typeRoots": [],
-    "outDir": "lib",
     "target": "es5",
     "module": "commonjs",
     "newLine": "LF",

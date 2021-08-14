@@ -1,7 +1,7 @@
-multi-integer-range.ts
+index.ts
+*.test.js
 tsconfig.json
 package-lock.json
-*.test.js
 /coverage
 .*
 *.tgz

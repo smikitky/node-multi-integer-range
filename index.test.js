@@ -1,4 +1,4 @@
-var multi_integer_range = require('./lib/multi-integer-range');
+var multi_integer_range = require('./index.js');
 var MultiRange = multi_integer_range.MultiRange;
 var multirange = multi_integer_range.multirange;
 
