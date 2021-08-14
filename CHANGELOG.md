@@ -3,7 +3,8 @@
 ## v4.0.9
 
 - Removed unnecessary files from the package.
-- Updated devDependencies to latest.
+- Updated all devDependencies to latest.
+- Migrated to GitHub Actions-based CI.
 
 ## v4.0.8
 
