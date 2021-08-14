@@ -22,13 +22,15 @@
   "author": "Soichiro Miki",
   "license": "MIT",
   "devDependencies": {
-    "coveralls": "^3.0.7",
+    "coveralls": "^3.1.1",
     "jest": "^24.9.0",
-    "prettier": "^1.18.2",
+    "prettier": "^2.3.2",
     "typescript": "^3.6.4"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "trailingComma": "none"
   },
   "runkitExampleFilename": "example.js"
 }

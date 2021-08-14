@@ -249,9 +249,11 @@ export class MultiRange {
    * @returns An object containing information about how the given range
    * overlaps or touches this instance.
    */
-  private findOverlap(
-    target: Range
-  ): { lo: number; count: number; union: Range } {
+  private findOverlap(target: Range): {
+    lo: number;
+    count: number;
+    union: Range;
+  } {
     //   a        b  c     d         e  f       g h i   j k  l       m
     //--------------------------------------------------------------------
     //   |----(0)----|     |---(1)---|  |---(2)---|          |--(3)--|

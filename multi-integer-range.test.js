@@ -59,8 +59,20 @@ describe('MultiRange', () => {
     it('must initialize with an array', () => {
       t(mr([]), '');
       t(mr([1, 10, 8, -5, 9]), '(-5),1,8-10');
-      t(mr([[2, 5], [7, 10]]), '2-5,7-10');
-      t(mr([[-7, 1], [3, 9]]), '(-7)-1,3-9');
+      t(
+        mr([
+          [2, 5],
+          [7, 10]
+        ]),
+        '2-5,7-10'
+      );
+      t(
+        mr([
+          [-7, 1],
+          [3, 9]
+        ]),
+        '(-7)-1,3-9'
+      );
       t(mr([5, [8, 10], [12, 15]]), '5,8-10,12-15');
     });
 
@@ -144,7 +156,13 @@ describe('MultiRange', () => {
     it('must append negative values correctly', () => {
       t(mr('(-5)-(-3)').append([-6, -2, 4, 5]), '(-6)-(-2),4-5');
       t(mr('(-5)-(-3)').append(3), '(-5)-(-3),3');
-      t(mr('(-5)-(-3)').append([[-8, -1], [3, 9]]), '(-8)-(-1),3-9');
+      t(
+        mr('(-5)-(-3)').append([
+          [-8, -1],
+          [3, 9]
+        ]),
+        '(-8)-(-1),3-9'
+      );
       t(mr('(-5)-(-3),(-10)-(-8),0-6').append([-6, -7, [-2, -1]]), '(-10)-6');
     });
     it('must append unbounded ranges correctly', () => {
@@ -192,14 +210,10 @@ describe('MultiRange', () => {
     });
     it('must pass options correctly', () => {
       expect(() => {
-        mrd('1', { parseNegative: false })
-          .append(3)
-          .append('(-5)');
+        mrd('1', { parseNegative: false }).append(3).append('(-5)');
       }).toThrow(SyntaxError);
       expect(() => {
-        mrd('1', { parseUnbounded: false })
-          .append(3)
-          .append('3-');
+        mrd('1', { parseUnbounded: false }).append(3).append('3-');
       }).toThrow(SyntaxError);
     });
   });
@@ -264,14 +278,10 @@ describe('MultiRange', () => {
     });
     it('must pass options correctly', () => {
       expect(() => {
-        mrd('1-10', { parseNegative: false })
-          .subtract(3)
-          .subtract('(-5)');
+        mrd('1-10', { parseNegative: false }).subtract(3).subtract('(-5)');
       }).toThrow(SyntaxError);
       expect(() => {
-        mrd('1-10', { parseUnbounded: false })
-          .subtract(3)
-          .subtract('3-');
+        mrd('1-10', { parseUnbounded: false }).subtract(3).subtract('3-');
       }).toThrow(SyntaxError);
     });
   });
@@ -331,23 +341,14 @@ describe('MultiRange', () => {
       }).toThrow(TypeError);
     });
     it('must be chainable', () => {
-      t(
-        mr('1-100')
-          .intersect('20-150')
-          .intersect('10-40'),
-        '20-40'
-      );
+      t(mr('1-100').intersect('20-150').intersect('10-40'), '20-40');
     });
     it('must pass options correctly', () => {
       expect(() => {
-        mrd('1-10', { parseNegative: false })
-          .intersect(5)
-          .intersect('(-5)');
+        mrd('1-10', { parseNegative: false }).intersect(5).intersect('(-5)');
       }).toThrow(SyntaxError);
       expect(() => {
-        mrd('1-10', { parseUnbounded: false })
-          .intersect(5)
-          .intersect('3-');
+        mrd('1-10', { parseUnbounded: false }).intersect(5).intersect('3-');
       }).toThrow(SyntaxError);
     });
   });
@@ -406,9 +407,18 @@ describe('MultiRange', () => {
       expect(mr('5-20,25-100,150-300').has('23')).toBe(false);
       expect(mr('5-20,25-100,150-300').has([10, 20, 30, 40])).toBe(true);
       expect(mr('5-20,25-100,150-300').has([10, 20, 30, 40, 120])).toBe(false);
-      expect(mr('5-20,25-100,150-300').has([[10, 20], [30, 50]])).toBe(true);
       expect(
-        mr('5-20,25-100,150-300').has([[10, 20], [21, 25], [30, 50]])
+        mr('5-20,25-100,150-300').has([
+          [10, 20],
+          [30, 50]
+        ])
+      ).toBe(true);
+      expect(
+        mr('5-20,25-100,150-300').has([
+          [10, 20],
+          [21, 25],
+          [30, 50]
+        ])
       ).toBe(false);
       expect(mr('5-20,25-100,150-300').has(mr('30'))).toBe(true);
       expect(mr('5-20,25-100,150-300').has(mr('23'))).toBe(false);
@@ -481,7 +491,12 @@ describe('MultiRange', () => {
 
   it('#isUnbounded', () => {
     expect(mr([[-Infinity, 5]]).isUnbounded()).toBe(true);
-    expect(mr([[0, 5], [10, Infinity]]).isUnbounded()).toBe(true);
+    expect(
+      mr([
+        [0, 5],
+        [10, Infinity]
+      ]).isUnbounded()
+    ).toBe(true);
     expect(mr(8).isUnbounded()).toBe(false);
   });
 
