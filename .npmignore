@@ -4,3 +4,4 @@ package-lock.json
 *.test.js
 /coverage
 .*
+*.tgz
