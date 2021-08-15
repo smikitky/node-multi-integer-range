@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/smikitky/node-multi-integer-range/badge.svg?branch=dev)](https://coveralls.io/github/smikitky/node-multi-integer-range)
 [![npm version](https://badge.fury.io/js/multi-integer-range.svg)](https://badge.fury.io/js/multi-integer-range)
 
-A small library which parses comma-delimited integer ranges (such as `"1-3,8-10"`) and manipulates such range data. This type of data is commonly used to specify which lines to highlight or which pages to print.
+A small library that parses comma-delimited integer ranges (such as `"1-3,8-10"`) and manipulates such range data. This type of data is commonly used to specify which lines to highlight or which pages to print.
 
 Supported operations:
 
@@ -42,16 +42,15 @@ Version 5.x should be fine for most modern development environments, but if you 
 Install via npm or yarn:
 
 ```
-# for v5
-npm install multi-integer-range@alpha
+npm install multi-integer-range@5
 ```
 
-Modern browsers can directly load this package as a standard ES module via CDN such as unpkg:
+Modern browsers can directly load this package as a standard ES module via CDN:
 
 ```html
-<script type="module" />
-import mr as * from 'https://unpkg.com/multi-integer-range@5/lib/fp.js';
-console.log(mr.parse('7,6,5'));
+<script type="module">
+  import mr as * from 'https://unpkg.com/multi-integer-range@5/lib/fp.js';
+  console.log(mr.parse('7,6,5'));
 </script>
 ```
 
@@ -80,7 +79,7 @@ const len = mr.length(ranges1); // 10
 
 ## Creating a _normalized_ MultiIntegerRange
 
-The fundamental data structure of this module is a **normalized** readonly array of `[min, max]` tuples, as shown in the following TypeScript definition. In other words, just an array of 2-element number arrays. Here, "normalized" means the range data is in the smallest possible representation, and is sorted in the ascending order.
+The fundamental data structure of this module is a **normalized** read-only array of `[min, max]` tuples, as shown in the following TypeScript definition. In other words, just an array of 2-element number arrays. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order.
 
 <!-- prettier-ignore -->
 ```ts
@@ -119,7 +118,7 @@ const wrong = mr.length(unsorted); // DON'T! This won't work!
 const correct = mr.length(mr.normalize(unsorted)); // 8
 ```
 
-`parse(data: string, options?: Options)` creates a normalized MultiIntegerRange from a string. The string parser is permissive and accepts space characters before/after comma/hyphens. It calles `normalize()` under the hood, so order is not important, and overlapped numbers are silently ignored.
+`parse(data: string, options?: Options)` creates a normalized MultiIntegerRange from a string. The string parser is permissive and accepts space characters before/after comma/hyphens. It calls `normalize()` under the hood, so the order is not important, and overlapped numbers are silently ignored.
 
 ```ts
 console.log(mr.parse('1-3,10')); // [[1, 3], [10, 10]]
@@ -143,7 +142,7 @@ console.log(
 
 ## API
 
-All functions are "pure". That is, they do not change the input data nor do they have any side effects. When a function returns a MultiIntegerRange, it is normalized. `MIR` is just a short alias for `MultiIntegerRange` (available in d.ts).
+All functions are "pure", and exported as named exports. They do not change the input data nor do they have any side effects. All MultiIntegerRange's returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (available in d.ts).
 
 - `parse(data: string, options?: Options): MIR` Parses the given string.
 - `normalize(data?: number | (number | Range)[]): MIR` Normalizes the given number or the array of numbers/Ranges.
@@ -169,7 +168,7 @@ Available `options` that can be passed to `parse()`:
 
 ## Iteration
 
-A `MultiIntegerRange` is simply an array of `Range`s. If you naively iterate over it (e.g., in a for-of loop), you'll simply get each `Range` tuple one by one. To iterate over each integer contained in the `MultiIntegerRange` instead, use `iterate()` like so:
+Since `MultiIntegerRange` is just an array of `Range`s, if you naively iterate over it (e.g., in a for-of loop), you'll simply get each `Range` tuple one by one. To iterate each integer contained in the `MultiIntegerRange` instead, use `iterate()` like so:
 
 ```js
 const ranges = mr.parse('2,5-7');
@@ -201,7 +200,7 @@ console.log(mr.stringify(pagesToPrint)); // '1-5,7-100'
 
 ## Legacy Classe-based API
 
-For compatibility purposes, version 5.x still exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but uses the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit.
+For compatibility purposes, version 5.x still exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but uses the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit. Use this only during migration.
 
 ## Changelog
 
@@ -210,10 +209,10 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## Caveats
 
 **Performance Considerations**: This library works efficiently for large ranges
-as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmentated set of integers which are scarcely continuous (e.g., random 10000 integers between 1 to 1000000).
+as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmented set of integers that are scarcely continuous (e.g., random 10000 integers between 1 to 1000000).
 
 **No Integer Type Checks**: Make sure you are not passing floating-point `number`s
-to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in an unexpected and unrecoverable behavior.
+to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
 
 ## Development
 
