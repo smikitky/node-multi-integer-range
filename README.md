@@ -23,21 +23,20 @@ Internal data are always _sorted and normalized_ to the smallest possible repres
 
 First, choose the right version you need. The API style has changed drastically in version 5. The new API is slightly more verbose but fully tree-shakable.
 
-|                   | 4.x                  | 5.x (alpha)           |
-| ----------------- | -------------------- | --------------------- |
-| API               | Class-based          | Function-based        |
-| ES version        | Downpiled to ES5     | ES2016                |
-| Module system     | CommonJS             | ESM (Tree-shakable❤️) |
-| Immutability      | Mutable method chain | Pure functions only❤️ |
-| Supported runtime | Works even on IE     | See below             |
+|                   | 4.x                  | 5.x (alpha)                    |
+| ----------------- | -------------------- | ------------------------------ |
+| API               | Class-based          | Function-based                 |
+| ES version        | Downpiled to ES5     | ES2015                         |
+| Module system     | CommonJS             | ESM/CJS hybrid (tree-shakable) |
+| Immutability      | Mutable method chain | Pure functions only            |
+| Supported runtime | Works even on IE     | See below                      |
 
 Supported runtime for version 5.x:
 
-- Node >= 10: If you're consuming this module via modern preprocessors like Webpack or tsc
-- Node >= 14: If you want to `import` the module natively
-- Deno: (haven't checked, should work via unpkg)
-
-Version 5.x should be fine for most modern development environments, but if you feel you are not ready yet, feel free to use 4.x, which is stable and has no known major bugs.
+- Node &ge; 10 (uses the CJS version)
+- Bundlers such as Webpack picks the ESM version of the module and benefit from tree-shaking
+- Modern browsers
+- Deno: Via Skypack, `import * as mr from 'https://cdn.skypack.dev/multi-integer-range@next?dts'`
 
 Install via npm or yarn:
 
@@ -71,8 +70,8 @@ const diff = mr.subtract(ranges1, ranges2); // [[1, 6], [11, 12]]
 const commonValues = mr.intersect(ranges1, ranges2); // [[9, 10]]
 
 const str = mr.stringify(sum); // "1-12,100"
-const bool = mr.has(range1, ranges3); // true
-const isSame = mr.equals(range1, range2); // false
+const bool = mr.has(ranges1, ranges3); // true
+const isSame = mr.equals(ranges1, ranges2); // false
 const array = mr.flatten(ranges3); // [1, 2, 3, 4, 5, 6]
 const len = mr.length(ranges1); // 10
 ```

@@ -3,14 +3,14 @@
   "version": "5.0.0-alpha.4",
   "description": "Parses and manipulates multiple comma-separated integer ranges (eg 1-3,8-10)",
   "repository": "https://github.com/smikitky/node-multi-integer-range.git",
-  "type": "module",
   "sideEffects": false,
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/cjs/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
-    "build": "tsc",
-    "prettier": "prettier --write *.ts *.js"
+    "build": "tsc && tsc -p tsconfig-cjs.json",
+    "prettier": "prettier --write src/**/*.{ts,js}"
   },
   "keywords": [
     "integer",

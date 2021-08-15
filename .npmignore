@@ -1,8 +1,8 @@
 package-lock.json
 /coverage
 /src
-/lib/*.test*
-tsconfig.json
+/lib/**/*.test*
+tsconfig*.json
 jest.config.cjs
 *.tgz
 .github
