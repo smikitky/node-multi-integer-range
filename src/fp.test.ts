@@ -69,7 +69,7 @@ describe('parse', () => {
 });
 
 // prettier-ignore
-describe('normalize', () => {
+test('normalize', () => {
   const t = (a: Parameters<typeof mr.normalize>[0], expected: Range[]) =>
     expect(mr.normalize(a)).toEqual(expected);
 
@@ -242,6 +242,33 @@ describe('intersect', () => {
     t('-', '80-', '80-');
     t('-', '40-45,(-20)', '(-20),40-45');
   });
+});
+
+test('monkey test', () => {
+  const arrs: number[][] = [[], [], []];
+  for (let i = -100; i <= 100; i++) {
+    arrs[Math.floor(Math.random() * 3)].push(i);
+  }
+
+  const shuffle = (array: number[]) => {
+    const result = array.slice(0);
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  };
+
+  const mirs = arrs.map(shuffle).map(mr.normalize);
+  const res1 = mirs.reduce(mr.append, []);
+  expect(mr.stringify(res1)).toBe('(-100)-100');
+
+  const res2 = mirs.reduce(mr.subtract, [[-Infinity, Infinity]]);
+  expect(mr.stringify(res2)).toBe('-(-101),101-');
+
+  expect(mr.intersect(mirs[0], mirs[1]).length).toBe(0);
+  expect(mr.intersect(mirs[0], mirs[2]).length).toBe(0);
+  expect(mr.intersect(mirs[1], mirs[2]).length).toBe(0);
 });
 
 describe('has', () => {
