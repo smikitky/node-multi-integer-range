@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.0.0-alpha
+
+- Dropped support for IE and ancient Node.
+- Migrated to ES modules and function-style API. This package is now fully tree-shakable.
+- Renamed/removed some functions.
+  - (constructor): Use `parse()` or `normalize()`.
+  - `toArray`: Renamed to `flatten()`.
+  - `toString`: Renamed to `stringify()`.
+  - `getIterator`: Renamed to `iterate()`.
+  - `segmentLength`: Removed. Just use `.length`.
+  - `pop`: Not in the new API. Use `max()` in combination with `init()`.
+  - `shift`: Not in the new API. Use `min()` in combination with `tail()`.
+- Rewrote `MultiRange` to use the new function-style API under the hood. It works, but defeats the benefits of version 5.
+
 ## v4.0.9
 
 - Removed unnecessary files from the package.
