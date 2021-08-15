@@ -27,29 +27,32 @@ First, choose the right version you need. The API style has changed drastically 
 | ----------------- | -------------------- | ------------------------------ |
 | API               | Class-based          | Function-based                 |
 | ES version        | Downpiled to ES5     | ES2015                         |
-| Module system     | CommonJS             | ESM/CJS hybrid (tree-shakable) |
+| Module system     | CommonJS (CJS)       | ESM/CJS hybrid (tree-shakable) |
 | Immutability      | Mutable method chain | Pure functions only            |
 | Supported runtime | Works even on IE     | See below                      |
 
 Supported runtime for version 5.x:
 
 - Node &ge; 10 (uses the CJS version)
-- Bundlers such as Webpack picks the ESM version of the module and benefit from tree-shaking
-- Modern browsers
-- Deno: Via Skypack, `import * as mr from 'https://cdn.skypack.dev/multi-integer-range@next?dts'`
+- Bundlers such as Webpack can pick the ESM version and benefit from tree-shaking
+- Modern browsers can load the ESM version via CDN.
+- Deno: Via Skypack, `import * as mr from 'https://cdn.skypack.dev/multi-integer-range@^5.0.0-alpha.1?dts'`
 
 Install via npm or yarn:
 
 ```
-npm install multi-integer-range@5
+npm install multi-integer-range@^5.0.0-alpha.1
 ```
 
-Modern browsers can directly load this package as a standard ES module via CDN:
+Although not recommended for performance reasons, modern browsers can directly load this package as a standard ES module via CDN:
 
 ```html
 <script type="module">
-  import mr as * from 'https://unpkg.com/multi-integer-range@5/lib/fp.js';
-  console.log(mr.parse('7,6,5'));
+  // With unpkg
+  import * as mr1 from 'https://unpkg.com/multi-integer-range@^5.0.0-alpha.1/lib/esm/fp.js';
+  // With skypack
+  import * as mr2 from 'https://cdn.skypack.dev/multi-integer-range@^5.0.0-alpha.1';
+  console.log(mr1.parse('7,6,5'));
 </script>
 ```
 
@@ -91,7 +94,7 @@ type MIR = MultiIntegerRange; // short alias
 [[-Infinity, -5], [-1, 0], [3, 3], [9, Infinity]]
 [[-Infinity, Infinity]]
 
-// These are NOT normalized MultiIntegerRanges
+// These are NOT normalized. Don't pass them to append() and such!
 [[3, 1]] // min is larger than max
 [[7, 9], [1, 4]] // not in the ascending order
 [[1, 5], [3, 7]] // there is an overlap
@@ -111,9 +114,10 @@ console.log(mr.normalize([5, [2, 0], 6])); // [[0, 2], [5, 6]]
 console.log(mr.normalize([7, 7, 7, 7, 10])); // [[7, 7], [10, 10]]
 console.log(mr.normalize()); // []
 
-// Do not pass un-normalized data to functions other than normalize().
+// Do not directly pass an un-normalized MultiIntegerRange
+// to functions other than normalize().
 const unsorted = [[3, 1], [2, 8]];
-const wrong = mr.length(unsorted); // DON'T! This won't work!
+const wrong = mr.length(unsorted); // This won't work!
 const correct = mr.length(mr.normalize(unsorted)); // 8
 ```
 
@@ -143,7 +147,7 @@ console.log(
 
 All functions are "pure", and exported as named exports. They do not change the input data nor do they have any side effects. All MultiIntegerRange's returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (available in d.ts).
 
-- `parse(data: string, options?: Options): MIR` Parses the given string.
+- `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
 - `normalize(data?: number | (number | Range)[]): MIR` Normalizes the given number or the array of numbers/Ranges.
 - `append(a: MIR, b: MIR): MIR` Appends the two values.
 - `subtract(a: MIR, b: MIR): MIR` Subtracts `b` from `a`.
