@@ -1,4 +1,4 @@
-import * as mr from './fp';
+import * as mr from './fp.js';
 
 export type Initializer = string | number | (number | mr.Range)[] | MultiRange;
 
