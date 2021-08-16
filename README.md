@@ -17,55 +17,49 @@ Supported operations:
 - ES6 iterator (`for ... of`, spread operator)
 - Array creation ("flatten")
 
-Internal data are always _sorted and normalized_ to the smallest possible representation.
+The range data are always _sorted and normalized_ to the smallest possible representation.
 
 ## Install
-
-First, choose the right version you need. The API style has changed drastically in version 5. The new API is slightly more verbose but fully tree-shakable.
-
-|                   | 4.x                  | 5.x                 |
-| ----------------- | -------------------- | ------------------- |
-| API architecture  | Class-based          | Function-based      |
-| ES version        | Downpiled to ES5     | ES2015              |
-| Module system     | CommonJS (CJS)       | ESM/CJS hybrid      |
-| Immutability      | Mutable method chain | Pure functions only |
-| Supported runtime | Works even on IE     | See below           |
-
-Supported runtime for version 5.x:
-
-- Node &ge; 10 (uses the CJS version)
-- Bundlers such as Webpack can pick the ESM version and benefit from tree-shaking
-- Modern browsers can load the ESM version via CDN.
-- Deno: Via Skypack, `import * as mr from 'https://cdn.skypack.dev/multi-integer-range@^5.0.0-alpha.1?dts'`
 
 Install via npm or yarn:
 
 ```
-npm install multi-integer-range@^5.0.0-alpha.1
+npm install multi-integer-range
 ```
 
-Although not recommended for performance reasons, modern browsers can directly load this package as a standard ES module via CDN:
+Version 5 provides both CommonJS and ESM builds. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
+
+The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+
+<details>
+<summary>Deno & modern browsers</summary>
+Deno users can use Skypack CDN:
+
+```ts
+import * as mr from 'https://cdn.skypack.dev/multi-integer-range?dts';
+```
+
+Although not recommended from a performance standpoint, modern browsers can directly load this package as a standard ES module via CDN:
 
 ```html
 <script type="module">
-  // With unpkg
-  import * as mr1 from 'https://unpkg.com/multi-integer-range@^5.0.0-alpha.1/lib/esm/fp.js';
-  // With skypack
-  import * as mr2 from 'https://cdn.skypack.dev/multi-integer-range@^5.0.0-alpha.1';
-  console.log(mr1.parse('7,6,5'));
+  import * as mr from 'https://cdn.skypack.dev/multi-integer-range';
+  console.log(mr.parse('7,6,5'));
 </script>
 ```
 
-## Basic Example
+Note that you should fix the version, e.g., multi-integer-range@5.0.3
 
-> **The following is the documentation for version 5, which is still in alpha. [Go to the docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9)**
+</details>
+
+## Basic Example
 
 <!-- prettier-ignore -->
 ```js
 import * as mr from 'multi-integer-range';
 
 const ranges1 = mr.parse('1-6,9-12'); // [[1, 6], [9, 12]]
-const ranges2 = mr.parse('7-10,100'); // [[7, 10], [100, 100]]
+const ranges2 = mr.parse('7-10, 100'); // [[7, 10], [100, 100]]
 const ranges3 = mr.normalize([1, 5, 6, [4, 2]]); // [[1, 6]]
 
 const sum = mr.append(ranges1, ranges2); // [[1, 12], [100, 100]]
@@ -75,13 +69,13 @@ const commonValues = mr.intersect(ranges1, ranges2); // [[9, 10]]
 const str = mr.stringify(sum); // "1-12,100"
 const bool = mr.has(ranges1, ranges3); // true
 const isSame = mr.equals(ranges1, ranges2); // false
-const array = mr.flatten(ranges3); // [1, 2, 3, 4, 5, 6]
+const array = mr.flatten(diff); // [1, 2, 3, 4, 5, 6, 11, 12]
 const len = mr.length(ranges1); // 10
 ```
 
 ## Creating a _normalized_ MultiIntegerRange
 
-The fundamental data structure of this package is a **normalized** read-only array of `[min, max]` tuples, as shown in the following TypeScript definition. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded range using the JavaScript constant `Infinity`.
+The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded range using the JavaScript constant `Infinity`.
 
 <!-- prettier-ignore -->
 ```ts
@@ -90,8 +84,8 @@ type MultiIntegerRange = readonly Range[];
 type MIR = MultiIntegerRange; // short alias
 
 // Examples of normalized MultiIntegerRanges
-[[1, 3], [4, 4], [7, 10]]
-[[-Infinity, -5], [-1, 0], [3, 3], [9, Infinity]] // unbounded
+[[1, 3], [5, 6], [9, 12]] // 1-3,5-6,9-12
+[[-Infinity, 4], [7, 7], [10, Infinity]] // -4,7,10-
 [[-Infinity, Infinity]] // all integers
 [] // empty
 
@@ -103,9 +97,9 @@ type MIR = MultiIntegerRange; // short alias
 [[Infinity, Infinity]] // makes no sense
 ```
 
-Most functions expect one or more **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()` or `parse()`. (You can write a normalized `MultiIntgerRange` by hand as shown above, too.)
+Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()` or `parse()`. (You can write a normalized `MultiIntgerRange` by hand as shown above, too.)
 
-`normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/Ranges. This is the only function that can safely take an unsorted array. Do not pass un-normalized range data to other functions.
+`normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This is the only function that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
 
 <!-- prettier-ignore -->
 ```ts
@@ -115,7 +109,7 @@ console.log(mr.normalize([5, [2, 0], 6])); // [[0, 2], [5, 6]]
 console.log(mr.normalize([7, 7, 10, 7, 7])); // [[7, 7], [10, 10]]
 console.log(mr.normalize()); // []
 
-// Do not directly pass an un-normalized MultiIntegerRange
+// Do not directly pass an unnormalized array
 // to functions other than normalize().
 const unsorted = [[3, 1], [2, 8]];
 const wrong = mr.length(unsorted); // This won't work!
@@ -129,7 +123,7 @@ console.log(mr.parse('1-3,10')); // [[1, 3], [10, 10]]
 console.log(mr.parse('3,\t8-3,2,3,\n10, 9 - 7 ')); // [[2, 10]]
 ```
 
-By default, the string parser does not try to parse unbounded ranges or negative integers. You need to pass an `options` object to modify the parsing behavior. To avoid ambiguity, all negative integers must always be enclosed in parentheses (sorry for the wacky syntax!). If you don't like the default `parse()`, you can always create and use your custom parsing function instead, as long as it returns a normalized `MultiIntegerRange`.
+By default, the string parser does not try to parse unbounded ranges or negative integers. You need to pass an `options` object to modify the parsing behavior. To avoid ambiguity, all negative integers must always be enclosed in parentheses. If you don't like the default `parse()`, you can always create and use your custom parsing function instead, as long as it returns a normalized `MultiIntegerRange`.
 
 ```ts
 console.log(mr.parse('7-')); // throws a SyntaxError
@@ -144,16 +138,16 @@ console.log(
 ); // [[-Infinity, -100], [-6, -2], [0, Infinity]]
 ```
 
-## API
+## API Reference
 
-All functions are "pure", and exported as named exports. They do not change the input data nor do they have any side effects. All MultiIntegerRange's returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
+All functions are "pure", and exported as named exports. They do not change the input data nor do they have any side effects. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
 
 - `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
 - `normalize(data?: number | (number | Range)[]): MIR` Normalizes the given number or the array of numbers/Ranges.
 - `append(a: MIR, b: MIR): MIR` Appends the two values.
 - `subtract(a: MIR, b: MIR): MIR` Subtracts `b` from `a`.
 - `intersect(a: MIR, b: MIR): MIR` Calculates the interesction, i.e., integers that belong to both `a` and `b`.
-- `has(a: MIR, b: MIR): boolean` Checks if `b` is a subset of `a`.
+- `has(a: MIR, b: MIR): boolean` Checks if `b` is equal to or a subset of `a`.
 - `length(data: MIR): number` Calculates how many numbers are effectively included in the given data (i.e., 5 for '3,5-7,9'). Returns Inifnity for unbounded ranges.
 - `equals(a: MIR, b: MIR): boolean` Checks if `a` and `b` contains the same range data.
 - `isUnbounded(data: MIR): boolean` Returns true if the instance is unbounded.
@@ -172,7 +166,7 @@ Available `options` that can be passed to `parse()`:
 
 ## Iteration
 
-Since `MultiIntegerRange` is just an array of `Range`s, if you naively iterate over it (e.g., in a for-of loop), you'll simply get each `Range` tuple one by one. To iterate each integer contained in the `MultiIntegerRange` instead, use `iterate()` like so:
+Since a `MultiIntegerRange` is just an array of `Range`s, if you naively iterate over it (e.g., in a for-of loop), you'll simply get each `Range` tuple one by one. To iterate each integer contained in the `MultiIntegerRange` instead, use `iterate()` like so:
 
 ```ts
 const ranges = mr.parse('2,5-7');
@@ -204,7 +198,7 @@ for (const page of mr.iterate(pagesToPrint)) await printPage(page);
 
 ## Legacy Classe-based API
 
-For compatibility purposes, version 5.x (still) exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but has been rewritten to use the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit. Use this only during migration.
+For compatibility purposes, version 5 exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but has been rewritten to use the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit. Use this only during migration. These may be removed in the future.
 
 ## Changelog
 
@@ -220,17 +214,21 @@ to this library. For example, don't do `normalize(3.14)`. For performance reason
 
 ## Development
 
-### Building and Testing
+To test:
 
 ```
-npm install
-npm run build
+npm ci
 npm test
 ```
 
-### Bugs
+To generate CJS and ESM builds:
 
-Please report any bugs and suggestions using GitHub issues.
+```
+npm ci
+npm run build
+```
+
+Please report bugs and suggestions using GitHub issues.
 
 ## Author
 

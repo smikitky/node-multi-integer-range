@@ -1,18 +1,34 @@
 # Changelog
 
-## v5.0.0-alpha
+## v5.0.0
 
-- Dropped support for IE and ancient Node.
-- Migrated to ES modules and function-style API. This package is now fully tree-shakable.
-- Renamed/removed some functions.
+**❗️ Breaking Changes**
+
+The API has changed radically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable.
+
+|                   | 4.x                     | 5.x                           |
+| ----------------- | ----------------------- | ----------------------------- |
+| API architecture  | Class-based             | Function-based                |
+| Range data        | Encapsulated in objects | Just an array of arrays       |
+| ES version        | Downpiled to ES5        | ES2015                        |
+| Module system     | CommonJS (CJS)          | CJS/ESM hybrid                |
+| Immutability      | Mutable method chain    | Pure functions only           |
+| Supported runtime | Works even on IE        | Modern browsers, Node &ge; 10 |
+
+- Dropped support for IE and old Node.
+- Migrated to pure function-style API and added an ESM build. This package is now fully tree-shakable.
+- In addition to the change from methods to simple functions, some functions have also been renamed or removed.
+
   - (constructor): Use `parse()` or `normalize()`.
   - `toArray`: Renamed to `flatten()`.
   - `toString`: Renamed to `stringify()`.
   - `getIterator`: Renamed to `iterate()`.
-  - `segmentLength`: Removed. Just use `.length`.
-  - `pop`: Not in the new API. Use `max()` in combination with `init()`.
-  - `shift`: Not in the new API. Use `min()` in combination with `tail()`.
-- Rewrote `MultiRange` to use the new function-style API under the hood. It works, but defeats the benefits of version 5.
+  - `segmentLength`: Removed. Use the standard `.length` property.
+  - `pop`: Removed as this was mutable. Use `max()` in combination with `init()`.
+  - `shift`: Removed as this was mutable. Use `min()` in combination with `tail()`.
+
+- Rewrote the `MultiRange` class to use the new function-style API under the hood. Use this only during migration because it defeats the benefits of version 5. Note that this is no longer exported as the default export, so you may need to change at least your `import` statements.
+- Improved the performance of heavily fragmented ranges by using binary search.
 
 ## v4.0.9
 
