@@ -146,8 +146,8 @@ const findOverlap = (
   //                                            |-(B)-|
   //                                              |-(C)-|
   //
-  // (0)-(3) represent the existing ranges (this.ranges),
-  // and (A)-(C) are the ranges being passed to this function.
+  // (0)-(3) represent the existing ranges (data),
+  // and (A)-(C) are the ranges being passed to this function (target).
   //
   // A pseudocode findOverlap(A) returns { lo: 0, count: 3, union: <a-h> },
   // meaning (A) overlaps the 3 existing ranges from index 0.
@@ -158,25 +158,44 @@ const findOverlap = (
   // findOverlap(C) returns { lo: 3, count: 0, union: <i-k> }
   // meaning (C) is between (2) and (3) but overlaps/touches neither of them.
 
-  for (let hi = data.length - 1; hi >= 0; hi--) {
-    const r = data[hi];
-    let union: Range | null;
-    if ((union = calcUnion(r, target))) {
-      let count = 1;
-      let tmp;
-      while (hi - count >= 0 && (tmp = calcUnion(union!, data[hi - count]))) {
-        union = tmp;
-        count++;
-      }
-      // The given target touches/overlaps one or more of the existing ranges
-      return { lo: hi + 1 - count, count, union: union! };
-    } else if (r[1] < target[0]) {
-      // The given target does not touch nor overlap the existing ranges
-      return { lo: hi + 1, count: 0, union: target };
+  const countOverlap = (lo: number) => {
+    let count = 0,
+      tmp: Range | null,
+      union = target;
+    while (
+      lo + count < data.length &&
+      (tmp = calcUnion(union, data[lo + count]))
+    ) {
+      union = tmp;
+      count++;
     }
+    return { lo, count, union };
+  };
+
+  const t0 = target[0];
+  if (data.length > 0 && t0 < data[0][0] - 1) {
+    return countOverlap(0);
+  } else if (data.length > 0 && t0 > data[data.length - 1][1] + 1) {
+    return { lo: data.length, count: 0, union: target };
+  } else {
+    // perform binary search
+    let imin = 0,
+      imax = data.length - 1;
+    while (imax >= imin) {
+      const imid = imin + Math.floor((imax - imin) / 2);
+      if (
+        (imid === 0 || t0 > data[imid - 1][1] + 1) &&
+        t0 <= data[imid][1] + 1
+      ) {
+        return countOverlap(imid);
+      } else if (data[imid][1] + 1 < t0) {
+        imin = imid + 1;
+      } else {
+        imax = imid - 1;
+      }
+    }
+    return { lo: 0, count: 0, union: target };
   }
-  // The given target is smaller than the smallest existing range
-  return { lo: 0, count: 0, union: target };
 };
 
 /**
