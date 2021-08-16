@@ -90,9 +90,13 @@ export const normalize = (value: (number | Range)[] | number): MIR => {
   const result: Range[] = [];
   if (typeof value === 'number') return normalize([value]);
   for (const r of value) {
-    let newRange: Range = Array.isArray(r) ? [r[0], r[1]] : [r, r];
-    if (newRange[0] > newRange[1]) {
-      newRange = [newRange[1], newRange[0]];
+    let newRange: Range;
+    if (typeof r === 'number') {
+      newRange = [r, r];
+    } else if (Array.isArray(r) && r.length === 2) {
+      newRange = r[0] <= r[1] ? [r[0], r[1]] : [r[1], r[0]];
+    } else {
+      throw new TypeError('Unrecognized range member.');
     }
     if (
       (newRange[0] === Infinity && newRange[1] === Infinity) ||

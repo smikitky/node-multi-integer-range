@@ -78,6 +78,12 @@ test('normalize', () => {
   t(5, [[5, 5]]);
   t([[1, Infinity], [-Infinity, 0]], [[-Infinity, Infinity]]);
   t([], []);
+  // @ts-expect-error
+  expect(() => mr.normalize([[1]])).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => mr.normalize([[2, 8, 3]])).toThrow(TypeError);
+  // @ts-expect-error
+  expect(() => mr.normalize(['str'])).toThrow(TypeError);
   expect(() => mr.normalize([[Infinity, Infinity]])).toThrow(RangeError);
   expect(() => mr.normalize([[-Infinity, -Infinity]])).toThrow(RangeError);
   expect(() => mr.normalize([Infinity])).toThrow(RangeError);
