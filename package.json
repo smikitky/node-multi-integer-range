@@ -13,7 +13,9 @@
   "types": "./lib/cjs/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
-    "build": "tsc && tsc -p tsconfig-cjs.json",
+    "clean": "rimraf lib",
+    "build": "npm run clean & tsc && tsc -p tsconfig-cjs.json",
+    "prepack": "npm run build",
     "prettier": "prettier --write src/**/*.{ts,js}"
   },
   "keywords": [
@@ -31,6 +33,7 @@
     "jest": "^27.0.6",
     "jest-ts-webcompat-resolver": "^1.0.0",
     "prettier": "^2.3.2",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
   },
