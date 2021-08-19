@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "lib/esm",
+    "noEmit": true,
     "rootDir": "src",
     "moduleResolution": "node",
     "target": "es2015",

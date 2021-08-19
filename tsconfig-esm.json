@@ -2,8 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    "module": "CommonJS",
-    "outDir": "./lib/cjs"
+    "outDir": "./lib/esm"
   },
   "exclude": ["src/**/*test.ts"]
 }
