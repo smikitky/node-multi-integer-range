@@ -396,13 +396,13 @@ export const tail = (data: MIR): MIR => {
  * @param data The value.
  * @returns The original value without its `max()` integer.
  * @example
- * init([[2, 5], [8, 10]]; //=> 2-5,8-9
+ * init([[2, 5], [8, 10]]); //=> 2-5,8-9
  */
 export const init = (data: MIR): MIR => {
   const m = max(data);
   if (m === Infinity)
     throw new RangeError(
-      'init() was invoked on an unbounded MultiRange which contains -Infinity'
+      'init() was invoked on an unbounded MultiRange which contains Infinity'
     );
   if (m === undefined) return data;
   return subtract(data, [[m, m]]);
