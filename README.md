@@ -19,6 +19,8 @@ Supported operations:
 
 The range data are always _sorted and normalized_ to the smallest possible representation.
 
+🚨 **Note (2022-03-11)**: The following README is for the 5.x release, which is still in beta. For the docs of the stable (@latest) release, check the NPM site. 🚨
+
 ## Install
 
 Install via npm or yarn:
@@ -32,7 +34,7 @@ Version 5 provides both CommonJS and ESM builds. Bundlers such as Webpack can au
 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 <details>
-<summary>Deno & modern browsers</summary>
+<summary>Deno & Modern Browsers</summary>
 Deno users can use Skypack CDN:
 
 ```ts
@@ -48,7 +50,7 @@ Although not recommended from a performance standpoint, modern browsers can dire
 </script>
 ```
 
-Note that you should fix the version, e.g., multi-integer-range@5.0.3
+Note that you probably want to fixate the version, e.g., multi-integer-range@5.0.3
 
 </details>
 
@@ -140,7 +142,7 @@ console.log(
 
 ## API Reference
 
-All functions are "pure", and exported as named exports. They do not change the input data nor do they have any side effects. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
+All functions are "pure", and are exported as named exports. They do not change the input data nor do they have any side effects. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
 
 - `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
 - `normalize(data?: number | (number | Range)[]): MIR` Normalizes the given number or the array of numbers/Ranges.
@@ -149,7 +151,7 @@ All functions are "pure", and exported as named exports. They do not change the 
 - `intersect(a: MIR, b: MIR): MIR` Calculates the interesction, i.e., integers that belong to both `a` and `b`.
 - `has(a: MIR, b: MIR): boolean` Checks if `b` is equal to or a subset of `a`.
 - `length(data: MIR): number` Calculates how many numbers are effectively included in the given data (i.e., 5 for '3,5-7,9'). Returns Inifnity for unbounded ranges.
-- `equals(a: MIR, b: MIR): boolean` Checks if `a` and `b` contains the same range data.
+- `equals(a: MIR, b: MIR): boolean` Checks if `a` and `b` contains the same range data. (If you like, you can use other deep-equal utilities instead.)
 - `isUnbounded(data: MIR): boolean` Returns true if the instance is unbounded.
 - `min(data: MIR): number | undefined` Returns the minimum integer. May return -Infinity.
 - `max(data: MIR): number | undefined` Returns the maxinum integer. May return Infinity.
@@ -171,9 +173,13 @@ Since a `MultiIntegerRange` is just an array of `Range`s, if you naively iterate
 ```ts
 const ranges = mr.parse('2,5-7');
 
+for (const page of ranges) {
+  console.log(page);
+} // prints 2 items: [2, 2] and [5, 7]
+
 for (const page of mr.iterate(ranges)) {
   console.log(page);
-} // prints 2, 5, 6 and 7
+} // prints 4 items: 2, 5, 6 and 7
 
 // array spreading (alternative of flatten())
 const arr1 = [...mr.iterate(ranges)]; //=> [2, 5, 6, 7]
