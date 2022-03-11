@@ -14,7 +14,7 @@
   "scripts": {
     "test": "jest --coverage",
     "clean": "rimraf lib",
-    "build": "npm run clean && tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json",
+    "build": "npm run clean && tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json && node postbuild.js",
     "prepack": "npm run build",
     "prettier": "prettier --write src/**/*.{ts,js}"
   },
