@@ -19,7 +19,7 @@ Supported operations:
 
 The range data are always _sorted and normalized_ to the smallest possible representation.
 
-🚨 **Note (2022-03-11)** 🚨: The following README is for the 5.x release, which is still in beta. For the docs of the stable (@latest) release, check the NPM site. You can install the beta using `npm install multi-integer-range@next`. The current plan is to release the stable 5.x in a few months.
+🚨 **Note (2022-03-11)** 🚨: The following README is for the 5.0.0 Release Candidate. For the docs of the stable (4.x, @latest) release, check the NPM site. You can install the RC using `npm install multi-integer-range@next`. The RC is feature complete, and the current plan is to release the stable version in a few months.
 
 ## Install
 
