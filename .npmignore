@@ -1,7 +1,7 @@
-index.ts
-*.test.js
-tsconfig.json
 package-lock.json
 /coverage
-.*
+/src
+tsconfig*.json
+jest.config.cjs
 *.tgz
+.github
