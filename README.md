@@ -19,7 +19,7 @@ Supported operations:
 
 The range data are always _sorted and normalized_ to the smallest possible representation.
 
-🚨 **Note (2022-03-11)**: The following README is for the 5.x release, which is still in beta. For the docs of the stable (@latest) release, check the NPM site. 🚨
+🚨 **Note (2022-03-11)** 🚨: The following README is for the 5.x release, which is still in beta. For the docs of the stable (@latest) release, check the NPM site. You can install the beta using `npm install multi-integer-range@next`. The current plan is to release the stable 5.x in a few months.
 
 ## Install
 
@@ -31,7 +31,7 @@ npm install multi-integer-range
 
 Version 5 provides both CommonJS and ESM builds. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
 
-The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 <details>
 <summary>Deno & Modern Browsers</summary>
