@@ -3,5 +3,6 @@ package-lock.json
 /src
 tsconfig*.json
 jest.config.cjs
+postbuild.js
 *.tgz
 .github
