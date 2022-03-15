@@ -31,7 +31,7 @@ Install via npm or yarn:
 npm install multi-integer-range
 ```
 
-Version 5 is a hybrid package; it provides both a CommonJS version and an ES Module version built from the same TypeScript source. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
+Version 5 is a hybrid package; it provides both a CommonJS version and an ES Module version, built from the same TypeScript source. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
 
 🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. For example, if you don't use the default parser, your bundle will not include it. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
@@ -148,7 +148,7 @@ All functions are _pure_; they do not change the input data nor do they have any
 
 - `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
 - `normalize(data?:(number | Range)[] | number): MIR` Normalizes the given number or the array of numbers/Ranges.
-- `initialize(data?: (number | Range)[] | number | string)`: Conditionally calls either `parse` or `normalize` and returns a new MultiIntegerRange. This takes an "Initializer" in version &lte; 4.
+- `initialize(data?: (number | Range)[] | number | string, options?: Options)`: Conditionally calls either `parse` or `normalize` and returns a new MultiIntegerRange. This takes an "Initializer" in version &le; 4.
 - `append(a: MIR, b: MIR): MIR` Appends the two values.
 - `subtract(a: MIR, b: MIR): MIR` Subtracts `b` from `a`.
 - `intersect(a: MIR, b: MIR): MIR` Calculates the interesction, i.e., integers that belong to both `a` and `b`.
