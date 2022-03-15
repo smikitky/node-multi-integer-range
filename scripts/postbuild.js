@@ -6,13 +6,13 @@ const fs = require('fs');
 const path = require('path');
 
 fs.writeFileSync(
-  path.join(__dirname, 'lib/cjs/package.json'),
+  path.join(__dirname, '../lib/cjs/package.json'),
   JSON.stringify({ type: 'commonjs' }),
   'utf8'
 );
 
 fs.writeFileSync(
-  path.join(__dirname, 'lib/esm/package.json'),
+  path.join(__dirname, '../lib/esm/package.json'),
   JSON.stringify({ type: 'module' }),
   'utf8'
 );
