@@ -43,7 +43,7 @@ export class MultiRange {
 
   /**
    * Appends to this instance.
-   * @param value The data to append.
+   * @param value - The data to append.
    */
   public append(value: Initializer): MultiRange {
     this.ranges = mr.append(
@@ -55,7 +55,7 @@ export class MultiRange {
 
   /**
    * Subtracts from this instance.
-   * @param value The data to subtract.
+   * @param value - The data to subtract.
    */
   public subtract(value: Initializer): MultiRange {
     this.ranges = mr.subtract(
@@ -68,7 +68,7 @@ export class MultiRange {
   /**
    * Remove integers which are not included in `value`,
    * yielding the intersection of this and `value`.
-   * @param value The data to calculate the intersetion.
+   * @param value - The data to calculate the intersetion.
    */
   public intersect(value: Initializer): MultiRange {
     this.ranges = mr.intersect(
@@ -90,7 +90,7 @@ export class MultiRange {
 
   /**
    * Checks if this instance contains the specified value.
-   * @param value Value to be checked.
+   * @param value - Value to be checked.
    * @returns True if the specified value is included in the instance.
    */
   public has(value: Initializer): boolean {
@@ -119,7 +119,7 @@ export class MultiRange {
 
   /**
    * Checks if two instances of MultiRange are identical.
-   * @param cmp The data to compare.
+   * @param cmp - The data to compare.
    * @returns True if `cmp` is exactly the same as this instance.
    */
   public equals(cmp: Initializer): boolean {
