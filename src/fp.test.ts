@@ -78,6 +78,7 @@ test('normalize', () => {
   t(5, [[5, 5]]);
   t([[1, Infinity], [-Infinity, 0]], [[-Infinity, Infinity]]);
   t([], []);
+  t(undefined, []);
   // @ts-expect-error
   expect(() => mr.normalize([[1]])).toThrow(TypeError);
   // @ts-expect-error
@@ -88,6 +89,16 @@ test('normalize', () => {
   expect(() => mr.normalize([[-Infinity, -Infinity]])).toThrow(RangeError);
   expect(() => mr.normalize([Infinity])).toThrow(RangeError);
   expect(() => mr.normalize(Infinity)).toThrow(RangeError);
+});
+
+test('initialize', () => {
+  const t = (a: Parameters<typeof mr.initialize>[0], expected: Range[]) =>
+    expect(mr.initialize(a)).toEqual(expected);
+  t('5-10', [[5, 10]]);
+  t([[9, 2]], [[2, 9]]);
+  t('', []);
+  t([], []);
+  t(undefined, []);
 });
 
 const parseAll = (a: string) =>
@@ -383,7 +394,7 @@ test('init', () => {
 
 test('stringify', () => {
   const t = (a: string) => expect(mr.stringify(parseAll(a))).toBe(a);
-  t('15-20');
+  t('15-20,30-70');
   t('0');
   t('(-8)-(-5)');
   t('-');

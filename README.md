@@ -19,6 +19,8 @@ Supported operations:
 
 The range data are always _sorted and normalized_ to the smallest possible representation.
 
+---
+
 🚨 **Note (2022-03-11)** 🚨: The following README is for the 5.0.0 Release Candidate. For the docs of the stable (4.x, @latest) release, check the NPM site. You can install the RC using `npm install multi-integer-range@next`. The RC is feature complete, and the current plan is to release the stable version in a few months.
 
 ## Install
@@ -29,9 +31,9 @@ Install via npm or yarn:
 npm install multi-integer-range
 ```
 
-Version 5 provides both CommonJS and ESM builds. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
+Version 5 is a hybrid package; it provides both a CommonJS version and an ES Module version built from the same TypeScript source. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
 
-🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. For example, if you don't use the default parser, your bundle will not include it. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 <details>
 <summary>Deno & Modern Browsers</summary>
@@ -94,20 +96,20 @@ type MIR = MultiIntegerRange; // short alias
 // These are NOT normalized. Don't pass them to append() and such!
 [[3, 1]] // min is larger than max
 [[7, 9], [1, 4]] // not in the ascending order
-[[1, 5], [3, 7]] // there is an overlap
+[[1, 5], [3, 7]] // there is an overlap of ranges
 [[1, 2], [3, 4]] // the two ranges can be combined to "1-4"
 [[Infinity, Infinity]] // makes no sense
 ```
 
-Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()` or `parse()`. (You can write a normalized `MultiIntgerRange` by hand as shown above, too.)
+Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()` or `initialize()`. (You can write a normalized `MultiIntgerRange` by hand as shown above, too.)
 
-`normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This is the only function that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
+`normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This and `initialize` are the only functions that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
 
 <!-- prettier-ignore -->
 ```ts
 console.log(mr.normalize(10)); // [[10, 10]]
 console.log(mr.normalize([3, 1, 2, 4, 5])); // [[1, 5]]
-console.log(mr.normalize([5, [2, 0], 6])); // [[0, 2], [5, 6]]
+console.log(mr.normalize([5, [2, 0], 6, 4])); // [[0, 2], [4, 6]]
 console.log(mr.normalize([7, 7, 10, 7, 7])); // [[7, 7], [10, 10]]
 console.log(mr.normalize()); // []
 
@@ -142,10 +144,11 @@ console.log(
 
 ## API Reference
 
-All functions are "pure", and are exported as named exports. They do not change the input data nor do they have any side effects. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
+All functions are _pure_; they do not change the input data nor do they have any side effects. All functions are exported as named exports. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
 
 - `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
-- `normalize(data?: number | (number | Range)[]): MIR` Normalizes the given number or the array of numbers/Ranges.
+- `normalize(data?:(number | Range)[] | number): MIR` Normalizes the given number or the array of numbers/Ranges.
+- `initialize(data?: (number | Range)[] | number | string)`: Conditionally calls either `parse` or `normalize` and returns a new MultiIntegerRange. This takes an "Initializer" in version &lte; 4.
 - `append(a: MIR, b: MIR): MIR` Appends the two values.
 - `subtract(a: MIR, b: MIR): MIR` Subtracts `b` from `a`.
 - `intersect(a: MIR, b: MIR): MIR` Calculates the interesction, i.e., integers that belong to both `a` and `b`.
