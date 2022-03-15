@@ -4,8 +4,11 @@
 export type Range = readonly [min: number, max: number];
 
 /**
- * An immutable, normalized Range array.
- * Create this value using either `parse()` or `normalize()`.
+ * An immutable Range array. This is the fundamental data type of this package.
+ *
+ * **Warning**: Most functions of this package work correctly
+ * only when **normalized** MultiIntegerRange's are passed.
+ * If you have a Range array that may not be sorted, use `normalize()` first.
  */
 export type MultiIntegerRange = readonly Range[];
 
@@ -23,9 +26,15 @@ export type Options = {
 };
 
 /**
- * Parses a string and creates a new MultiIntegerRange array.
- * This is the default parser, but you can create and use another parser
- * to suit your needs as long as it produces a normalized array of `Range`s.
+ * Parses a string and creates a new MultiIntegerRange.
+ *
+ * - `options.parseNegative` (boolean): When set to true, parses negative integers enclosed in parentheses.
+ * - `options.parseUnbounded` (boolean): When set to true, parses unbounded ranges like `10-` or `-10`.
+ *
+ * This is the default parser, but you don't necessary have to use this.
+ * You can create your own parser to suit your needs
+ * as long as it produces a normalized array of `Range`s.
+ *
  * @param data - The string to parse.
  * @param options - Options to modify the parsing behavior.
  * @returns A new normalized MultiIntegerRange.
@@ -78,13 +87,22 @@ export const parse = (data: string, options?: Options): MIR => {
 /**
  * Takes a number or an unsorted array of ranges,
  * and returns a new normalized MultiIntegerRange.
+ *
+ * Here, "normalized" means the range data is in the smallest possible
+ * representation and is sorted in ascending order.
+ *
+ * This is the only function that can take an unsorted array of Range's.
+ * Unsorted range data MUST be normalized before being passed to
+ * other functions such as `append()` and `length()`.
+ *
  * @param data - A number or an unsorted array, e.g., `[[7, 5], 1]`.
  * @returns Normalized array, e.g., `[[1, 1], [5, 7]]`.
  * @example
  * normalize(5); // [[5, 5]]
- * normalize([1, 8]) // [[1, 1], [8, 8]]
- * normalize([[1, 8]]) // [[1, 8]]
- * normalize([[1, Infinity]]) // [[1, Infinity]]
+ * normalize([1, 8]); // [[1, 1], [8, 8]]
+ * normalize([[1, 8]]); // [[1, 8]]
+ * normalize([2, 3, 1, 5, 4, 0, 1, 3]); // [[0, 5]]
+ * normalize([[Infinity, 1]]); // [[1, Infinity]]
  */
 export const normalize = (data?: (number | Range)[] | number): MIR => {
   const result: Range[] = [];
@@ -115,10 +133,10 @@ export const normalize = (data?: (number | Range)[] | number): MIR => {
 
 /**
  * Takes any supported data and returns a normalized MultiIntegerRange.
- * Conditionally calls either `parse` or `normalize` under the hood.
+ * Conditionally calls either `parse()` or `normalize()` under the hood.
  * This is an equivalent of "initializer" constructor of version &le; 4.
- * @param data - Anything understood by either `parse` or `normalize`.
- * @param options - Parse options passed to `parse`.
+ * @param data - Anything understood by either `parse()` or `normalize()`.
+ * @param options - Parse options passed to `parse()`.
  * @returns A new normalized MultiIntegerRange.
  * @example
  * initialize(5); // [[5, 5]]
@@ -127,7 +145,7 @@ export const normalize = (data?: (number | Range)[] | number): MIR => {
 export const initialize = (
   data?: (number | Range)[] | number | string,
   options?: Options
-) => {
+): MIR => {
   return typeof data === 'string' ? parse(data, options) : normalize(data);
 };
 
@@ -226,6 +244,8 @@ const findOverlap = (
  * Appends two MultiIntegerRange's.
  * @param a - The first value.
  * @param b - The second value.
+ * @returns A new MultiIntegerRange containing all integers that belong to
+ *   **either `a` or `b` (or both)**.
  * @example
  * append([[1, 5]], [[3, 8], [10, 15]]); // [[1, 8], [10, 15]]
  * append([[5, 9]], [[-Infinity, 2]]); // [[-Infinity, 2], [5, 9]]
@@ -243,6 +263,8 @@ export const append = (a: MIR, b: MIR): MIR => {
  * Subtracts the second value from the first value.
  * @param a - The value to be subtracted.
  * @param b - The value to subtract.
+ * @returns A new MultiIntegerRange containing all integers that belong to
+ *   **`a` but not `b`**.
  * @example
  * subtract([[1, 7]], [[2, 4]]); // [[1, 1], [5, 7]]
  * subtract([[-Infinity, Infinity]], [[2, 4]]); // [[-Infinity, 1], [5, Infinity]]
@@ -270,7 +292,7 @@ export const subtract = (a: MIR, b: MIR): MIR => {
  * @param a - The first value.
  * @param b - The second value.
  * @returns A new MultiIntegerRange containing all integers
- *   that belong to both `a` and `b`.
+ *   that belong to **both `a` and `b`**.
  * @example
  * intersect([[2, 5]], [[4, 9]]); // [[4, 5]]
  * intersect([[5, 10]], [[-Infinity, Infinity]]); // [[5, 10]]
@@ -299,10 +321,11 @@ export const intersect = (a: MIR, b: MIR): MIR => {
  * Checks if `a` contains or is equal to `b` (a ⊇ b).
  * @param a - The value that possibly contains `b`.
  * @param b - The value that is possibly contained by `a`.
- * @returns True if `b` is a subset of `a`.
+ * @returns True if `b` is equal to or a subset of `a`.
  * @example
- * has([[0, 100]], [[2, 10]]) // true
- * has([[2, 10]], [[0, 100]]) // false
+ * has([[0, 100]], [[2, 10]]); // true
+ * has([[5, 7]], [[5, 7]]); // true
+ * has([[2, 10]], [[0, 100]]); // false
  */
 export const has = (a: MIR, b: MIR): boolean => {
   const s = 0;
@@ -321,6 +344,9 @@ export const has = (a: MIR, b: MIR): boolean => {
 
 /**
  * Calculates how many integers are included in the given MultiIntegerRange.
+ *
+ * Note: If you want to know the number of Ranges (segments), just use the
+ * standard `Array#length`.
  * @param data - The value to calculate the length on.
  * @returns The number of integers contained in `data`. May be `Infinity`.
  * @example
@@ -351,7 +377,8 @@ export const isUnbounded = (data: MIR): boolean => {
 };
 
 /**
- * Checks if the two values are the same.
+ * Checks if the two values are the same. (Altenatively, you can use any
+ * "deep-equal" utility function.)
  * @param a - The first value to compare.
  * @param b - The second value to compare.
  * @returns True if `a` and `b` have the same range data.
@@ -371,7 +398,7 @@ export const equals = (a: MIR, b: MIR): boolean => {
 /**
  * Returns the minimum integer of the given MultiIntegerRange.
  * @param data - The value.
- * @returns The minimum integer. May be `undefined` of `-Infinity`.
+ * @returns The minimum integer. May be `undefined` or `-Infinity`.
  * @example
  * min([[2, 5], [8, 10]]); // 2
  * min([[-Infinity, 0]]); // -Infinity
@@ -385,7 +412,7 @@ export const min = (data: MIR): number | undefined => {
 /**
  * Returns the maximum integer of the given MultiIntegerRange.
  * @param data - The value.
- * @returns The minimum integer. May be `undefined` of `Infinity`.
+ * @returns The minimum integer. May be `undefined` or `Infinity`.
  * @example
  * max([[2, 5], [8, 10]]); // 10
  * max([[3, Infinity]]); // Infinity
@@ -434,7 +461,8 @@ export const init = (data: MIR): MIR => {
 
 /**
  * Returns the string respresentation of the given MultiIntegerRange.
- * @param data - The value to stringify.
+ * @param data - The MultiIntegerRange to stringify.
+ * @returns The string representation of the given data.
  * @example
  * stringify([[3, 5], [7, Infinity]]); // '3-5,7-'
  */
@@ -464,6 +492,7 @@ export const stringify = (data: MIR): string => {
  * Note that this may be slow and memory-consuming for large ranges.
  * Consider using the iterator whenever possible.
  * @param data - The value to build an array on.
+ * @returns The flattened array of numbers.
  * @example
  * flatten([[-1, 1], [7, 9]]); // [-1, 0, 1, 7, 8, 9]
  */
@@ -487,6 +516,7 @@ export const flatten = (data: MIR): number[] => {
  * @returns An Iterable object.
  * @example
  * Array.from(iterate([[1, 3], [7, 9]])); // [1, 2, 3, 7, 8, 9]
+ * [...iterate([[-1, 1]])]; // [-1, 0, 1]
  */
 export const iterate = (data: MIR): Iterable<number> => {
   if (isUnbounded(data)) {

@@ -79,7 +79,7 @@ const len = mr.length(ranges1); // 10
 
 ## Creating a _normalized_ MultiIntegerRange
 
-The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded range using the JavaScript constant `Infinity`.
+The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded (aka infinite) range using the JavaScript constant `Infinity`.
 
 <!-- prettier-ignore -->
 ```ts
@@ -144,30 +144,7 @@ console.log(
 
 ## API Reference
 
-All functions are _pure_; they do not change the input data nor do they have any side effects. All functions are exported as named exports. All `MultiIntegerRange`s returned by these functions are normalized. `MIR` is just a short alias for `MultiIntegerRange` (also available in d.ts).
-
-- `parse(data: string, options?: Options): MIR` Parses the given string. See below for the options.
-- `normalize(data?:(number | Range)[] | number): MIR` Normalizes the given number or the array of numbers/Ranges.
-- `initialize(data?: (number | Range)[] | number | string, options?: Options)`: Conditionally calls either `parse` or `normalize` and returns a new MultiIntegerRange. This takes an "Initializer" in version &le; 4.
-- `append(a: MIR, b: MIR): MIR` Appends the two values.
-- `subtract(a: MIR, b: MIR): MIR` Subtracts `b` from `a`.
-- `intersect(a: MIR, b: MIR): MIR` Calculates the interesction, i.e., integers that belong to both `a` and `b`.
-- `has(a: MIR, b: MIR): boolean` Checks if `b` is equal to or a subset of `a`.
-- `length(data: MIR): number` Calculates how many numbers are effectively included in the given data (i.e., 5 for '3,5-7,9'). Returns Inifnity for unbounded ranges.
-- `equals(a: MIR, b: MIR): boolean` Checks if `a` and `b` contains the same range data. (If you like, you can use other deep-equal utilities instead.)
-- `isUnbounded(data: MIR): boolean` Returns true if the instance is unbounded.
-- `min(data: MIR): number | undefined` Returns the minimum integer. May return -Infinity.
-- `max(data: MIR): number | undefined` Returns the maxinum integer. May return Infinity.
-- `tail(data: MIR): MIR` Removes the minimum integer.
-- `init(data: MIR): MIR` Removes the maxinum integer.
-- `stringify(data: MIR): string` Returns the string respresentation of the given data (the opposite of parse()).
-- `flatten(data: MIR): number[]` Builds a flat array of integers. This may be slow and memory-consuming for large ranges such as '1-10000'.
-- `iterate(data: MIR): Iterable<number>` Returns an ES6 iterable object. See the description below.
-
-Available `options` that can be passed to `parse()`:
-
-- `parseNegative` (boolean, default = false): Enables parsing negative ranges (e.g., `(-10)-(-3)`).
-- `parseUnbounded` (boolean, default = false): Enables parsing unbounded ranges (e.g., `-5,10-`).
+See [api-reference.md](api-reference.md).
 
 ## Iteration
 
@@ -197,11 +174,11 @@ Intersection is especially useful to "trim" unbounded ranges.
 
 ```ts
 const userInput = '-5,15-';
-const pagesInMyDoc = [[1, 20]]; // '1-20'
+const pagesInMyDoc = [[1, 20]]; // (1-20)
 const pagesToPrint = mr.intersect(
   mr.parse(userInput, { parseUnbounded: true }),
   pagesInMyDoc
-);
+); // [[1, 5], [15, 20]]
 for (const page of mr.iterate(pagesToPrint)) await printPage(page);
 ```
 

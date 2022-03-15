@@ -13,6 +13,7 @@
   "types": "./lib/cjs/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
+    "doc": "node scripts/docgen.js",
     "clean": "rimraf lib",
     "build": "npm run clean && tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json && node scripts/postbuild.js",
     "prepack": "npm run build",
