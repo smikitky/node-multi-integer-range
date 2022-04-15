@@ -1,6 +1,6 @@
 # Changelog
 
-## v5.0.0 (currently in RC)
+## v5.0.0
 
 **❗️ Breaking Changes**
 

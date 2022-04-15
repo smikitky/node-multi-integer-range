@@ -21,7 +21,7 @@ The range data are always _sorted and normalized_ to the smallest possible repre
 
 ---
 
-🚨 **Note (2022-03-11)** 🚨: The following README is for the 5.0.0 Release Candidate. For the docs of the stable (4.x, @latest) release, check the NPM site. You can install the RC using `npm install multi-integer-range@next`. The RC is feature complete, and the current plan is to release the stable version in a few months.
+🚨 **Note**: The following README is for the 5.x release, whose API has changed drastically. For the docs of the 4.x release, see [this](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 ## Install
 
