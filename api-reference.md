@@ -362,11 +362,11 @@ at(data: MultiIntegerRange, index: number): number | undefined
 | Param | Description |
 |-|-|
 | `data` | The value. |
-| `index` | The 0-based index of the integer to return.
-If a negative index is given, the index is counted from the end. |
+| `index` | The 0-based index of the integer to return. Can be negative. |
 | Returns | The N-th integer. Returns `undefined` if the index is out of bounds. |
 
 Returns the N-th integer of the given MultiIntegerRange.
+If a negative index is given, the index is counted from the end.
 
 ### Example
 

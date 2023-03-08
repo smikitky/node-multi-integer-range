@@ -425,9 +425,9 @@ export const max = (data: MIR): number | undefined => {
 
 /**
  * Returns the N-th integer of the given MultiIntegerRange.
+ * If a negative index is given, the index is counted from the end.
  * @param data - The value.
- * @param index - The 0-based index of the integer to return.
- *   If a negative index is given, the index is counted from the end.
+ * @param index - The 0-based index of the integer to return. Can be negative.
  * @returns The N-th integer. Returns `undefined` if the index is out of bounds.
  * @example
  * at([[2, 4], [8, 10]], 4); // 9
