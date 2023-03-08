@@ -71,6 +71,7 @@ const buildMarkdown = parsed => {
     '- All functions are *pure* functions. They do not alter the input arguments nor do they have side effects.',
     '- All functions and types are exported as named exports.',
     '- All MultiIntegerRange returned by these functions are normalized.',
+    '- The legacy `MultiRange` class is also available but is not documented here. See the docs for v4 for this.',
     '',
     '## Contents',
     ''
