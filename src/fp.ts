@@ -577,3 +577,35 @@ export const iterate = (data: MIR): Iterable<number> => {
     }
   };
 };
+
+/**
+ * Like `iterate`, but in descending order.
+ * @param data - The normalized MultiIntegerRange to iterate over.
+ * @returns An Iterable object.
+ * @example
+ * Array.from(iterateDesc([[1, 3], [7, 9]])); // [9, 8, 7, 3, 2, 1]
+ */
+export const iterateDesc = (data: MIR): Iterable<number> => {
+  if (isUnbounded(data)) {
+    throw new RangeError('Unbounded ranges cannot be iterated over');
+  }
+  return {
+    [Symbol.iterator]: () => {
+      let i = data.length - 1,
+        curRange: Range = data[i],
+        j = curRange ? curRange[1] : undefined;
+      return {
+        next: () => {
+          if (!curRange || j === undefined)
+            return { done: true, value: undefined };
+          const ret = j;
+          if (--j < curRange[0]) {
+            curRange = data[--i];
+            j = curRange ? curRange[1] : undefined;
+          }
+          return { done: false, value: ret };
+        }
+      };
+    }
+  };
+};

@@ -463,3 +463,12 @@ test('iterate', () => {
   expect([...mr.iterate([])]).toEqual([]);
   expect(() => mr.iterate(parseAll('3-'))).toThrow(RangeError);
 });
+
+test('iterateDesc', () => {
+  expect([...mr.iterateDesc([[1, 5]])]).toEqual([5, 4, 3, 2, 1]);
+  expect(Array.from(mr.iterateDesc(parseAll('(-8)-(-6),2,5-7')))).toEqual([
+    7, 6, 5, 2, -6, -7, -8
+  ]);
+  expect([...mr.iterateDesc([])]).toEqual([]);
+  expect(() => mr.iterateDesc(parseAll('3-'))).toThrow(RangeError);
+});
