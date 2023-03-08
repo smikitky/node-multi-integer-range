@@ -404,6 +404,9 @@ test('at', () => {
   t('-4,8-10', 6, RangeError);
   t('-4,8-10', -7, 1);
   t('2-4,8-', -7, RangeError);
+
+  t('', Infinity, RangeError);
+  t('', -Infinity, RangeError);
   t('', 0, undefined);
   t('', 1, undefined);
   t('', -1, undefined);

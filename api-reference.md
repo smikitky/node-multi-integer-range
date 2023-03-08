@@ -364,9 +364,9 @@ at(data: MultiIntegerRange, index: number): number | undefined
 |-|-|
 | `data` | The value. |
 | `index` | The 0-based index of the integer to return. Can be negative. |
-| Returns | The N-th integer. Returns `undefined` if the index is out of bounds. |
+| Returns | The integer at the specified index. Returns `undefined` if the index is out of bounds. |
 
-Returns the N-th integer of the given MultiIntegerRange.
+Returns the integer at the specified 0-based index.
 If a negative index is given, the index is counted from the end.
 
 ### Example
