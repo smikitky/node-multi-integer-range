@@ -198,6 +198,26 @@ as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). H
 **No Integer Type Checks**: Make sure you are not passing floating-point `number`s
 to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
 
+## Comparison with Similar Libraries
+
+[range-parser](https://www.npmjs.com/package/range-parser) specializes in parsing range requests in HTTP headers as defined in RFC 7233. It comes with behavior that cannot be turned off and is inappropriate for other purposes. For example, `'-5'` means "last 5 bytes".
+
+[parse-numeric-range](https://www.npmjs.com/package/parse-numeric-range) is fine for small ranges, but it always builds a "flat" array, so it is very inefficient for large ranges such as byte ranges. Also, whether you like it or not, it handles overlapping or descending ranges as-is without normalization. For example, `'4-2,1-3'` results in `[4, 3, 2, 1, 2, 3]`.
+
+multi-integer-range is a general-purpose library for handling this type of data structure. It has a default parser that is intuitive enough for many purposes, but you can also use a custom parser. Its real value lies in its ability to treat normalized ranges as intermediate forms, allowing for a variety of mathematical operations. See the [API reference](api-reference.md).
+
+| Input     | multi-integer-range           | range-parser                              | parse-numeric-range        |
+| --------- | ----------------------------- | ----------------------------------------- | -------------------------- |
+| '1-3'     | [[1, 3]]                      | [{ start: 1, end: 3 }]                    | [1, 2, 3]                  |
+| '1-1000'  | [[1, 1000]]                   | [{ start: 1, end: 1000 }]                 | [1, 2, ..., 999, 1000 ] ⚠️ |
+| '5-1'     | [[1, 5]]                      | (error)                                   | [5, 4, 3, 2, 1]            |
+| '1-3,2-4' | [[1, 4]]                      | [{ start: 1, end: 4 }] <sup>1</sup>       | [1, 2, 3, 2, 3, 4]         |
+| '4-2,1-3' | [[1, 4]]                      | [{ start: 1, end: 3 }] ⚠️<sup>1</sup>     | [4, 3, 2, 1, 2, 3]         |
+| '-5'      | [[-Infinity, 5]] <sup>2</sup> | [{ start: 9995, end: 9999 }] <sup>3</sup> | [-5]                       |
+| '5-'      | [[5, Infinity]] <sup>2</sup>  | [{ start: 5, end: 9999 }] <sup>3</sup>    | []                         |
+
+<sup>1</sup>: With `combine` option. <sup>2</sup>: With `parseUnbounded` option. <sup>3</sup>: When size is 10000.
+
 ## Development
 
 To test:
