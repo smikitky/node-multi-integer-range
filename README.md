@@ -6,16 +6,16 @@
 
 A small library that parses comma-delimited integer ranges (such as `"1-3,8-10"`) and manipulates such range data. This type of data is commonly used to specify which lines to highlight or which pages to print.
 
-Supported operations:
+Key features:
 
-- Addition (e.g., `1-2,6` + `3-5` &rarr; `1-6`)
-- Subtraction (e.g., `1-10` - `5-9` &rarr; `1-4,10`)
+- Addition (aka union, e.g., `1-2,6` &plus; `3-5` &rarr; `1-6`)
+- Subtraction (e.g., `1-10` &minus; `5-9` &rarr; `1-4,10`)
 - Inclusion check (e.g., `3,7-9` &sub; `1-10`)
 - Intersection (e.g., `1-5` &cap; `2-8` &rarr; `2-5`)
 - Unbounded ranges (aka infinite ranges, e.g., `5-`, meaning "all integers &ge; 5")
 - Ranges including negative integers or zero
 - ES6 iterator (`for ... of`, spread operator)
-- Array creation ("flatten")
+- Array building ("flatten")
 
 The range data are always _sorted and normalized_ to the smallest possible representation.
 
@@ -56,15 +56,14 @@ const array = mr.flatten(diff); // [1, 2, 3, 4, 5, 6, 11, 12]
 const len = mr.length(ranges1); // 10
 ```
 
-## Creating a _normalized_ MultiIntegerRange
+## Creating a normalized MultiIntegerRange
 
-The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, "normalized" means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded (aka infinite) range using the JavaScript constant `Infinity`.
+The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, 'normalized' means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded (aka infinite) range using the JavaScript constant `Infinity`.
 
 <!-- prettier-ignore -->
 ```ts
 type Range = readonly [min: number, max: number];
 type MultiIntegerRange = readonly Range[];
-type MIR = MultiIntegerRange; // short alias
 
 // Examples of normalized MultiIntegerRanges
 [[1, 3], [5, 6], [9, 12]] // 1-3,5-6,9-12
@@ -80,7 +79,7 @@ type MIR = MultiIntegerRange; // short alias
 [[Infinity, Infinity]] // makes no sense
 ```
 
-Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()` or `initialize()`. (You can write a normalized `MultiIntgerRange` by hand as shown above, too.)
+Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()` or `initialize()`. You can write a normalized `MultiIntgerRange` by hand as shown above, too.
 
 `normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This and `initialize` are the only functions that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
 
@@ -125,7 +124,9 @@ console.log(
 
 See [api-reference.md](api-reference.md).
 
-## Iteration
+## Tips
+
+### Iteration
 
 Since a `MultiIntegerRange` is just an array of `Range`s, if you naively iterate over it (e.g., in a for-of loop), you'll simply get each `Range` tuple one by one. To iterate each integer contained in the `MultiIntegerRange` instead, use `iterate()` like so:
 
@@ -145,15 +146,13 @@ const arr1 = [...mr.iterate(ranges)]; //=> [2, 5, 6, 7]
 const arr2 = Array.from(mr.iterate(ranges)); //=> [2, 5, 6, 7]
 ```
 
-## Tip
-
 ### Combine Intersection and Unbounded Ranges
 
 Intersection is especially useful to "trim" unbounded ranges.
 
 ```ts
 const userInput = '-5,15-';
-const pagesInMyDoc = [[1, 20]]; // (1-20)
+const pagesInMyDoc = [[1, 20]]; // 1-20
 const pagesToPrint = mr.intersect(
   mr.parse(userInput, { parseUnbounded: true }),
   pagesInMyDoc
@@ -165,23 +164,17 @@ for (const page of mr.iterate(pagesToPrint)) await printPage(page);
 
 For compatibility purposes, version 5 exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but has been rewritten to use the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit. Use this only during migration. These may be removed in the future.
 
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
-
 ## Caveats
 
-**Performance Considerations**: This library works efficiently for large ranges
-as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmented set of integers that are scarcely continuous (e.g., random 10000 integers between 1 to 1000000).
+**Performance Considerations**: This library works efficiently for large ranges as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmented set of integers that are scarcely continuous (e.g., random 10000 integers between 1 to 1000000).
 
-**No Integer Type Checks**: Make sure you are not passing floating-point `number`s
-to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
+**No Integer Type Checks**: Make sure you are not passing floating-point `number`s to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
 
 ## Comparison with Similar Libraries
 
-[range-parser](https://www.npmjs.com/package/range-parser) specializes in parsing range requests in HTTP headers as defined in RFC 7233. It comes with behavior that cannot be turned off and is inappropriate for other purposes. For example, `'-5'` means "last 5 bytes".
+[range-parser](https://www.npmjs.com/package/range-parser) specializes in parsing range requests in HTTP headers as defined in RFC 7233, and it behaves in a way that is usually inappropriate for other purposes. For example, `'-5'` means "last 5 bytes".
 
-[parse-numeric-range](https://www.npmjs.com/package/parse-numeric-range) is fine for small ranges, but it always builds a "flat" array, so it is very inefficient for large ranges such as byte ranges. Also, whether you like it or not, it handles overlapping or descending ranges as-is without normalization. For example, `'4-2,1-3'` results in `[4, 3, 2, 1, 2, 3]`.
+[parse-numeric-range](https://www.npmjs.com/package/parse-numeric-range) is fine for small ranges, but it always builds a "flat" array, which makes it very inefficient for large ranges such as byte ranges. Also, whether you like it or not, it handles overlapping or descending ranges as-is, without normalization. For example, `'4-2,1-3'` results in `[4, 3, 2, 1, 2, 3]`.
 
 multi-integer-range is a general-purpose library for handling this type of data structure. It has a default parser that is intuitive enough for many purposes, but you can also use a custom parser. Its real value lies in its ability to treat normalized ranges as intermediate forms, allowing for a variety of mathematical operations. See the [API reference](api-reference.md).
 
@@ -190,12 +183,11 @@ multi-integer-range is a general-purpose library for handling this type of data 
 | '1-3'     | [[1, 3]]                      | [{ start: 1, end: 3 }]                    | [1, 2, 3]                  |
 | '1-1000'  | [[1, 1000]]                   | [{ start: 1, end: 1000 }]                 | [1, 2, ..., 999, 1000 ] ⚠️ |
 | '5-1'     | [[1, 5]]                      | (error)                                   | [5, 4, 3, 2, 1]            |
-| '1-3,2-4' | [[1, 4]]                      | [{ start: 1, end: 4 }] <sup>1</sup>       | [1, 2, 3, 2, 3, 4]         |
 | '4-2,1-3' | [[1, 4]]                      | [{ start: 1, end: 3 }] ⚠️<sup>1</sup>     | [4, 3, 2, 1, 2, 3]         |
 | '-5'      | [[-Infinity, 5]] <sup>2</sup> | [{ start: 9995, end: 9999 }] <sup>3</sup> | [-5]                       |
 | '5-'      | [[5, Infinity]] <sup>2</sup>  | [{ start: 5, end: 9999 }] <sup>3</sup>    | []                         |
 
-<sup>1</sup>: With `combine` option. <sup>2</sup>: With `parseUnbounded` option. <sup>3</sup>: When size is 10000.
+<sup>1</sup>: With `combine` option. <sup>2</sup>: With `parseUnbounded` option. <sup>3</sup>: When `size` is 10000.
 
 ## Development
 
@@ -214,6 +206,10 @@ npm run build
 ```
 
 Please report bugs and suggestions using GitHub issues.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Author
 
