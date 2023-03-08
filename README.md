@@ -35,27 +35,6 @@ Version 5 is a hybrid package; it provides both a CommonJS version and an ES Mod
 
 🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. For example, if you don't use the default parser, your bundle will not include it. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
-<details>
-<summary>Deno & Modern Browsers</summary>
-Deno users can use Skypack CDN:
-
-```ts
-import * as mr from 'https://cdn.skypack.dev/multi-integer-range?dts';
-```
-
-Although not recommended from a performance standpoint, modern browsers can directly load this package as a standard ES module via CDN:
-
-```html
-<script type="module">
-  import * as mr from 'https://cdn.skypack.dev/multi-integer-range';
-  console.log(mr.parse('7,6,5'));
-</script>
-```
-
-Note that you probably want to fixate the version, e.g., multi-integer-range@5.0.3
-
-</details>
-
 ## Basic Example
 
 <!-- prettier-ignore -->
