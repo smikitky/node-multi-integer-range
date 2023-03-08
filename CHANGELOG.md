@@ -1,5 +1,10 @@
 # Changelog
 
+## v5.1.0
+
+- Introduced the `at()` function, which can be used to access the N-th smallest/largest integer.
+- `iterate()` now accepts an option to iterate in descending order.
+
 ## v5.0.0
 
 **❗️ Breaking Changes**
