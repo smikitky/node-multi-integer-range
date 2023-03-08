@@ -579,11 +579,12 @@ export const iterate = (data: MIR): Iterable<number> => {
 };
 
 /**
- * Like `iterate`, but in descending order.
+ * Like `iterate`, but iterates in descending order.
  * @param data - The normalized MultiIntegerRange to iterate over.
  * @returns An Iterable object.
  * @example
  * Array.from(iterateDesc([[1, 3], [7, 9]])); // [9, 8, 7, 3, 2, 1]
+ * [...iterateDesc([[-1, 1]])]; // [1, 0, -1]
  */
 export const iterateDesc = (data: MIR): Iterable<number> => {
   if (isUnbounded(data)) {

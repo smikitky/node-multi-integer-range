@@ -504,4 +504,5 @@ Like `iterate`, but in descending order.
 
 ```ts
 Array.from(iterateDesc([[1, 3], [7, 9]])); // [9, 8, 7, 3, 2, 1]
+[...iterateDesc([[-1, 1]])]; // [1, 0, -1]
 ```
