@@ -25,7 +25,6 @@
 - [`stringify()`](#function-stringify)
 - [`flatten()`](#function-flatten)
 - [`iterate()`](#function-iterate)
-- [`iterateDesc()`](#function-iteratedesc)
 
 ---
 
@@ -469,12 +468,16 @@ flatten([[-1, 1], [7, 9]]); // [-1, 0, 1, 7, 8, 9]
 ## function: `iterate`
 
 ```ts
-iterate(data: MultiIntegerRange): Iterable<number>
+iterate(
+  data: MultiIntegerRange,
+  options: IterateOptions = {}
+): Iterable<number>
 ```
 
 | Param | Description |
 |-|-|
 | `data` | The normalized MultiIntegerRange to iterate over. |
+| `options` | Pass `{ descending: true }` to iterate in descending order. |
 | Returns | An Iterable object. |
 
 Returns an Iterable with which you can use `for-of` or the spread syntax.
@@ -483,27 +486,6 @@ Returns an Iterable with which you can use `for-of` or the spread syntax.
 
 ```ts
 Array.from(iterate([[1, 3], [7, 9]])); // [1, 2, 3, 7, 8, 9]
-[...iterate([[-1, 1]])]; // [-1, 0, 1]
-```
-
----
-
-## function: `iterateDesc`
-
-```ts
-iterateDesc(data: MultiIntegerRange): Iterable<number>
-```
-
-| Param | Description |
-|-|-|
-| `data` | The normalized MultiIntegerRange to iterate over. |
-| Returns | An Iterable object. |
-
-Like `iterate`, but iterates in descending order.
-
-### Example
-
-```ts
-Array.from(iterateDesc([[1, 3], [7, 9]])); // [9, 8, 7, 3, 2, 1]
-[...iterateDesc([[-1, 1]])]; // [1, 0, -1]
+Array.from(iterate([[1, 3], [7, 9]], { descending: true })); // [9, 8, 7, 3, 2, 1]
+[...iterate([[-1, 2]])]; // [-1, 0, 1, 2]
 ```

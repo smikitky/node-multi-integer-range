@@ -545,64 +545,41 @@ export const flatten = (data: MIR): number[] => {
   return result;
 };
 
+export interface IterateOptions {
+  readonly descending?: boolean;
+}
+
 /**
  * Returns an Iterable with which you can use `for-of` or the spread syntax.
  * @param data - The normalized MultiIntegerRange to iterate over.
+ * @param options - Pass `{ descending: true }` to iterate in descending order.
  * @returns An Iterable object.
  * @example
  * Array.from(iterate([[1, 3], [7, 9]])); // [1, 2, 3, 7, 8, 9]
- * [...iterate([[-1, 1]])]; // [-1, 0, 1]
+ * Array.from(iterate([[1, 3], [7, 9]], { descending: true })); // [9, 8, 7, 3, 2, 1]
+ * [...iterate([[-1, 2]])]; // [-1, 0, 1, 2]
  */
-export const iterate = (data: MIR): Iterable<number> => {
-  if (isUnbounded(data)) {
+export const iterate = (
+  data: MIR,
+  options: IterateOptions = {}
+): Iterable<number> => {
+  const { descending = false } = options;
+  if (isUnbounded(data))
     throw new RangeError('Unbounded ranges cannot be iterated over');
-  }
-  return {
-    [Symbol.iterator]: () => {
-      let i = 0,
-        curRange: Range = data[i],
-        j = curRange ? curRange[0] : undefined;
-      return {
-        next: () => {
-          if (!curRange || j === undefined)
-            return { done: true, value: undefined };
-          const ret = j;
-          if (++j > curRange[1]) {
-            curRange = data[++i];
-            j = curRange ? curRange[0] : undefined;
-          }
-          return { done: false, value: ret };
-        }
-      };
-    }
-  };
-};
 
-/**
- * Like `iterate`, but iterates in descending order.
- * @param data - The normalized MultiIntegerRange to iterate over.
- * @returns An Iterable object.
- * @example
- * Array.from(iterateDesc([[1, 3], [7, 9]])); // [9, 8, 7, 3, 2, 1]
- * [...iterateDesc([[-1, 1]])]; // [1, 0, -1]
- */
-export const iterateDesc = (data: MIR): Iterable<number> => {
-  if (isUnbounded(data)) {
-    throw new RangeError('Unbounded ranges cannot be iterated over');
-  }
   return {
     [Symbol.iterator]: () => {
-      let i = data.length - 1,
+      let i = descending ? data.length - 1 : 0,
         curRange: Range = data[i],
-        j = curRange ? curRange[1] : undefined;
+        j = curRange ? (descending ? curRange[1] : curRange[0]) : undefined;
       return {
         next: () => {
           if (!curRange || j === undefined)
             return { done: true, value: undefined };
           const ret = j;
-          if (--j < curRange[0]) {
-            curRange = data[--i];
-            j = curRange ? curRange[1] : undefined;
+          if (descending ? --j < curRange[0] : ++j > curRange[1]) {
+            curRange = data[descending ? --i : ++i];
+            j = curRange ? (descending ? curRange[1] : curRange[0]) : undefined;
           }
           return { done: false, value: ret };
         }

@@ -456,19 +456,16 @@ test('flatten', () => {
 });
 
 test('iterate', () => {
-  expect([...mr.iterate([[1, 5]])]).toEqual([1, 2, 3, 4, 5]);
-  expect(Array.from(mr.iterate(parseAll('(-8)-(-6),2,5-7')))).toEqual([
-    -8, -7, -6, 2, 5, 6, 7
-  ]);
-  expect([...mr.iterate([])]).toEqual([]);
-  expect(() => mr.iterate(parseAll('3-'))).toThrow(RangeError);
-});
+  expect([...mr.iterate([[1, 3]])]).toEqual([1, 2, 3]);
+  expect([...mr.iterate([[1, 3]], { descending: true })]).toEqual([3, 2, 1]);
 
-test('iterateDesc', () => {
-  expect([...mr.iterateDesc([[1, 5]])]).toEqual([5, 4, 3, 2, 1]);
-  expect(Array.from(mr.iterateDesc(parseAll('(-8)-(-6),2,5-7')))).toEqual([
+  const r = parseAll('(-8)-(-6),2,5-7');
+  expect(Array.from(mr.iterate(r))).toEqual([-8, -7, -6, 2, 5, 6, 7]);
+  expect(Array.from(mr.iterate(r, { descending: true }))).toEqual([
     7, 6, 5, 2, -6, -7, -8
   ]);
-  expect([...mr.iterateDesc([])]).toEqual([]);
-  expect(() => mr.iterateDesc(parseAll('3-'))).toThrow(RangeError);
+
+  expect([...mr.iterate([])]).toEqual([]);
+  expect([...mr.iterate([], { descending: true })]).toEqual([]);
+  expect(() => mr.iterate(parseAll('3-'))).toThrow(RangeError);
 });
