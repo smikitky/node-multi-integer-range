@@ -376,6 +376,46 @@ test('max', () => {
   t('', undefined);
 });
 
+test('at', () => {
+  const t = (
+    s: string,
+    index: number,
+    v: number | undefined | typeof RangeError
+  ) =>
+    v === RangeError
+      ? expect(() =>
+          mr.at(mr.parse(s, { parseUnbounded: true }), index)
+        ).toThrow(v)
+      : expect(mr.at(mr.parse(s, { parseUnbounded: true }), index)).toBe(v);
+
+  t('2-4,8-10', 0, 2);
+  t('2-4,8-10', 1, 3);
+  t('2-4,8-10', 2, 4);
+  t('2-4,8-10', 3, 8);
+  t('2-4,8-10', 5, 10);
+  t('2-4,8-10', 6, undefined);
+  t('2-4,8-10', -1, 10);
+  t('2-4,8-10', -6, 2);
+  t('2-4,8-10', -7, undefined);
+  t('2-4,8-10', Infinity, RangeError);
+  t('2-4,8-10', -Infinity, RangeError);
+
+  t('2-4,8-', 6, 11);
+  t('-4,8-10', 6, RangeError);
+  t('-4,8-10', -7, 1);
+  t('2-4,8-', -7, RangeError);
+  t('', 0, undefined);
+  t('', 1, undefined);
+  t('', -1, undefined);
+
+  const a = mr.parse('(-3)-0,5-6,9,12-14', { parseNegative: true });
+  const vals = mr.flatten(a);
+  for (let i = 0; i < vals.length; i++) {
+    expect(mr.at(a, i)).toBe(vals[i]);
+    expect(mr.at(a, i - vals.length)).toBe(vals[i]);
+  }
+});
+
 test('tail', () => {
   const t = makeT1(mr.tail, mr.stringify);
   t('1,5,10-15', '5,10-15');

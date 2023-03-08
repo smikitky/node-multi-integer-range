@@ -18,6 +18,7 @@
 - [`equals()`](#function-equals)
 - [`min()`](#function-min)
 - [`max()`](#function-max)
+- [`at()`](#function-at)
 - [`tail()`](#function-tail)
 - [`init()`](#function-init)
 - [`stringify()`](#function-stringify)
@@ -348,6 +349,31 @@ Returns the maximum integer of the given MultiIntegerRange.
 max([[2, 5], [8, 10]]); // 10
 max([[3, Infinity]]); // Infinity
 max([]); // undefined
+```
+
+---
+
+## function: `at`
+
+```ts
+at(data: MultiIntegerRange, index: number): number | undefined
+```
+
+| Param | Description |
+|-|-|
+| `data` | The value. |
+| `index` | The 0-based index of the integer to return.
+If a negative index is given, the index is counted from the end. |
+| Returns | The N-th integer. Returns `undefined` if the index is out of bounds. |
+
+Returns the N-th integer of the given MultiIntegerRange.
+
+### Example
+
+```ts
+at([[2, 4], [8, 10]], 4); // 9
+at([[2, 4], [8, 10]], 6); // undefined
+at([[2, 4], [8, 10]], -1); // 10
 ```
 
 ---

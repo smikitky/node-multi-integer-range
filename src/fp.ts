@@ -424,6 +424,41 @@ export const max = (data: MIR): number | undefined => {
 };
 
 /**
+ * Returns the N-th integer of the given MultiIntegerRange.
+ * @param data - The value.
+ * @param index - The 0-based index of the integer to return.
+ *   If a negative index is given, the index is counted from the end.
+ * @returns The N-th integer. Returns `undefined` if the index is out of bounds.
+ * @example
+ * at([[2, 4], [8, 10]], 4); // 9
+ * at([[2, 4], [8, 10]], 6); // undefined
+ * at([[2, 4], [8, 10]], -1); // 10
+ */
+export const at = (data: MIR, index: number): number | undefined => {
+  if (index === Infinity || index === -Infinity)
+    throw new RangeError('at() was invoked with an invalid index');
+  if (
+    (index >= 0 && data[0]?.[0] === -Infinity) ||
+    (index < 0 && data[data.length - 1]?.[1] === Infinity)
+  ) {
+    throw new RangeError('at() was invoked on an unbounded range');
+  }
+
+  let i = 0;
+  const start = index >= 0 ? 0 : data.length - 1;
+  const delta = index >= 0 ? 1 : -1;
+  const nth = index >= 0 ? index : -index - 1;
+
+  for (let j = start; j >= 0 && j < data.length; j += delta) {
+    const r = data[j];
+    const len = r[1] - r[0] + 1;
+    if (i + len > nth) return delta > 0 ? r[0] + nth - i : r[1] - nth + i;
+    i += len;
+  }
+  return undefined;
+};
+
+/**
  * Returns all but the minimum integer.
  * @param data - The value.
  * @returns A new MultiIntegerRange which is almost the same as `data` but with
