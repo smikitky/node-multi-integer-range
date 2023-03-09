@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.2.0
+
+- Added `individualThreshold` option to `stringify()`.
+
 ## v5.1.0
 
 - Introduced the `at()` function, which can be used to access the N-th smallest/largest integer.
