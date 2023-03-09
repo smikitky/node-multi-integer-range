@@ -424,19 +424,32 @@ init([[2, 5], [8, 10]]); // [[2, 5], [8, 9]]
 ## function: `stringify`
 
 ```ts
-stringify(data: MultiIntegerRange): string
+stringify(
+  data: MultiIntegerRange,
+  options: StringifyOptions = {}
+): string
 ```
 
 | Param | Description |
 |-|-|
 | `data` | The MultiIntegerRange to stringify. |
+| `options` | Options for the stringification. |
 | Returns | The string representation of the given data. |
 
 Returns the string respresentation of the given MultiIntegerRange.
 
+- `options.individualThreshold` (number): If set, small ranges with a length
+  smaller than or equal to this will be output as individual integers.
+  Defaults to `1`, which means only ranges with a length of 1 will be
+  output as a single integer.
+
 ### Example
 
 ```ts
+stringify([[2, 3], [5, 5], [7, 9]]); // '2-3,5,7-9'
+stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 0 }); // '2-3,5-5,7-9'
+stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 2 }); // '2,3,5,7-9'
+stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 3 }); // '2,3,5,7,8,9'
 stringify([[3, 5], [7, Infinity]]); // '3-5,7-'
 ```
 
@@ -477,10 +490,12 @@ iterate(
 | Param | Description |
 |-|-|
 | `data` | The normalized MultiIntegerRange to iterate over. |
-| `options` | Pass `{ descending: true }` to iterate in descending order. |
+| `options` | Options for the iteration. |
 | Returns | An Iterable object. |
 
 Returns an Iterable with which you can use `for-of` or the spread syntax.
+
+- `options.descending` (boolean): If set to true, the iterator will iterate in descending order.
 
 ### Example
 

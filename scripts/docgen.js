@@ -6,7 +6,7 @@ const fs = require('fs/promises');
 const parseDocComment = docComment => {
   const lines = docComment
     .split('\n')
-    .map(s => s.replace(/^\s*(\/\*\*|\*)?\s*/g, ''));
+    .map(s => s.replace(/^\s*(\/\*\*|\*)?\s?/g, ''));
   const tags = {};
   let currentTag = 'summary';
   let currentTagContent = '';
@@ -77,6 +77,7 @@ const buildMarkdown = parsed => {
     ''
   ];
 
+  // TOC
   parsed
     .filter(item => item.type === 'function')
     .forEach(item => {

@@ -444,6 +444,15 @@ test('stringify', () => {
   t('-10');
   t('10-');
   t('');
+
+  const r = mr.parse('2-3,5,7-9');
+  const t2 = (individualThreshold: number, expected: string) =>
+    expect(mr.stringify(r, { individualThreshold })).toBe(expected);
+  t2(0, '2-3,5-5,7-9');
+  t2(1, '2-3,5,7-9');
+  t2(2, '2,3,5,7-9');
+  t2(3, '2,3,5,7,8,9');
+  t2(4, '2,3,5,7,8,9');
 });
 
 test('flatten', () => {

@@ -245,7 +245,7 @@ const findOverlap = (
  * @param a - The first value.
  * @param b - The second value.
  * @returns A new MultiIntegerRange containing all integers that belong to
- *   **either `a` or `b` (or both)**.
+ * **either `a` or `b` (or both)**.
  * @example
  * append([[1, 5]], [[3, 8], [10, 15]]); // [[1, 8], [10, 15]]
  * append([[5, 9]], [[-Infinity, 2]]); // [[-Infinity, 2], [5, 9]]
@@ -264,7 +264,7 @@ export const append = (a: MIR, b: MIR): MIR => {
  * @param a - The value to be subtracted.
  * @param b - The value to subtract.
  * @returns A new MultiIntegerRange containing all integers that belong to
- *   **`a` but not `b`**.
+ * **`a` but not `b`**.
  * @example
  * subtract([[1, 7]], [[2, 4]]); // [[1, 1], [5, 7]]
  * subtract([[-Infinity, Infinity]], [[2, 4]]); // [[-Infinity, 1], [5, Infinity]]
@@ -292,7 +292,7 @@ export const subtract = (a: MIR, b: MIR): MIR => {
  * @param a - The first value.
  * @param b - The second value.
  * @returns A new MultiIntegerRange containing all integers
- *   that belong to **both `a` and `b`**.
+ * that belong to **both `a` and `b`**.
  * @example
  * intersect([[2, 5]], [[4, 9]]); // [[4, 5]]
  * intersect([[5, 10]], [[-Infinity, Infinity]]); // [[5, 10]]
@@ -429,7 +429,7 @@ export const max = (data: MIR): number | undefined => {
  * @param data - The value.
  * @param index - The 0-based index of the integer to return. Can be negative.
  * @returns The integer at the specified index.
- *   Returns `undefined` if the index is out of bounds.
+ * Returns `undefined` if the index is out of bounds.
  * @example
  * at([[2, 4], [8, 10]], 4); // 9
  * at([[2, 4], [8, 10]], 6); // undefined
@@ -464,7 +464,7 @@ export const at = (data: MIR, index: number): number | undefined => {
  * Returns all but the minimum integer.
  * @param data - The value.
  * @returns A new MultiIntegerRange which is almost the same as `data` but with
- *   its minimum integer removed.
+ * its minimum integer removed.
  * @example
  * tail([[2, 5], [8, 10]]); // [[3, 5], [8, 10]]
  */
@@ -482,7 +482,7 @@ export const tail = (data: MIR): MIR => {
  * Returns all but the maximum integer.
  * @param data - The value.
  * @returns A new MultiIntegerRange which is almost the same as `data` but with
- *   its maximum integer removed.
+ * its maximum integer removed.
  * @example
  * init([[2, 5], [8, 10]]); // [[2, 5], [8, 9]]
  */
@@ -497,13 +497,35 @@ export const init = (data: MIR): MIR => {
 };
 
 /**
+ * Options for the `stringify()` function.
+ */
+export interface StringifyOptions {
+  individualThreshold?: number;
+}
+
+/**
  * Returns the string respresentation of the given MultiIntegerRange.
+ *
+ * - `options.individualThreshold` (number): If set, small ranges with a length
+ *   smaller than or equal to this will be output as individual integers.
+ *   Defaults to `1`, which means only ranges with a length of 1 will be
+ *   output as a single integer.
+ *
  * @param data - The MultiIntegerRange to stringify.
+ * @param options - Options for the stringification.
  * @returns The string representation of the given data.
  * @example
+ * stringify([[2, 3], [5, 5], [7, 9]]); // '2-3,5,7-9'
+ * stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 0 }); // '2-3,5-5,7-9'
+ * stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 2 }); // '2,3,5,7-9'
+ * stringify([[2, 3], [5, 5], [7, 9]], { individualThreshold: 3 }); // '2,3,5,7,8,9'
  * stringify([[3, 5], [7, Infinity]]); // '3-5,7-'
  */
-export const stringify = (data: MIR): string => {
+export const stringify = (
+  data: MIR,
+  options: StringifyOptions = {}
+): string => {
+  const { individualThreshold = 1 } = options;
   const wrap = (i: number) => (i >= 0 ? String(i) : `(${i})`);
   const ranges: string[] = [];
   for (let r of data) {
@@ -515,10 +537,10 @@ export const stringify = (data: MIR): string => {
       }
     } else if (r[1] === Infinity) {
       ranges.push(`${wrap(r[0])}-`);
-    } else if (r[0] == r[1]) {
-      ranges.push(wrap(r[0]));
     } else {
-      ranges.push(`${wrap(r[0])}-${wrap(r[1])}`);
+      if (individualThreshold && r[1] - r[0] + 1 <= individualThreshold) {
+        for (let i = r[0]; i <= r[1]; i++) ranges.push(wrap(i));
+      } else ranges.push(`${wrap(r[0])}-${wrap(r[1])}`);
     }
   }
   return ranges.join(',');
@@ -547,14 +569,23 @@ export const flatten = (data: MIR): number[] => {
   return result;
 };
 
+/**
+ * Options for the `iterate()` function.
+ */
 export interface IterateOptions {
+  /**
+   * Whether to iterate in descending order.
+   */
   readonly descending?: boolean;
 }
 
 /**
  * Returns an Iterable with which you can use `for-of` or the spread syntax.
+ *
+ * - `options.descending` (boolean): If set to true, the iterator will iterate in descending order.
+ *
  * @param data - The normalized MultiIntegerRange to iterate over.
- * @param options - Pass `{ descending: true }` to iterate in descending order.
+ * @param options - Options for the iteration.
  * @returns An Iterable object.
  * @example
  * Array.from(iterate([[1, 3], [7, 9]])); // [1, 2, 3, 7, 8, 9]
