@@ -161,7 +161,7 @@ const calcUnion = (a: Range, b: Range): Range | null => {
   if (a[1] + 1 < b[0] || a[0] - 1 > b[1]) {
     return null; // cannot make union
   }
-  return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
+  return [a[0] < b[0] ? a[0] : b[0], a[1] > b[1] ? a[1] : b[1]];
 };
 
 /**
@@ -306,8 +306,8 @@ export const intersect = (a: MIR, b: MIR): MIR => {
       const r2 = b[j];
       if (r1[0] <= r2[1] && r1[1] >= r2[0]) {
         jstart = j;
-        const min = Math.max(r1[0], r2[0]);
-        const max = Math.min(r1[1], r2[1]);
+        const min = r1[0] < r2[0] ? r2[0] : r1[0];
+        const max = r1[1] < r2[1] ? r1[1] : r2[1];
         result.push([min, max]);
       } else if (r1[1] < r2[0]) {
         break;
@@ -328,11 +328,11 @@ export const intersect = (a: MIR, b: MIR): MIR => {
  * has([[2, 10]], [[0, 100]]); // false
  */
 export const has = (a: MIR, b: MIR): boolean => {
-  const s = 0;
+  const start = 0;
   const len = a.length;
   for (let r of b) {
     let i: number;
-    for (i = s; i < len; i++) {
+    for (i = start; i < len; i++) {
       const my = a[i];
       if (r[0] >= my[0] && r[1] <= my[1] && r[1] >= my[0] && r[1] <= my[1])
         break;
@@ -436,7 +436,7 @@ export const max = (data: MIR): number | undefined => {
  * at([[2, 4], [8, 10]], -1); // 10
  */
 export const at = (data: MIR, index: number): number | undefined => {
-  if (index === Infinity || index === -Infinity)
+  if (!Number.isInteger(index))
     throw new RangeError('at() was invoked with an invalid index');
   if (
     data.length > 0 &&
