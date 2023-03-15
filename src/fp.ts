@@ -16,11 +16,11 @@ export type MIR = MultiIntegerRange; // shorthand
 
 export type Options = {
   /**
-   * Parses negative integers enclosed in parentheses.
+   * If set to true, allows parsing negative integers enclosed in parentheses.
    */
   readonly parseNegative?: boolean;
   /**
-   * Parses unbounded ranges like `10-` or `-10`.
+   * If set to true, allows parsing unbounded ranges like `10-` or `-10`.
    */
   readonly parseUnbounded?: boolean;
 };
@@ -31,7 +31,7 @@ export type Options = {
  * - `options.parseNegative` (boolean): When set to true, parses negative integers enclosed in parentheses.
  * - `options.parseUnbounded` (boolean): When set to true, parses unbounded ranges like `10-` or `-10`.
  *
- * This is the default parser, but you don't necessary have to use this.
+ * This is the default parser, but you don't necessarily have to use this.
  * You can create your own parser to suit your needs
  * as long as it produces a normalized array of `Range`s.
  *
@@ -46,7 +46,7 @@ export const parse = (data: string, options?: Options): MIR => {
   const { parseNegative = false, parseUnbounded = false } = options || {};
 
   const toInt = (str: string): number => {
-    const m = str.match(/^\(?(\-?\d+)/) as any;
+    const m = str.match(/^\(?(\-?\d+)/)!;
     const int = parseInt(m[1], 10);
     if (int < Number.MIN_SAFE_INTEGER || Number.MAX_SAFE_INTEGER < int)
       throw new RangeError('The number is too big or too small.');
