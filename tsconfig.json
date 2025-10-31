@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "noEmit": true,
     "rootDir": "src",
-    "moduleResolution": "node",
+    "outDir": "./lib",
+    "moduleResolution": "nodenext",
     "target": "es2015",
-    "module": "es2015",
+    "module": "nodenext",
     "newLine": "LF",
     "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "declaration": true
   },
   "include": ["src/**/*"]

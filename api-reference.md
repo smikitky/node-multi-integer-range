@@ -69,7 +69,7 @@ Parses a string and creates a new MultiIntegerRange.
 - `options.parseNegative` (boolean): When set to true, parses negative integers enclosed in parentheses.
 - `options.parseUnbounded` (boolean): When set to true, parses unbounded ranges like `10-` or `-10`.
 
-This is the default parser, but you don't necessary have to use this.
+This is the default parser, but you don't necessarily have to use this.
 You can create your own parser to suit your needs
 as long as it produces a normalized array of `Range`s.
 

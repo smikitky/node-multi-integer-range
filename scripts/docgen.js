@@ -1,5 +1,7 @@
-const path = require('path');
-const fs = require('fs/promises');
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises';
+
+const __dirname = import.meta.dirname;
 
 // Yes I do know the ideal is to use a serious parser, but this works
 

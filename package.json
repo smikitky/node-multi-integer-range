@@ -4,18 +4,14 @@
   "description": "Parses and manipulates multiple comma-separated integer ranges (eg 1-3,8-10)",
   "repository": "https://github.com/smikitky/node-multi-integer-range.git",
   "sideEffects": false,
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "exports": {
-    "import": "./lib/esm/index.js",
-    "require": "./lib/cjs/index.js"
-  },
-  "types": "./lib/cjs/index.d.ts",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "c8 tsx --test src/**/*.test.ts",
     "doc": "node scripts/docgen.js",
     "clean": "rimraf lib",
-    "build": "npm run clean && tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json && node scripts/postbuild.js",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "prepack": "npm run build",
     "prettier": "prettier --write src/**/*.{ts,js}"
   },
@@ -30,13 +26,12 @@
   "author": "Soichiro Miki",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "jest": "^27.5.1",
-    "jest-ts-webcompat-resolver": "^1.0.0",
+    "@types/node": "^24.9.2",
+    "c8": "^10.1.3",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.3",
-    "typescript": "^4.6.2"
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   },
   "prettier": {
     "singleQuote": true,

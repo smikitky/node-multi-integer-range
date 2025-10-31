@@ -1,77 +1,84 @@
-import * as mr from './fp';
-import { MIR, Range } from './fp';
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import * as mr from './fp.js';
+import type { MIR, Range } from './fp.js';
 
-describe('parse', () => {
-  test('no option', () => {
-    expect(mr.parse('')).toEqual([]);
-    expect(mr.parse('0')).toEqual([[0, 0]]);
-    expect(mr.parse('1-3,5,7-10')).toEqual([
+test('parse', t => {
+  t.test('no option', () => {
+    assert.deepEqual(mr.parse(''), []);
+    assert.deepEqual(mr.parse('0'), [[0, 0]]);
+    assert.deepEqual(mr.parse('1-3,5,7-10'), [
       [1, 3],
       [5, 5],
       [7, 10]
     ]);
-    expect(() => mr.parse('5-')).toThrow(SyntaxError);
-    expect(() => mr.parse('(-10)')).toThrow(SyntaxError);
+    assert.throws(() => mr.parse('5-'), SyntaxError);
+    assert.throws(() => mr.parse('(-10)'), SyntaxError);
   });
 
-  test('parse negative', () => {
-    expect(mr.parse('(-5)', { parseNegative: true })).toEqual([[-5, -5]]);
-    expect(
-      mr.parse('(-10)-(-7),(-5),(-3)-(-1)', { parseNegative: true })
-    ).toEqual([
-      [-10, -7],
-      [-5, -5],
-      [-3, -1]
+  t.test('parse negative', () => {
+    assert.deepEqual(mr.parse('(-5)', { parseNegative: true }), [[-5, -5]]);
+    assert.deepEqual(
+      mr.parse('(-10)-(-7),(-5),(-3)-(-1)', { parseNegative: true }),
+      [
+        [-10, -7],
+        [-5, -5],
+        [-3, -1]
+      ]
+    );
+  });
+
+  t.test('parse unbounded', () => {
+    assert.deepEqual(mr.parse('10-', { parseUnbounded: true }), [
+      [10, Infinity]
     ]);
-  });
-
-  test('parse unbounded', () => {
-    expect(mr.parse('10-', { parseUnbounded: true })).toEqual([[10, Infinity]]);
-    expect(mr.parse('-5', { parseUnbounded: true })).toEqual([[-Infinity, 5]]);
-    expect(mr.parse('-5,10-', { parseUnbounded: true })).toEqual([
+    assert.deepEqual(mr.parse('-5', { parseUnbounded: true }), [
+      [-Infinity, 5]
+    ]);
+    assert.deepEqual(mr.parse('-5,10-', { parseUnbounded: true }), [
       [-Infinity, 5],
       [10, Infinity]
     ]);
   });
 
-  test('strip spaces', () => {
-    expect(mr.parse('1 -3,  5,\t7-10\n')).toEqual([
+  t.test('strip spaces', () => {
+    assert.deepEqual(mr.parse('1 -3,  5,\t7-10\n'), [
       [1, 3],
       [5, 5],
       [7, 10]
     ]);
   });
 
-  test('normalize', () => {
-    expect(mr.parse('1,8,2-4,7,5-6,10-9')).toEqual([[1, 10]]);
-    expect(mr.parse('10-8,7-5,1-4')).toEqual([[1, 10]]);
-    expect(parseAll('8-10,(-5),100-, 0,7,(-1)-(-4),1-6')).toEqual([
+  t.test('normalize', () => {
+    assert.deepEqual(mr.parse('1,8,2-4,7,5-6,10-9'), [[1, 10]]);
+    assert.deepEqual(mr.parse('10-8,7-5,1-4'), [[1, 10]]);
+    assert.deepEqual(parseAll('8-10,(-5),100-, 0,7,(-1)-(-4),1-6'), [
       [-5, 10],
       [100, Infinity]
     ]);
   });
 
-  test('throw SyntaxError for invalid input', () => {
-    expect(() => mr.parse('abc')).toThrow(SyntaxError);
-    expect(() => mr.parse('1.5')).toThrow(SyntaxError);
-    expect(() => mr.parse('2-5,8-10,*,99')).toThrow(SyntaxError);
-    expect(() => mr.parse('2,,5')).toThrow(SyntaxError);
-    expect(() => mr.parse(',')).toThrow(SyntaxError);
+  t.test('throw SyntaxError for invalid input', () => {
+    assert.throws(() => mr.parse('abc'), SyntaxError);
+    assert.throws(() => mr.parse('1.5'), SyntaxError);
+    assert.throws(() => mr.parse('2-5,8-10,*,99'), SyntaxError);
+    assert.throws(() => mr.parse('2,,5'), SyntaxError);
+    assert.throws(() => mr.parse(','), SyntaxError);
     // @ts-expect-error
-    expect(() => mr.parse()).toThrow(TypeError);
-    expect(() => mr.parse('')).not.toThrow();
+    assert.throws(() => mr.parse(), TypeError);
+    assert.doesNotThrow(() => mr.parse(''));
   });
 
-  test('throw RangeError for huge integer strings', () => {
-    expect(() => mr.parse('1-900719925474099100')).toThrow(RangeError);
-    expect(() => parseAll('(-900719925474099100)')).toThrow(RangeError);
+  t.test('throw RangeError for huge integer strings', () => {
+    assert.throws(() => mr.parse('1-900719925474099100'), RangeError);
+    assert.throws(() => parseAll('(-900719925474099100)'), RangeError);
   });
 });
 
 // prettier-ignore
 test('normalize', () => {
   const t = (a: Parameters<typeof mr.normalize>[0], expected: Range[]) =>
-    expect(mr.normalize(a)).toEqual(expected);
+    assert.deepEqual(mr.normalize(a), expected);
 
   t([[7, 5], 1], [[1, 1], [5, 7]]);
   t([3, 1, [5, 7], [0, -3]], [[-3, 1], [3, 3], [5, 7]]);
@@ -80,20 +87,20 @@ test('normalize', () => {
   t([], []);
   t(undefined, []);
   // @ts-expect-error
-  expect(() => mr.normalize([[1]])).toThrow(TypeError);
+  assert.throws(() => mr.normalize([[1]]), TypeError);
   // @ts-expect-error
-  expect(() => mr.normalize([[2, 8, 3]])).toThrow(TypeError);
+  assert.throws(() => mr.normalize([[2, 8, 3]]), TypeError);
   // @ts-expect-error
-  expect(() => mr.normalize(['str'])).toThrow(TypeError);
-  expect(() => mr.normalize([[Infinity, Infinity]])).toThrow(RangeError);
-  expect(() => mr.normalize([[-Infinity, -Infinity]])).toThrow(RangeError);
-  expect(() => mr.normalize([Infinity])).toThrow(RangeError);
-  expect(() => mr.normalize(Infinity)).toThrow(RangeError);
+  assert.throws(() => mr.normalize(['str']), TypeError);
+  assert.throws(() => mr.normalize([[Infinity, Infinity]]), RangeError);
+  assert.throws(() => mr.normalize([[-Infinity, -Infinity]]), RangeError);
+  assert.throws(() => mr.normalize([Infinity]), RangeError);
+  assert.throws(() => mr.normalize(Infinity), RangeError);
 });
 
 test('initialize', () => {
   const t = (a: Parameters<typeof mr.initialize>[0], expected: Range[]) =>
-    expect(mr.initialize(a)).toEqual(expected);
+    assert.deepEqual(mr.initialize(a), expected);
   t('5-10', [[5, 10]]);
   t([[9, 2]], [[2, 9]]);
   t('', []);
@@ -110,7 +117,7 @@ const makeT1 =
     resultFilter: (result: T) => R = i => i as unknown as R
   ) =>
   (data: string, expected: R) => {
-    expect(resultFilter(testFunc(parseAll(data)))).toBe(expected);
+    assert.strictEqual(resultFilter(testFunc(parseAll(data))), expected);
   };
 
 const makeT2 =
@@ -120,144 +127,150 @@ const makeT2 =
     swappable?: boolean
   ) =>
   (a: string, b: string, expected: R) => {
-    expect(resultFilter(testFunc(parseAll(a), parseAll(b)))).toBe(expected);
+    assert.strictEqual(
+      resultFilter(testFunc(parseAll(a), parseAll(b))),
+      expected
+    );
     if (swappable) {
-      expect(resultFilter(testFunc(parseAll(b), parseAll(a)))).toBe(expected);
+      assert.strictEqual(
+        resultFilter(testFunc(parseAll(b), parseAll(a))),
+        expected
+      );
     }
   };
 
-describe('append', () => {
-  const t = makeT2(mr.append, mr.stringify, true);
+test('append', t => {
+  const t2 = makeT2(mr.append, mr.stringify, true);
 
-  test('positive', () => {
-    t('5-10', '5', '5-10');
-    t('5-10', '8', '5-10');
-    t('5-10', '10', '5-10');
-    t('5-10', '11', '5-11');
-    t('5-10', '4', '4-10');
-    t('5-10', '15', '5-10,15');
-    t('5-10', '1', '1,5-10');
-    t('5-10,15-20', '12', '5-10,12,15-20');
-    t('5-10,15-20', '3', '3,5-10,15-20');
-    t('5-10,15-20', '25', '5-10,15-20,25');
-    t('1-10,12-15,17-20', '11', '1-15,17-20');
-    t('1-10,12-15,17-20', '1-100', '1-100');
-    t('1-10,12-15,17-20,100', '5-14', '1-15,17-20,100');
-    t('1-10,12-15,17-20', '14-19', '1-10,12-20');
-    t('1,8,10', '2-3,4-5,6,7,9', '1-10');
+  t.test('positive', () => {
+    t2('5-10', '5', '5-10');
+    t2('5-10', '8', '5-10');
+    t2('5-10', '10', '5-10');
+    t2('5-10', '11', '5-11');
+    t2('5-10', '4', '4-10');
+    t2('5-10', '15', '5-10,15');
+    t2('5-10', '1', '1,5-10');
+    t2('5-10,15-20', '12', '5-10,12,15-20');
+    t2('5-10,15-20', '3', '3,5-10,15-20');
+    t2('5-10,15-20', '25', '5-10,15-20,25');
+    t2('1-10,12-15,17-20', '11', '1-15,17-20');
+    t2('1-10,12-15,17-20', '1-100', '1-100');
+    t2('1-10,12-15,17-20,100', '5-14', '1-15,17-20,100');
+    t2('1-10,12-15,17-20', '14-19', '1-10,12-20');
+    t2('1,8,10', '2-3,4-5,6,7,9', '1-10');
   });
 
-  test('negative', () => {
-    t('(-5)-(-3)', '(-6),(-2),4,5', '(-6)-(-2),4-5');
-    t('(-5)-(-3)', '3', '(-5)-(-3),3');
+  t.test('negative', () => {
+    t2('(-5)-(-3)', '(-6),(-2),4,5', '(-6)-(-2),4-5');
+    t2('(-5)-(-3)', '3', '(-5)-(-3),3');
   });
 
-  test('unbounded', () => {
-    t('5-', '10', '5-');
-    t('5-', '4', '4-');
-    t('5-', '3', '3,5-');
-    t('5-', '10-', '5-');
-    t('5-', '2-', '2-');
-    t('-5', '10', '-5,10');
-    t('-5', '6', '-6');
-    t('-5', '2', '-5');
-    t('-5', '-10', '-10');
-    t('-5', '-2', '-5');
-    t('-5', '3-', '-');
-    t('-5', '6-', '-');
-    t('-5,8-', '1-10', '-');
-    t('-3', '5-', '-3,5-');
-    t('-(-10)', '(-8),0,10-', '-(-10),(-8),0,10-');
-    t('-(-10)', '(-8),0,10-', '-(-10),(-8),0,10-');
-    t('-', '(-8),0,10-', '-');
-    t('-', '-', '-');
-    t('', '-', '-');
+  t.test('unbounded', () => {
+    t2('5-', '10', '5-');
+    t2('5-', '4', '4-');
+    t2('5-', '3', '3,5-');
+    t2('5-', '10-', '5-');
+    t2('5-', '2-', '2-');
+    t2('-5', '10', '-5,10');
+    t2('-5', '6', '-6');
+    t2('-5', '2', '-5');
+    t2('-5', '-10', '-10');
+    t2('-5', '-2', '-5');
+    t2('-5', '3-', '-');
+    t2('-5', '6-', '-');
+    t2('-5,8-', '1-10', '-');
+    t2('-3', '5-', '-3,5-');
+    t2('-(-10)', '(-8),0,10-', '-(-10),(-8),0,10-');
+    t2('-(-10)', '(-8),0,10-', '-(-10),(-8),0,10-');
+    t2('-', '(-8),0,10-', '-');
+    t2('-', '-', '-');
+    t2('', '-', '-');
   });
 });
 
-describe('subtract', () => {
-  const t = makeT2(mr.subtract, mr.stringify);
+test('subtract', t => {
+  const t2 = makeT2(mr.subtract, mr.stringify);
 
-  test('positive', () => {
-    t('1-10', '100', '1-10');
-    t('1-10', '0', '1-10');
-    t('1-10', '11', '1-10');
-    t('1-10', '1', '2-10');
-    t('1-10', '10', '1-9');
-    t('1-10', '1-10', '');
-    t('1-10', '5-8', '1-4,9-10');
-    t('1-10,20-30', '11-19', '1-10,20-30');
-    t('1-10,20-30', '5-25', '1-4,26-30');
-    t('1-100', '1,3,5,7,9', '2,4,6,8,10-100');
+  t.test('positive', () => {
+    t2('1-10', '100', '1-10');
+    t2('1-10', '0', '1-10');
+    t2('1-10', '11', '1-10');
+    t2('1-10', '1', '2-10');
+    t2('1-10', '10', '1-9');
+    t2('1-10', '1-10', '');
+    t2('1-10', '5-8', '1-4,9-10');
+    t2('1-10,20-30', '11-19', '1-10,20-30');
+    t2('1-10,20-30', '5-25', '1-4,26-30');
+    t2('1-100', '1,3,5,7,9', '2,4,6,8,10-100');
   });
 
-  test('negative', () => {
-    t('(-10)-(-3)', '5', '(-10)-(-3)');
-    t('(-10)-(-3)', '(-10)', '(-9)-(-3)');
-    t('(-10)-(-3)', '(-3)', '(-10)-(-4)');
-    t('(-10)-(-3)', '(-5)', '(-10)-(-6),(-4)-(-3)');
-    t(
+  t.test('negative', () => {
+    t2('(-10)-(-3)', '5', '(-10)-(-3)');
+    t2('(-10)-(-3)', '(-10)', '(-9)-(-3)');
+    t2('(-10)-(-3)', '(-3)', '(-10)-(-4)');
+    t2('(-10)-(-3)', '(-5)', '(-10)-(-6),(-4)-(-3)');
+    t2(
       '(-30),(-20)-(-10),(-8)-0,8',
       '(-20),(-12)-(-5)',
       '(-30),(-19)-(-13),(-4)-0,8'
     );
   });
 
-  test('unbounded', () => {
-    t('10-20', '15-', '10-14');
-    t('10-20', '-15', '16-20');
-    t('10-20', '-12,18-', '13-17');
-    t('-12,18-', '5', '-4,6-12,18-');
-    t('-12,18-', '5,20', '-4,6-12,18-19,21-');
-    t('-12,18-', '-20,3-', '');
-    t('-12,18-', '-', '');
-    t('-', '200-205', '-199,206-');
-    t('-', '-100,150-', '101-149');
-    t('-', '-100,120,130,150-', '101-119,121-129,131-149');
-    t('-', '-', '');
+  t.test('unbounded', () => {
+    t2('10-20', '15-', '10-14');
+    t2('10-20', '-15', '16-20');
+    t2('10-20', '-12,18-', '13-17');
+    t2('-12,18-', '5', '-4,6-12,18-');
+    t2('-12,18-', '5,20', '-4,6-12,18-19,21-');
+    t2('-12,18-', '-20,3-', '');
+    t2('-12,18-', '-', '');
+    t2('-', '200-205', '-199,206-');
+    t2('-', '-100,150-', '101-149');
+    t2('-', '-100,120,130,150-', '101-119,121-129,131-149');
+    t2('-', '-', '');
   });
 });
 
-describe('intersect', () => {
-  const t = makeT2(mr.intersect, mr.stringify, true);
+test('intersect', t => {
+  const t2 = makeT2(mr.intersect, mr.stringify, true);
 
-  test('positive', () => {
-    t('1-5', '8', '');
-    t('5-100', '1,10,50,70,80,90,100,101', '10,50,70,80,90,100');
-    t('5-100', '1-10,90-110', '5-10,90-100');
-    t('30-50,60-80,90-120', '45-65,75-90', '45-50,60-65,75-80,90');
-    t('10,12,14,16,18,20', '11,13,15,17,19,21', '');
-    t('10,12,14,16,18,20', '10,12,14,16,18,20', '10,12,14,16,18,20');
-    t('10-12,14-16,18-20', '11,13,15,17,19,21', '11,15,19');
-    t('10-12,14-16,18-20', '10-12,14-16,18-20', '10-12,14-16,18-20');
-    t('10-12,14-16,18-20', '20-22,24-26,28-30', '20');
-    t('', '', '');
+  t.test('positive', () => {
+    t2('1-5', '8', '');
+    t2('5-100', '1,10,50,70,80,90,100,101', '10,50,70,80,90,100');
+    t2('5-100', '1-10,90-110', '5-10,90-100');
+    t2('30-50,60-80,90-120', '45-65,75-90', '45-50,60-65,75-80,90');
+    t2('10,12,14,16,18,20', '11,13,15,17,19,21', '');
+    t2('10,12,14,16,18,20', '10,12,14,16,18,20', '10,12,14,16,18,20');
+    t2('10-12,14-16,18-20', '11,13,15,17,19,21', '11,15,19');
+    t2('10-12,14-16,18-20', '10-12,14-16,18-20', '10-12,14-16,18-20');
+    t2('10-12,14-16,18-20', '20-22,24-26,28-30', '20');
+    t2('', '', '');
   });
 
-  test('negative', () => {
-    t('0', '0', '0');
-    t('(-50)-50', '(-30)-30', '(-30)-30');
-    t('(-50)-50', '5-30', '5-30');
-    t('(-50)-50', '(-100)-(-20)', '(-50)-(-20)');
-    t('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '1-50', '');
-    t(
+  t.test('negative', () => {
+    t2('0', '0', '0');
+    t2('(-50)-50', '(-30)-30', '(-30)-30');
+    t2('(-50)-50', '5-30', '5-30');
+    t2('(-50)-50', '(-100)-(-20)', '(-50)-(-20)');
+    t2('(-20)-(-18),(-16)-(-14),(-12)-(-10)', '1-50', '');
+    t2(
       '(-20)-(-18),(-16)-(-14),(-12)-(-10)',
       '(-19)-(-12)',
       '(-19)-(-18),(-16)-(-14),(-12)'
     );
   });
 
-  test('unbounded', () => {
-    t('1-', '4-', '4-');
-    t('100-', '-300', '100-300');
-    t('-5', '-0', '-0');
-    t('-10,50,90-', '0-100', '0-10,50,90-100');
-    t('-40,70,80-', '-50,70,90-', '-40,70,90-');
-    t('-10', '80-', '');
-    t('-', '-', '-');
-    t('-', '-90', '-90');
-    t('-', '80-', '80-');
-    t('-', '40-45,(-20)', '(-20),40-45');
+  t.test('unbounded', () => {
+    t2('1-', '4-', '4-');
+    t2('100-', '-300', '100-300');
+    t2('-5', '-0', '-0');
+    t2('-10,50,90-', '0-100', '0-10,50,90-100');
+    t2('-40,70,80-', '-50,70,90-', '-40,70,90-');
+    t2('-10', '80-', '');
+    t2('-', '-', '-');
+    t2('-', '-90', '-90');
+    t2('-', '80-', '80-');
+    t2('-', '40-45,(-20)', '(-20),40-45');
   });
 });
 
@@ -278,52 +291,52 @@ test('monkey test', () => {
 
   const mirs = arrs.map(shuffle).map(mr.normalize);
   const res1 = mirs.reduce(mr.append, []);
-  expect(mr.stringify(res1)).toBe('(-100)-100');
+  assert.strictEqual(mr.stringify(res1), '(-100)-100');
 
   const res2 = mirs.reduce(mr.subtract, [[-Infinity, Infinity]]);
-  expect(mr.stringify(res2)).toBe('-(-101),101-');
+  assert.strictEqual(mr.stringify(res2), '-(-101),101-');
 
-  expect(mr.intersect(mirs[0], mirs[1]).length).toBe(0);
-  expect(mr.intersect(mirs[0], mirs[2]).length).toBe(0);
-  expect(mr.intersect(mirs[1], mirs[2]).length).toBe(0);
+  assert.strictEqual(mr.intersect(mirs[0], mirs[1]).length, 0);
+  assert.strictEqual(mr.intersect(mirs[0], mirs[2]).length, 0);
+  assert.strictEqual(mr.intersect(mirs[1], mirs[2]).length, 0);
 });
 
-describe('has', () => {
-  const t = makeT2(mr.has);
+test('has', t => {
+  const t2 = makeT2(mr.has);
 
-  test('bounded', () => {
-    t('5-20,25-100,150-300', '7', true);
-    t('5-20,25-100,150-300', '25', true);
-    t('5-20,25-100,150-300', '300', true);
-    t('5-20,25-100,150-300', '5-10', true);
-    t('5-20,25-100,150-300', '5-10,25', true);
-    t('5-20,25-100,150-300', '25-40,160', true);
-    t('5-20,25-100,150-300', '5-20,25-100,150-300', true);
-    t('5-20,25-100,150-300', '5,80,18-7,280,100,15-20,25,200-250', true);
-    t('5-20,25-100,150-300', '', true);
-    t('(-300)-(-200),(-50)-(-30),20-25', '(-40),(-250)-(-280)', true);
-    t('(-300)-(-200),(-50)-(-30),20-25', '(-200)-(-250),(-280)-(-220)', true);
-    t('5-20,25-100,150-300', '3', false);
-    t('5-20,25-100,150-300', '22', false);
-    t('5-20,25-100,150-300', '500', false);
-    t('5-20,25-100,150-300', '10-21', false);
-    t('5-20,25-100,150-300', '149-400', false);
-    t('5-20,25-100,150-300', '5-20,25-103,150-300', false);
-    t('5-20,25-100,150-300', '5,80,18-7,280,100,15-20,25,200-250,301', false);
-    t('(-300)-(-200),(-50)-(-30),20-25', '(-40),(-100)', false);
+  t.test('bounded', () => {
+    t2('5-20,25-100,150-300', '7', true);
+    t2('5-20,25-100,150-300', '25', true);
+    t2('5-20,25-100,150-300', '300', true);
+    t2('5-20,25-100,150-300', '5-10', true);
+    t2('5-20,25-100,150-300', '5-10,25', true);
+    t2('5-20,25-100,150-300', '25-40,160', true);
+    t2('5-20,25-100,150-300', '5-20,25-100,150-300', true);
+    t2('5-20,25-100,150-300', '5,80,18-7,280,100,15-20,25,200-250', true);
+    t2('5-20,25-100,150-300', '', true);
+    t2('(-300)-(-200),(-50)-(-30),20-25', '(-40),(-250)-(-280)', true);
+    t2('(-300)-(-200),(-50)-(-30),20-25', '(-200)-(-250),(-280)-(-220)', true);
+    t2('5-20,25-100,150-300', '3', false);
+    t2('5-20,25-100,150-300', '22', false);
+    t2('5-20,25-100,150-300', '500', false);
+    t2('5-20,25-100,150-300', '10-21', false);
+    t2('5-20,25-100,150-300', '149-400', false);
+    t2('5-20,25-100,150-300', '5-20,25-103,150-300', false);
+    t2('5-20,25-100,150-300', '5,80,18-7,280,100,15-20,25,200-250,301', false);
+    t2('(-300)-(-200),(-50)-(-30),20-25', '(-40),(-100)', false);
   });
 
-  test('unbounded', () => {
-    t('-', '5', true);
-    t('-20,40-', '70', true);
-    t('-20,40', '10', true);
-    t('-20,30-35,40-', '-10,30,31,50-', true);
-    t('-', '-', true);
-    t('-20,40-', '30', false);
-    t('-20,40-', '10-50', false);
-    t('-20,40-', '10-', false);
-    t('-20,40-', '-50', false);
-    t('-20,40-', '-', false);
+  t.test('unbounded', () => {
+    t2('-', '5', true);
+    t2('-20,40-', '70', true);
+    t2('-20,40', '10', true);
+    t2('-20,30-35,40-', '-10,30,31,50-', true);
+    t2('-', '-', true);
+    t2('-20,40-', '30', false);
+    t2('-20,40-', '10-50', false);
+    t2('-20,40-', '10-', false);
+    t2('-20,40-', '-50', false);
+    t2('-20,40-', '-', false);
   });
 });
 
@@ -351,7 +364,7 @@ test('equals', () => {
   t('2-8', '2-7', false);
   t('2-8,10-12,15-20', '2-8,10-12,15-20,23-25', false);
   const a = mr.parse('7-8,10');
-  expect(mr.equals(a, a)).toBe(true);
+  assert.strictEqual(mr.equals(a, a), true);
 });
 
 test('isUnbounded', () => {
@@ -383,10 +396,14 @@ test('at', () => {
     v: number | undefined | typeof RangeError
   ) =>
     v === RangeError
-      ? expect(() =>
-          mr.at(mr.parse(s, { parseUnbounded: true }), index)
-        ).toThrow(v)
-      : expect(mr.at(mr.parse(s, { parseUnbounded: true }), index)).toBe(v);
+      ? assert.throws(
+          () => mr.at(mr.parse(s, { parseUnbounded: true }), index),
+          v
+        )
+      : assert.strictEqual(
+          mr.at(mr.parse(s, { parseUnbounded: true }), index),
+          v
+        );
 
   t('2-4,8-10', 0, 2);
   t('2-4,8-10', 1, 3);
@@ -414,8 +431,8 @@ test('at', () => {
   const a = mr.parse('(-3)-0,5-6,9,12-14', { parseNegative: true });
   const vals = mr.flatten(a);
   for (let i = 0; i < vals.length; i++) {
-    expect(mr.at(a, i)).toBe(vals[i]);
-    expect(mr.at(a, i - vals.length)).toBe(vals[i]);
+    assert.strictEqual(mr.at(a, i), vals[i]);
+    assert.strictEqual(mr.at(a, i - vals.length), vals[i]);
   }
 });
 
@@ -424,7 +441,7 @@ test('tail', () => {
   t('1,5,10-15', '5,10-15');
   t('0,5,10-', '5,10-');
   t('', '');
-  expect(() => mr.tail(parseAll('-1,5,10'))).toThrow(RangeError);
+  assert.throws(() => mr.tail(parseAll('-1,5,10')), RangeError);
 });
 
 test('init', () => {
@@ -432,11 +449,11 @@ test('init', () => {
   t('1,5,10-15', '1,5,10-14');
   t('-0,5,10', '-0,5');
   t('', '');
-  expect(() => mr.init(parseAll('5,10-'))).toThrow(RangeError);
+  assert.throws(() => mr.init(parseAll('5,10-')), RangeError);
 });
 
 test('stringify', () => {
-  const t = (a: string) => expect(mr.stringify(parseAll(a))).toBe(a);
+  const t = (a: string) => assert.strictEqual(mr.stringify(parseAll(a)), a);
   t('15-20,30-70');
   t('0');
   t('(-8)-(-5)');
@@ -447,7 +464,7 @@ test('stringify', () => {
 
   const r = mr.parse('2-3,5,7-9');
   const t2 = (individualThreshold: number, expected: string) =>
-    expect(mr.stringify(r, { individualThreshold })).toBe(expected);
+    assert.strictEqual(mr.stringify(r, { individualThreshold }), expected);
   t2(0, '2-3,5-5,7-9');
   t2(1, '2-3,5,7-9');
   t2(2, '2,3,5,7-9');
@@ -457,27 +474,28 @@ test('stringify', () => {
 
 test('flatten', () => {
   const t = (a: string, expected: number[]) =>
-    expect(mr.flatten(parseAll(a))).toEqual(expected);
+    assert.deepEqual(mr.flatten(parseAll(a)), expected);
   t('', []);
   t('2', [2]);
   t('2-5', [2, 3, 4, 5]);
   t('2-3,8,10-12', [2, 3, 8, 10, 11, 12]);
   t('(-8)-(-6),0,2-3', [-8, -7, -6, 0, 2, 3]);
-  expect(() => mr.flatten([[-Infinity, -5]])).toThrow(RangeError);
-  expect(() => mr.flatten([[3, Infinity]])).toThrow(RangeError);
+  assert.throws(() => mr.flatten([[-Infinity, -5]]), RangeError);
+  assert.throws(() => mr.flatten([[3, Infinity]]), RangeError);
 });
 
 test('iterate', () => {
-  expect([...mr.iterate([[1, 3]])]).toEqual([1, 2, 3]);
-  expect([...mr.iterate([[1, 3]], { descending: true })]).toEqual([3, 2, 1]);
+  assert.deepEqual([...mr.iterate([[1, 3]])], [1, 2, 3]);
+  assert.deepEqual([...mr.iterate([[1, 3]], { descending: true })], [3, 2, 1]);
 
   const r = parseAll('(-8)-(-6),2,5-7');
-  expect(Array.from(mr.iterate(r))).toEqual([-8, -7, -6, 2, 5, 6, 7]);
-  expect(Array.from(mr.iterate(r, { descending: true }))).toEqual([
-    7, 6, 5, 2, -6, -7, -8
-  ]);
+  assert.deepEqual(Array.from(mr.iterate(r)), [-8, -7, -6, 2, 5, 6, 7]);
+  assert.deepEqual(
+    Array.from(mr.iterate(r, { descending: true })),
+    [7, 6, 5, 2, -6, -7, -8]
+  );
 
-  expect([...mr.iterate([])]).toEqual([]);
-  expect([...mr.iterate([], { descending: true })]).toEqual([]);
-  expect(() => mr.iterate(parseAll('3-'))).toThrow(RangeError);
+  assert.deepEqual([...mr.iterate([])], []);
+  assert.deepEqual([...mr.iterate([], { descending: true })], []);
+  assert.throws(() => mr.iterate(parseAll('3-')), RangeError);
 });
