@@ -38,5 +38,11 @@
     "arrowParens": "avoid",
     "trailingComma": "none"
   },
+  "c8": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
+  },
   "runkitExampleFilename": "example.js"
 }
