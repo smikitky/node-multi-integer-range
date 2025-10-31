@@ -3,8 +3,8 @@ import test from 'node:test';
 import * as mr from './fp.js';
 import type { MIR, Range } from './fp.js';
 
-test('parse', t => {
-  t.test('no option', () => {
+test('parse', async t => {
+  await t.test('no option', () => {
     assert.deepEqual(mr.parse(''), []);
     assert.deepEqual(mr.parse('0'), [[0, 0]]);
     assert.deepEqual(mr.parse('1-3,5,7-10'), [
@@ -16,7 +16,7 @@ test('parse', t => {
     assert.throws(() => mr.parse('(-10)'), SyntaxError);
   });
 
-  t.test('parse negative', () => {
+  await t.test('parse negative', () => {
     assert.deepEqual(mr.parse('(-5)', { parseNegative: true }), [[-5, -5]]);
     assert.deepEqual(
       mr.parse('(-10)-(-7),(-5),(-3)-(-1)', { parseNegative: true }),
@@ -28,7 +28,7 @@ test('parse', t => {
     );
   });
 
-  t.test('parse unbounded', () => {
+  await t.test('parse unbounded', () => {
     assert.deepEqual(mr.parse('10-', { parseUnbounded: true }), [
       [10, Infinity]
     ]);
@@ -41,7 +41,7 @@ test('parse', t => {
     ]);
   });
 
-  t.test('strip spaces', () => {
+  await t.test('strip spaces', () => {
     assert.deepEqual(mr.parse('1 -3,  5,\t7-10\n'), [
       [1, 3],
       [5, 5],
@@ -49,7 +49,7 @@ test('parse', t => {
     ]);
   });
 
-  t.test('normalize', () => {
+  await t.test('normalize', () => {
     assert.deepEqual(mr.parse('1,8,2-4,7,5-6,10-9'), [[1, 10]]);
     assert.deepEqual(mr.parse('10-8,7-5,1-4'), [[1, 10]]);
     assert.deepEqual(parseAll('8-10,(-5),100-, 0,7,(-1)-(-4),1-6'), [
@@ -58,7 +58,7 @@ test('parse', t => {
     ]);
   });
 
-  t.test('throw SyntaxError for invalid input', () => {
+  await t.test('throw SyntaxError for invalid input', () => {
     assert.throws(() => mr.parse('abc'), SyntaxError);
     assert.throws(() => mr.parse('1.5'), SyntaxError);
     assert.throws(() => mr.parse('2-5,8-10,*,99'), SyntaxError);
@@ -69,7 +69,7 @@ test('parse', t => {
     assert.doesNotThrow(() => mr.parse(''));
   });
 
-  t.test('throw RangeError for huge integer strings', () => {
+  await t.test('throw RangeError for huge integer strings', () => {
     assert.throws(() => mr.parse('1-900719925474099100'), RangeError);
     assert.throws(() => parseAll('(-900719925474099100)'), RangeError);
   });
@@ -139,10 +139,10 @@ const makeT2 =
     }
   };
 
-test('append', t => {
+test('append', async t => {
   const t2 = makeT2(mr.append, mr.stringify, true);
 
-  t.test('positive', () => {
+  await t.test('positive', () => {
     t2('5-10', '5', '5-10');
     t2('5-10', '8', '5-10');
     t2('5-10', '10', '5-10');
@@ -160,12 +160,12 @@ test('append', t => {
     t2('1,8,10', '2-3,4-5,6,7,9', '1-10');
   });
 
-  t.test('negative', () => {
+  await t.test('negative', () => {
     t2('(-5)-(-3)', '(-6),(-2),4,5', '(-6)-(-2),4-5');
     t2('(-5)-(-3)', '3', '(-5)-(-3),3');
   });
 
-  t.test('unbounded', () => {
+  await t.test('unbounded', () => {
     t2('5-', '10', '5-');
     t2('5-', '4', '4-');
     t2('5-', '3', '3,5-');
@@ -188,10 +188,10 @@ test('append', t => {
   });
 });
 
-test('subtract', t => {
+test('subtract', async t => {
   const t2 = makeT2(mr.subtract, mr.stringify);
 
-  t.test('positive', () => {
+  await t.test('positive', () => {
     t2('1-10', '100', '1-10');
     t2('1-10', '0', '1-10');
     t2('1-10', '11', '1-10');
@@ -204,7 +204,7 @@ test('subtract', t => {
     t2('1-100', '1,3,5,7,9', '2,4,6,8,10-100');
   });
 
-  t.test('negative', () => {
+  await t.test('negative', () => {
     t2('(-10)-(-3)', '5', '(-10)-(-3)');
     t2('(-10)-(-3)', '(-10)', '(-9)-(-3)');
     t2('(-10)-(-3)', '(-3)', '(-10)-(-4)');
@@ -216,7 +216,7 @@ test('subtract', t => {
     );
   });
 
-  t.test('unbounded', () => {
+  await t.test('unbounded', () => {
     t2('10-20', '15-', '10-14');
     t2('10-20', '-15', '16-20');
     t2('10-20', '-12,18-', '13-17');
@@ -231,10 +231,10 @@ test('subtract', t => {
   });
 });
 
-test('intersect', t => {
+test('intersect', async t => {
   const t2 = makeT2(mr.intersect, mr.stringify, true);
 
-  t.test('positive', () => {
+  await t.test('positive', () => {
     t2('1-5', '8', '');
     t2('5-100', '1,10,50,70,80,90,100,101', '10,50,70,80,90,100');
     t2('5-100', '1-10,90-110', '5-10,90-100');
@@ -247,7 +247,7 @@ test('intersect', t => {
     t2('', '', '');
   });
 
-  t.test('negative', () => {
+  await t.test('negative', () => {
     t2('0', '0', '0');
     t2('(-50)-50', '(-30)-30', '(-30)-30');
     t2('(-50)-50', '5-30', '5-30');
@@ -260,7 +260,7 @@ test('intersect', t => {
     );
   });
 
-  t.test('unbounded', () => {
+  await t.test('unbounded', () => {
     t2('1-', '4-', '4-');
     t2('100-', '-300', '100-300');
     t2('-5', '-0', '-0');
@@ -301,10 +301,10 @@ test('monkey test', () => {
   assert.strictEqual(mr.intersect(mirs[1], mirs[2]).length, 0);
 });
 
-test('has', t => {
+test('has', async t => {
   const t2 = makeT2(mr.has);
 
-  t.test('bounded', () => {
+  await t.test('bounded', () => {
     t2('5-20,25-100,150-300', '7', true);
     t2('5-20,25-100,150-300', '25', true);
     t2('5-20,25-100,150-300', '300', true);
@@ -326,7 +326,7 @@ test('has', t => {
     t2('(-300)-(-200),(-50)-(-30),20-25', '(-40),(-100)', false);
   });
 
-  t.test('unbounded', () => {
+  await t.test('unbounded', () => {
     t2('-', '5', true);
     t2('-20,40-', '70', true);
     t2('-20,40', '10', true);

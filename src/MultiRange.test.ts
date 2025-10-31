@@ -10,8 +10,8 @@ const t = (mr: MultiRange, expected: any) => {
   assert.strictEqual(mr.toString(), expected);
 };
 
-test('constructor', tc => {
-  tc.test('initialize with various types of initializer', () => {
+test('constructor', async tc => {
+  await tc.test('initialize with various types of initializer', () => {
     t(mr('10-8,7-5,1-4'), '1-10');
     t(mr(-8), '(-8)');
     t(mr([]), '');
@@ -24,7 +24,7 @@ test('constructor', tc => {
     assert.throws(() => mr('1-900719925474099100'), RangeError);
   });
 
-  tc.test('respect options', () => {
+  await tc.test('respect options', () => {
     assert.throws(() => multirange('(-5)-(-1)'), SyntaxError);
     assert.throws(
       () => multirange('(-5)-', { parseUnbounded: true }),
@@ -37,7 +37,7 @@ test('constructor', tc => {
     );
   });
 
-  tc.test('copy constructor copies options', () => {
+  await tc.test('copy constructor copies options', () => {
     const o1 = multirange('5-10', {
       parseNegative: true,
       parseUnbounded: true
