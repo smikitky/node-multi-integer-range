@@ -1,8 +1,7 @@
 package-lock.json
 /coverage
 /src
-tsconfig*.json
-jest.config.cjs
 /scripts
+tsconfig*.json
 *.tgz
 .github
