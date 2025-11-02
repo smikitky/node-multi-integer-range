@@ -21,15 +21,11 @@ The range data are always _sorted and normalized_ to the smallest possible repre
 
 ---
 
-🚨 **Note**: The following README is for the 5.x release, whose API has changed drastically. For the docs of the 4.x release, see [this](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+🚨 **Note**: The following README is for the 6.x/5.x releases, whose API has changed drastically. For the docs of the 4.x release, see [this](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 ## Install
 
-Install via npm or yarn:
-
-```
-npm install multi-integer-range
-```
+Install using any package manager or ESM-ready CDN.
 
 Version 6 is a fully tree-shakable, ESM-only package. This package has no external dependencies nor does it use any Node-specific API.
 
@@ -198,7 +194,7 @@ npm ci
 npm test
 ```
 
-To generate CJS and ESM builds:
+To build:
 
 ```
 npm ci

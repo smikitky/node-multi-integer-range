@@ -2,7 +2,13 @@
 
 ## v6.0.0 (2025-11-02)
 
+**❗️ Breaking Changes**
+
 - Dropped support for CJS modules. This package is now ESM-only.
+- Changed the internal directory structure under `lib`. If you are importing from a specific file, you need to change the path.
+
+**Other Changes**
+
 - Migrated the test framework from Jest to Node's Test Runner.
 - Set the tests to run only on Node 20, 22, and 24. However, this package is expected to function in any JS environment as long as ESM is supported; if it does not, please file an issue.
 
