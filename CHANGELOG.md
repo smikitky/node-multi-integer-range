@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.0.0
+
+- Dropped support for CJS modules. This package is now ESM-only.
+- Migrated the test framework from Jest to Node's Test Runner.
+- Set the tests to run only on Node 20, 22, and 24. However, this package is expected to function in any JS environment as long as ESM is supported; if it does not, please file an issue.
+
 ## v5.2.0
 
 - Added `individualThreshold` option to `stringify()`.
@@ -27,7 +33,6 @@ The API has changed radically in version 5. The new API is slightly more verbose
 - Dropped support for IE and old Node.
 - Migrated to pure function-style API and added an ESM build. This package is now fully tree-shakable.
 - In addition to the change from methods to simple functions, some functions have also been renamed or removed.
-
   - (constructor): Use `parse()` or `normalize()`.
   - `toArray`: Renamed to `flatten()`.
   - `toString`: Renamed to `stringify()`.
@@ -114,7 +119,6 @@ The API has changed radically in version 5. The new API is slightly more verbose
 **❗️ Breaking Changes**
 
 - Removed the following methods which had been deprecated since v2.0.0.
-
   - `isContinuous()` (Gone for good. Use `segmentLength() === 1` instead)
   - `hasRange()` \*
   - `appendRange()` \*

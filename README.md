@@ -31,7 +31,7 @@ Install via npm or yarn:
 npm install multi-integer-range
 ```
 
-Version 5 is a hybrid package; it provides both a CommonJS version and an ES Module version, built from the same TypeScript source. Bundlers such as Webpack can automatically pick the ESM version and perform tree-shaking. This package has no external dependencies nor does it use any Node-specific API.
+Version 6 is a fully tree-shakable, ESM-only package. This package has no external dependencies nor does it use any Node-specific API.
 
 🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. For example, if you don't use the default parser, your bundle will not include it. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
