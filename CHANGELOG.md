@@ -1,6 +1,6 @@
 # Changelog
 
-## v6.0.0
+## v6.0.0 (2025-11-02)
 
 - Dropped support for CJS modules. This package is now ESM-only.
 - Migrated the test framework from Jest to Node's Test Runner.
