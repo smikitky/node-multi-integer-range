@@ -21,15 +21,11 @@ The range data are always _sorted and normalized_ to the smallest possible repre
 
 ---
 
-🚨 **Note**: The following README is for the 6.x/5.x releases, whose API has changed drastically. For the docs of the 4.x release, see [this](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+🚨 **Note**: The following README is for the 6.x/5.x releases, whose API has changed drastically. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
 
 ## Install
 
-Install using any package manager or ESM-ready CDN.
-
-Version 6 is a fully tree-shakable, ESM-only package. This package has no external dependencies nor does it use any Node-specific API.
-
-🚨 The API style has changed drastically in version 5. The new API is slightly more verbose, but is simpler and tree-shakable 🌲. For example, if you don't use the default parser, your bundle will not include it. See the [CHANGELOG](./CHANGELOG.md) and the [docs for version 4](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9).
+You can use any package manager (NPM, pnpm, Yarn) or ESM-ready CDN. Version 6 is a fully tree-shakable, ESM-only package. This package has no external dependencies nor does it use any Node-specific API.
 
 ## Basic Example
 
@@ -52,7 +48,7 @@ const array = mr.flatten(diff); // [1, 2, 3, 4, 5, 6, 11, 12]
 const len = mr.length(ranges1); // 10
 ```
 
-## Creating a normalized MultiIntegerRange
+## Creating a Normalized MultiIntegerRange
 
 The fundamental data structure of this package is a **normalized** array of `[min, max]` tuples, as shown below. Here, 'normalized' means the range data is in the smallest possible representation and is sorted in ascending order. You can denote an unbounded (aka infinite) range using the JavaScript constant `Infinity`.
 
@@ -67,7 +63,7 @@ type MultiIntegerRange = readonly Range[];
 [[-Infinity, Infinity]] // all integers
 [] // empty
 
-// These are NOT normalized. Don't pass them to append() and such!
+// These are NOT normalized. Don't pass them to append() and others!
 [[3, 1]] // min is larger than max
 [[7, 9], [1, 4]] // not in the ascending order
 [[1, 5], [3, 7]] // there is an overlap of ranges
@@ -75,7 +71,7 @@ type MultiIntegerRange = readonly Range[];
 [[Infinity, Infinity]] // makes no sense
 ```
 
-Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()` or `initialize()`. You can write a normalized `MultiIntgerRange` by hand as shown above, too.
+Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()`, or `initialize()`. You can also write a normalized `MultiIntegerRange` by hand as shown above.
 
 `normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This and `initialize` are the only functions that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
 
@@ -88,7 +84,7 @@ console.log(mr.normalize([7, 7, 10, 7, 7])); // [[7, 7], [10, 10]]
 console.log(mr.normalize()); // []
 
 // Do not directly pass an unnormalized array
-// to functions other than normalize().
+// to functions other than normalize()/initialize().
 const unsorted = [[3, 1], [2, 8]];
 const wrong = mr.length(unsorted); // This won't work!
 const correct = mr.length(mr.normalize(unsorted)); // 8
@@ -101,7 +97,7 @@ console.log(mr.parse('1-3,10')); // [[1, 3], [10, 10]]
 console.log(mr.parse('3,\t8-3,2,3,\n10, 9 - 7 ')); // [[2, 10]]
 ```
 
-By default, the string parser does not try to parse unbounded ranges or negative integers. You need to pass an `options` object to modify the parsing behavior. To avoid ambiguity, all negative integers must always be enclosed in parentheses. If you don't like the default `parse()`, you can always create and use your custom parsing function instead, as long as it returns a normalized `MultiIntegerRange`.
+By default, the string parser does not try to parse unbounded ranges or negative integers. You need to pass an `options` object to modify the parsing behavior. To avoid ambiguity, all negative integers must always be enclosed in parentheses. If you don't like the default `parse()` behavior, you can always create and use your custom parsing function instead, as long as it returns a normalized `MultiIntegerRange`.
 
 ```ts
 console.log(mr.parse('7-')); // throws a SyntaxError
@@ -144,7 +140,7 @@ const arr2 = Array.from(mr.iterate(ranges)); //=> [2, 5, 6, 7]
 
 ### Combine Intersection and Unbounded Ranges
 
-Intersection is especially useful to "trim" unbounded ranges.
+Intersection is especially useful for "trimming" unbounded ranges.
 
 ```ts
 const userInput = '-5,15-';
@@ -156,15 +152,15 @@ const pagesToPrint = mr.intersect(
 for (const page of mr.iterate(pagesToPrint)) await printPage(page);
 ```
 
-## Legacy Classe-based API
+## Legacy Class-based API
 
-For compatibility purposes, version 5 exports the `MultiRange` class and `multirange` function, which is mostly compatible with the 4.x API but has been rewritten to use the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for the usage. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance merit. Use this only during migration. These may be removed in the future.
+For compatibility purposes, version 5 exports the `MultiRange` class and `multirange` function, which are mostly compatible with the 4.x API but have been rewritten to use the new functional API under the hood. See the [4.x documentation](https://github.com/smikitky/node-multi-integer-range/tree/v4.0.9) for usage details. The use of this compatibility layer is discouraged because it is not tree-shakable and has no performance benefits. Use this only during migration. These may be removed in the future.
 
 ## Caveats
 
-**Performance Considerations**: This library works efficiently for large ranges as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmented set of integers that are scarcely continuous (e.g., random 10000 integers between 1 to 1000000).
+**Performance Considerations**: This library works efficiently for large ranges as long as they're _mostly_ continuous (e.g., `1-10240000,20480000-50960000`). However, this library is not intended to be efficient with a heavily fragmented set of integers that are scarcely continuous (e.g., 10,000 random integers between 1 and 1,000,000).
 
-**No Integer Type Checks**: Make sure you are not passing floating-point `number`s to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check if a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
+**No Integer Type Checks**: Make sure you are not passing floating-point `number`s to this library. For example, don't do `normalize(3.14)`. For performance reasons, the library does not check whether a passed number is an integer. Passing a float will result in unexpected and unrecoverable behavior.
 
 ## Comparison with Similar Libraries
 
