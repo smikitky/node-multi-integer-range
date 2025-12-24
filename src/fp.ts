@@ -345,8 +345,8 @@ export const has = (a: MIR, b: MIR): boolean => {
 /**
  * Calculates how many integers are included in the given MultiIntegerRange.
  *
- * Note: If you want to know the number of Ranges (segments), just use the
- * standard `Array#length`.
+ * Note: If you want to know the number of Ranges (segments), use
+ * [`segmentLength()`](#function-segmentlength).
  * @param data - The value to calculate the length on.
  * @returns The number of integers contained in `data`. May be `Infinity`.
  * @example
@@ -358,6 +358,16 @@ export const length = (data: MIR): number => {
   let result = 0;
   for (const r of data) result += r[1] - r[0] + 1;
   return result;
+};
+
+/**
+ * Returns the number of range segments.
+ * For example, the segment length of `2-5,7,9-11` is 3.
+ * @param data - The value to calculate the segment length on.
+ * @returns The number of segments. Returns 0 for an empty value.
+ */
+export const segmentLength = (data: MIR): number => {
+  return data.length;
 };
 
 /**

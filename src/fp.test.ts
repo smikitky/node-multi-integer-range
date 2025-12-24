@@ -352,6 +352,14 @@ test('length', () => {
   t('-', Infinity);
 });
 
+test('segmentLength', () => {
+  const t = makeT1(mr.segmentLength);
+  t('', 0);
+  t('1,3,10-15,20-21', 4);
+  t('-3,8-', 2);
+  t('-', 1);
+});
+
 test('equals', () => {
   const t = makeT2(mr.equals, b => b, true);
   t('', '', true);

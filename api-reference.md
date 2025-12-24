@@ -15,6 +15,7 @@
 - [`intersect()`](#function-intersect)
 - [`has()`](#function-has)
 - [`length()`](#function-length)
+- [`segmentLength()`](#function-segmentlength)
 - [`isUnbounded()`](#function-isunbounded)
 - [`equals()`](#function-equals)
 - [`min()`](#function-min)
@@ -249,14 +250,37 @@ length(data: MultiIntegerRange): number
 
 Calculates how many integers are included in the given MultiIntegerRange.
 
-Note: If you want to know the number of Ranges (segments), just use the
-standard `Array#length`.
+Note: If you want to know the number of ranges (segments), use
+[`segmentLength()`](#function-segmentlength).
 
 ### Example
 
 ```ts
 length([[1, 3], [8, 10]]); // 6
 length([[1, Infinity]]); // Infinity
+```
+
+---
+
+## function: `segmentLength`
+
+```ts
+segmentLength(data: MultiIntegerRange): number
+```
+
+| Param | Description |
+|-|-|
+| `data` | The value to calculate the segment length on. |
+| Returns | The number of segments in `data`. |
+
+Returns how many range segments the given value contains.
+
+### Example
+
+```ts
+segmentLength([[2, 5], [7, 7], [9, 11]]); // 3
+segmentLength([]); // 0
+segmentLength([[1, Infinity]]); // 1
 ```
 
 ---
