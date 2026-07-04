@@ -1,5 +1,12 @@
 # Changelog
 
+## v6.1.0 (2026-07-05)
+
+- Widened the TypeScript signature of `normalize`. The runtime behavior is unchanged. Now `normalize` officially supports `new Set([2, 1, 3])`, etc., as an argument.
+  - Before: `normalize(data?: (number | Range)[] | number): MultiIntegerRange`
+  - After: `normalize(data?: Iterable<number | Range> | number): MultiIntegerRange`
+- Set up tests for Node 26.
+
 ## v6.0.0 (2025-11-02)
 
 **❗️ Breaking Changes**
