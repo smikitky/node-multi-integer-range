@@ -85,12 +85,12 @@ parse(' 10-, 7', { parseUnbounded: true }); // [[7, 7], [10, Infinity]]
 ## function: `normalize`
 
 ```ts
-normalize(data?: (number | Range)[] | number): MultiIntegerRange
+normalize(data?: Iterable<number | Range> | number): MultiIntegerRange
 ```
 
 | Param | Description |
 |-|-|
-| `data` | A number or an unsorted array, e.g., `[[7, 5], 1]`. |
+| `data` | A number or an unsorted array (iterable), e.g., `[[7, 5], 1]`. |
 | Returns | Normalized array, e.g., `[[1, 1], [5, 7]]`. |
 
 Takes a number or an unsorted array of ranges,
@@ -99,7 +99,7 @@ and returns a new normalized MultiIntegerRange.
 Here, "normalized" means the range data is in the smallest possible
 representation and is sorted in ascending order.
 
-This is the only function that can take an unsorted array of Range's.
+This is the only function that can take unsorted range data.
 Unsorted range data MUST be normalized before being passed to
 other functions such as [`append()`](#function-append) and [`length()`](#function-length).
 

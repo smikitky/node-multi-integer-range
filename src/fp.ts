@@ -91,11 +91,11 @@ export const parse = (data: string, options?: Options): MIR => {
  * Here, "normalized" means the range data is in the smallest possible
  * representation and is sorted in ascending order.
  *
- * This is the only function that can take an unsorted array of Range's.
+ * This is the only function that can take unsorted range data.
  * Unsorted range data MUST be normalized before being passed to
  * other functions such as `append()` and `length()`.
  *
- * @param data - A number or an unsorted array, e.g., `[[7, 5], 1]`.
+ * @param data - A number or an unsorted array (iterable), e.g., `[[7, 5], 1]`.
  * @returns Normalized array, e.g., `[[1, 1], [5, 7]]`.
  * @example
  * normalize(5); // [[5, 5]]
@@ -104,7 +104,7 @@ export const parse = (data: string, options?: Options): MIR => {
  * normalize([2, 3, 1, 5, 4, 0, 1, 3]); // [[0, 5]]
  * normalize([[Infinity, 1]]); // [[1, Infinity]]
  */
-export const normalize = (data?: (number | Range)[] | number): MIR => {
+export const normalize = (data?: Iterable<number | Range> | number): MIR => {
   const result: Range[] = [];
   if (data === undefined) return result;
   if (typeof data === 'number') return normalize([data]);

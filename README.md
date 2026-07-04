@@ -73,7 +73,7 @@ type MultiIntegerRange = readonly Range[];
 
 Most functions take one or two **normalized** `MultiIntegerRange`s as shown above to work correctly. To produce a valid normalized `MultiIntegerRange`, you can use `normalize()`, `parse()`, or `initialize()`. You can also write a normalized `MultiIntegerRange` by hand as shown above.
 
-`normalize(data?: number | (number | Range)[])` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array of integers/`Range`s. This and `initialize` are the only functions that can safely take an unsorted array. Do not pass unnormalized range data to other functions.
+`normalize(data?: number | Iterable<number | Range>)` creates a normalized `MultiIntegerRange` from a single integer or an unsorted array/iterable of integers/`Range`s. This and `initialize` are the only functions that can safely take unsorted range data. Do not pass unnormalized range data to other functions.
 
 <!-- prettier-ignore -->
 ```ts
@@ -81,6 +81,7 @@ console.log(mr.normalize(10)); // [[10, 10]]
 console.log(mr.normalize([3, 1, 2, 4, 5])); // [[1, 5]]
 console.log(mr.normalize([5, [2, 0], 6, 4])); // [[0, 2], [4, 6]]
 console.log(mr.normalize([7, 7, 10, 7, 7])); // [[7, 7], [10, 10]]
+console.log(mr.normalize(new Set([3, 1, 2, 4, 5]))); // [[1, 5]]
 console.log(mr.normalize()); // []
 
 // Do not directly pass an unnormalized array

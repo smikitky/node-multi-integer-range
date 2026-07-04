@@ -75,7 +75,13 @@ test('parse', async t => {
   });
 });
 
-// prettier-ignore
+function* generateRangeData(): Iterable<number | Range> {
+  yield 8;
+  yield [3, 1];
+  yield 4;
+  yield [9, 9];
+}
+
 test('normalize', () => {
   const t = (a: Parameters<typeof mr.normalize>[0], expected: Range[]) =>
     assert.deepEqual(mr.normalize(a), expected);
@@ -84,6 +90,8 @@ test('normalize', () => {
   t([3, 1, [5, 7], [0, -3]], [[-3, 1], [3, 3], [5, 7]]);
   t(5, [[5, 5]]);
   t([[1, Infinity], [-Infinity, 0]], [[-Infinity, Infinity]]);
+  t(new Set<number | Range>([3, [1, 2]]), [[1, 3]]);
+  t(generateRangeData(), [[1, 4], [8, 9]]);
   t([], []);
   t(undefined, []);
   // @ts-expect-error
