@@ -8,6 +8,7 @@
     "newLine": "LF",
     "strict": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "declaration": true
   },
   "include": ["src/**/*"]
